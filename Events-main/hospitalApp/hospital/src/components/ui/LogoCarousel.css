@@ -1,0 +1,204 @@
+.logo-carousel-section {
+    width: 100%;
+    padding: 0;
+    background-color: white;
+    padding-bottom: 2.5rem
+}
+
+.logo-carousel-container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+
+.logo-carousel-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow-x: scroll;
+    /* Use instant jumps to avoid stutter when we snap back for infinite scroll */
+    scroll-behavior: auto;
+    user-select: none;
+    white-space: nowrap;
+    position: relative;
+}
+
+.logo-row {
+    display: flex;
+    width: 100%;
+    gap: 10px;
+}
+
+.logo-row:first-child {
+    margin-left: 0;
+    margin-bottom: 10px;
+}
+
+.logo-row:last-child {
+    margin-left: 7.142%;
+    /* Half of 14.285% to center the second row between first row logos */
+}
+
+
+
+.logo-carousel-item {
+    flex: 0 0 14.285%;
+    /* 100% / 7 = 14.285% for 7 logos per page */
+    min-width: 14.285%;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Card layout inside each item */
+.logo-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 56px;
+    border: 1px solid #e6e6e6;
+    border-radius: 8px;
+    padding: 0px 6px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.logo-card-image {
+    flex: 0 0 30%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-card-image img {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 56px;
+    object-fit: contain;
+}
+
+.logo-card-text {
+    flex: 1 1 80%;
+    font-size: 14px;
+    font-weight: 600;
+    color: #222;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Hide scrollbar but keep functionality */
+.logo-carousel-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.logo-carousel-wrapper {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .logo-carousel-wrapper {
+        width: 100%;
+        overflow-x: scroll;
+        scroll-behavior: auto;
+    }
+
+    .logo-row {
+        display: flex;
+        width: max-content;
+        gap: 10px;
+    }
+
+    .logo-row:first-child {
+        margin-left: 0;
+    }
+
+    .logo-row:last-child {
+        margin-left: 60px;
+        /* Half of 120px to center the second row between first row logos */
+    }
+
+    .logo-carousel-item {
+        flex: 0 0 120px;
+        min-width: 120px;
+        height: 60px;
+    }
+
+    .logo-card {
+        height: 60px;
+        gap: 8px;
+        padding: 6px 8px;
+    }
+
+    .logo-card-image img {
+        max-height: 54px;
+    }
+
+    .logo-card-text {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-carousel-wrapper {
+        width: 100%;
+        overflow-x: scroll;
+        scroll-behavior: auto;
+    }
+
+    .logo-row {
+        display: flex;
+        width: max-content;
+        gap: 5px;
+        margin-bottom: 0;
+    }
+
+    .logo-row:first-child {
+        margin-left: 0;
+    }
+
+    .logo-row:last-child {
+        margin-left: 50px;
+        /* Half of 100px to center the second row between first row logos */
+    }
+
+    .logo-carousel-item {
+        flex: 0 0 100px;
+        min-width: 100px;
+        height: 80px;
+    }
+
+    .logo-card {
+        height: 70px;
+        gap: 6px;
+        padding: 6px 8px;
+    }
+
+    .logo-card-image img {
+        max-height: 56px;
+    }
+
+    .logo-card-text {
+        font-size: 12px;
+    }
+}
+
+/* 1920x1080 Resolution */
+@media (min-width: 1920px) {
+    .logo-card-text {
+        flex: 1 1 80%;
+        font-size: 27px;
+        font-weight: 600;
+        color: #222;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}

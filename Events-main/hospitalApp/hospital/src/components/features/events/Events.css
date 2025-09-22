@@ -1,0 +1,2000 @@
+/* Events Page Styles */
+.events-page {
+    width: 100vw;
+    background: white;
+    position: relative;
+}
+
+/* Events Header Text - Using margins for positioning */
+.events-header-text {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+}
+
+.events-header-first {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.events-header-second {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    padding: 0rem 2rem;
+    border-radius: 8px;
+    background: linear-gradient(#1243AC 97.59%);
+    position: relative;
+    overflow: hidden;
+    transform: skewX(-15deg);
+    transform-origin: center;
+}
+
+.events-header-second span {
+    display: inline-block;
+    transform: skewX(15deg);
+    transform-origin: center;
+}
+
+.events-header-second::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg,
+            rgba(255, 255, 255, 0.25) 0%,
+            rgba(255, 255, 255, 0.15) 20%,
+            rgba(255, 255, 255, 0.05) 50%,
+            transparent 80%);
+    pointer-events: none;
+    border-radius: 4px;
+}
+
+.events-header-second::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(225deg,
+            transparent 0%,
+            rgba(0, 0, 0, 0.1) 50%,
+            rgba(0, 0, 0, 0.2) 100%);
+    pointer-events: none;
+    border-radius: 4px;
+}
+
+/* Events Content Container - No margin-top needed now */
+.events-content-container {
+    display: flex;
+    width: 100%;
+    padding: 2rem;
+    margin-top: 2rem;
+    gap: 3rem;
+}
+
+/* Events Left Section */
+.events-left-section {
+    flex: 0 0 35%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 2rem;
+    margin-left: 4rem;
+    gap: 2rem;
+}
+
+/* Search Container */
+.search-container {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 40px 12px 0;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    outline: none;
+    font-size: 16px;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    border-bottom-color: #1243AC;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(18, 67, 172, 0.1);
+}
+
+.search-input::placeholder {
+    color: #999;
+}
+
+.search-icon {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    user-select: none;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.search-icon:hover {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.search-input:focus+.search-icon {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.05);
+}
+
+/* Calendar Container */
+.calendar-container {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 300px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+/* Calendar container enlargement animation when refresh button appears */
+.calendar-container.has-refresh-button {
+    animation: calendarEnlarge 0.4s ease-out;
+}
+
+@keyframes calendarEnlarge {
+    from {
+        transform: scale(1);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    to {
+        transform: scale(1.02);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+}
+
+/* Smooth transition when refresh button disappears */
+.calendar-container:not(.has-refresh-button) {
+    transform: scale(1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.calendar-month-year {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.calendar-navigation {
+    display: flex;
+    gap: 12px;
+}
+
+.nav-arrow {
+    color: #999;
+    font-size: 16px;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.3s ease;
+}
+
+.nav-arrow:hover {
+    color: #1243AC;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    padding: 2px 4px;
+    transition: all 0.2s ease;
+}
+
+.nav-arrow:active {
+    background-color: #e0e0e0;
+    transform: scale(0.95);
+}
+
+.calendar-refresh-section {
+    margin-top: 1rem;
+    text-align: center;
+    animation: refreshButtonSlideIn 0.4s ease-out;
+}
+
+@keyframes refreshButtonSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.calendar-refresh-text {
+    background: transparent;
+    color: #1243AC;
+    border: 1px solid #1243AC;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    animation: refreshButtonPulse 0.6s ease-out;
+}
+
+@keyframes refreshButtonPulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.calendar-refresh-text:hover {
+    background: #1243AC;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(18, 67, 172, 0.3);
+}
+
+.calendar-refresh-text:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(18, 67, 172, 0.3);
+}
+
+.calendar-days-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.calendar-days-header span {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: #666;
+    padding: 6px 0;
+}
+
+.calendar-days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-day {
+    text-align: center;
+    padding: 6px 2px;
+    font-size: 12px;
+    color: #333;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+    user-select: none;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    min-height: 28px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.calendar-day:hover:not(.empty) {
+    background-color: #f0f0f0;
+}
+
+.calendar-day.today {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: 600;
+}
+
+.calendar-day.selected {
+    background-color: #1243AC;
+    color: white;
+    font-weight: 600;
+}
+
+.calendar-day.selected:hover {
+    background-color: #0f3a9a;
+}
+
+.calendar-day.has-events {
+    position: relative;
+    font-weight: 600;
+}
+
+.calendar-day.has-events:not(.selected):not(.today) {
+    background-color: #e3f2fd;
+    color: #1243AC;
+}
+
+.calendar-day.has-events:hover:not(.selected):not(.today) {
+    background-color: #bbdefb;
+}
+
+.event-indicator {
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background-color: #4CAF50;
+    border-radius: 50%;
+}
+
+.calendar-day.selected .event-indicator {
+    background-color: white;
+}
+
+.calendar-day.today .event-indicator {
+    background-color: white;
+}
+
+.calendar-day.empty {
+    cursor: default;
+}
+
+.calendar-day.disabled {
+    color: #ccc;
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.calendar-day.disabled:hover {
+    background-color: #f8f9fa;
+    transform: none;
+}
+
+/* Events Right Section */
+.events-right-section {
+    flex: 0 0 65%;
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+}
+
+/* Filter Results Info */
+.filter-results-info {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.filter-results-info p {
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Events Header Content - Positioned like About page content */
+.events-header-content {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    z-index: 10;
+    margin-bottom: 2rem;
+}
+
+.events-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.events-subtitle {
+    font-size: 1.2rem;
+    margin: 0;
+    opacity: 0.9;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    line-height: 1.6;
+}
+
+/* Events Main Content */
+.events-main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 2rem;
+    min-height: 300px;
+}
+
+/* Events Grid */
+.events-grid {
+    display: grid;
+    grid-template-columns: 350px 350px;
+    gap: 1rem;
+    justify-content: start;
+    max-width: 900px;
+    width: 100%;
+    margin-left: -16rem;
+    margin-bottom: 2rem;
+}
+
+/* 1920x1080 Resolution - 3 columns */
+@media (min-width: 1920px) {
+    .events-grid {
+        grid-template-columns: 350px 350px 350px;
+        max-width: 1200px;
+        gap: 1.5rem;
+    }
+
+    /* Make search input much bigger */
+    .search-input {
+        font-size: 24px;
+        padding: 24px 60px 24px 0;
+        border-bottom-width: 3px;
+        height: 60px;
+    }
+
+    .search-input::placeholder {
+        font-size: 24px;
+    }
+
+    .search-icon {
+        width: 32px;
+        height: 32px;
+        right: 12px;
+    }
+
+    /* Make calendar much bigger */
+    .calendar-container {
+        padding: 36px;
+        border-radius: 16px;
+        box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
+        min-height: 400px;
+        min-width: 500px;
+    }
+
+    .calendar-header {
+        font-size: 28px;
+        margin-bottom: 28px;
+        font-weight: 600;
+    }
+
+    .calendar-days-header {
+        font-size: 20px;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .calendar-day {
+        font-size: 20px;
+        padding: 18px 12px;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .calendar-day:hover {
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+    .calendar-day.selected {
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+    .calendar-refresh-text {
+        font-size: 20px;
+        padding: 16px 32px;
+        border-radius: 12px;
+        font-weight: 500;
+    }
+
+    /* Use non-rotated prev icon when swapping to icon-prev.svg at 1920+ */
+    .slider-nav-btn.prev-btn {
+        transform: none;
+    }
+
+    .search-container {
+        position: relative;
+        width: 100%;
+        max-width: 499px;
+    }
+}
+
+/* Events Card */
+.events-card {
+    background: #1B1B3F;
+    border-radius: 12px;
+    padding: 2rem 3rem;
+    box-shadow: 0 8px 25px rgba(27, 27, 63, 0.3);
+    width: 350px;
+    height: 420px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Subtle hover effect */
+.events-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(27, 27, 63, 0.4);
+}
+
+/* Fade in animation for cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Staggered animation delays */
+.events-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.events-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.events-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.events-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.events-card:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.events-card:nth-child(6) {
+    animation-delay: 0.6s;
+}
+
+/* Page transition animations */
+.events-card.page-changing {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.2s ease;
+    animation: none;
+}
+
+/* Search animation - same as page changing */
+.events-card.search-animating {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.2s ease;
+    animation: none;
+}
+
+/* Event Date (inside card) */
+.event-date {
+    position: absolute;
+    top: 10.5rem;
+    left: 18%;
+    /* Reverted back to original */
+    transform: translateX(-50%);
+    /* Reverted back to original */
+    display: inline-block;
+}
+
+.event-title {
+    position: absolute;
+    top: 1.6rem;
+    left: 9%;
+    right: 0;
+    color: white;
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.3;
+    text-align: left;
+    transition: all 0.3s ease;
+}
+
+.events-card:hover .event-title {
+    color: #87CEEB;
+    transform: translateX(5px);
+}
+
+.trainer-name {
+    position: absolute;
+    top: 7rem;
+    left: 9%;
+    right: 0;
+    color: #87CEEB;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.event-day {
+    color: white;
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 0.3;
+}
+
+/* Event Month (inside card) */
+.event-month {
+    position: absolute;
+    top: -0.5rem;
+    left: 100%;
+    /* Position relative to the day text, not from right edge */
+    margin-left: 0.2rem;
+    /* Add some spacing from the day */
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 400;
+    line-height: 1;
+}
+
+/* Event Venue (inside card) */
+.event-venue {
+    position: absolute;
+    top: 51%;
+    left: 100%;
+    /* Position relative to the month text, not from left edge */
+    margin-left: 0.2rem;
+    /* Add spacing from the month text */
+    color: white;
+    font-size: 0.5rem;
+    font-weight: 400;
+    line-height: 1;
+    white-space: nowrap;
+    border: 0.1px solid gray;
+    padding: 2px 5px;
+}
+
+.event-image {
+    width: 320px;
+    height: 165px;
+    margin-top: 11.5rem;
+    object-fit: cover;
+    border-radius: 8px 8px 0px 0px;
+    transition: all 0.4s ease;
+    filter: grayscale(0.2);
+}
+
+.events-card:hover .event-image {
+    filter: grayscale(0) brightness(1.1);
+    transform: scale(1.02);
+}
+
+.card-icon {
+    width: 25px;
+    height: 25px;
+    margin-top: 5px;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    animation: pulse 2s infinite;
+}
+
+.card-icon:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    animation: none;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.8;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* Responsive Design - Same as About page */
+@media (max-width: 768px) {
+    .events-content-container {
+        margin-top: 150px;
+        padding: 1rem;
+        gap: 2rem;
+    }
+
+    .events-title {
+        font-size: 2.5rem;
+    }
+
+    .events-subtitle {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .events-content-container {
+        margin-top: 120px;
+        padding: 0.5rem;
+    }
+
+    .events-title {
+        font-size: 2rem;
+    }
+
+    .events-subtitle {
+        font-size: 0.9rem;
+    }
+}
+
+/* Pagination Styles */
+.pagination-container {
+    margin-top: 40px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    width: 100%;
+    clear: both;
+    margin-left: -16rem;
+    max-width: 900px;
+    position: relative;
+    z-index: 1;
+}
+
+.pagination-info {
+    display: none;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.pagination-btn {
+    padding: 0;
+    background: linear-gradient(135deg, #1243AC, #4A90E2);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 40px;
+    transition: all 0.3s ease;
+    width: 30px;
+    height: 30px;
+    position: relative;
+    line-height: 1;
+    text-align: center;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-2px);
+    }
+}
+
+.pagination-btn::before {
+    content: attr(data-arrow);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -62%);
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 1;
+    color: white;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+}
+
+.pagination-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.pagination-numbers {
+    display: flex;
+    gap: 10px;
+}
+
+.pagination-number {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #1243AC;
+    background: transparent;
+    color: #1243AC;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination-number:hover {
+    background: #1243AC;
+    color: white;
+    transform: scale(1.1);
+}
+
+.pagination-number.active {
+    background: #1243AC;
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Responsive pagination */
+@media (max-width: 768px) {
+    .pagination-container {
+        margin-top: 2rem;
+        margin-left: -9rem;
+    }
+
+    .pagination-controls {
+        flex-direction: row;
+        gap: 15px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .pagination-info {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .pagination-numbers {
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .pagination-number {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+
+    .pagination-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+
+    /* Region Filter Mobile */
+    .region-filter-container {
+        width: 100%;
+    }
+
+    .region-filter-dropdown {
+        width: 100%;
+        padding: 0.8rem 1rem;
+    }
+
+    .region-filter-text {
+        font-size: 0.9rem;
+    }
+
+    .region-dropdown-menu {
+        width: 100%;
+    }
+
+    .region-dropdown-item {
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Events Top Card with Background Image */
+.events-top-card {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 16rem auto 0 auto;
+    height: 400px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.events-top-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.events-top-background img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Featured Events Content - Inside Top Card */
+.featured-events-content {
+    position: relative;
+    z-index: 10;
+    padding: 2rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 40%;
+    margin-top: -20px;
+}
+
+/* Featured Events Section */
+.featured-events-section {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto 3rem auto;
+    padding: 0 2rem;
+}
+
+
+
+
+
+.featured-event-card {
+    background: none;
+    padding: 1.5rem;
+    color: white;
+    transition: all 0.3s ease;
+    position: relative;
+    height: 100%;
+}
+
+.featured-event-header {
+    margin-bottom: 1.5rem;
+}
+
+.featured-event-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+    color: white;
+}
+
+
+
+.featured-event-subtitle {
+    font-size: 1.6rem;
+    color: white;
+    margin: 0 0 0.5rem 0;
+    text-align: center;
+    opacity: 0.9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    margin-left: -17px;
+}
+
+.featured-event-trainer {
+    font-size: 1rem;
+    color: rgba(142, 205, 255, 1);
+    margin: 0;
+}
+
+
+
+.featured-event-timer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    padding: 0.7rem 0.5rem;
+    background: transparent;
+    border: 1px solid rgba(119, 201, 99, 1);
+    border-radius: 8px;
+    width: fit-content;
+}
+
+.timer-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.featured-event-timer .timer-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #77C963;
+}
+
+
+
+.featured-event-timer .timer-separator {
+    font-size: 1.2rem;
+    font-weight: 600;
+    opacity: 0.8;
+    color: #77C963;
+    margin-top: -5px;
+}
+
+.featured-event-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.featured-event-date-venue-row {
+    position: absolute;
+    bottom: 50px;
+    left: 46%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 350px;
+    justify-content: space-between;
+    z-index: 10;
+    /* background: rgba(0, 0, 0, 0.1); */
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    min-width: 300px;
+}
+
+.featured-event-date,
+.featured-event-venue {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1rem;
+    font-weight: 100;
+    white-space: nowrap;
+    min-width: 120px;
+    flex-shrink: 0;
+    flex: 1;
+}
+
+.featured-event-date span,
+.featured-event-venue span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 117px;
+}
+
+
+
+.featured-event-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Slider Navigation - Outside the Card */
+.featured-slider-navigation {
+    position: absolute;
+    top: 26rem;
+    right: 12rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Buttons Outside the Background */
+.featured-event-buttons-outer {
+    position: absolute;
+    bottom: -10px;
+    left: 21px;
+    display: flex;
+    gap: 1rem;
+    z-index: 20;
+}
+
+.slider-nav-btn {
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.slider-nav-btn:hover {
+    transform: scale(1.1);
+}
+
+.slider-nav-btn.prev-btn {
+    transform: none;
+}
+
+
+
+.slider-dots {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.slider-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.slider-dot.active {
+    background: white;
+}
+
+.slider-dot:hover {
+    background: rgba(255, 255, 255, 0.7);
+}
+
+
+
+.featured-event-btn {
+    padding: 0.5rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 140px;
+}
+
+.qeydiyyat-btn {
+    background: rgba(18, 67, 172, 1);
+    color: white;
+}
+
+.qeydiyyat-btn:hover {
+    background: linear-gradient(0deg, #454471, #454471),
+        linear-gradient(87.1deg, #0B0B2F -14.15%, #0A33A0 97.59%);
+    transform: translateY(-2px);
+}
+
+.detalli-btn {
+    background: transparent;
+    color: white;
+
+    border: 1px solid #81BBE9;
+    border-image-slice: 1;
+}
+
+.detalli-btn:hover {
+    background: white;
+    color: #1B1B3F;
+    transform: translateY(-2px);
+}
+
+.featured-icon {
+    width: 20px;
+    height: 20px;
+    filter: brightness(0) invert(1) saturate(0);
+}
+
+/* Responsive design for featured events card */
+@media (max-width: 768px) {
+    .events-top-card {
+        height: 350px;
+        margin: 12rem auto 0 auto;
+    }
+
+    .featured-events-content {
+        width: 60%;
+        padding: 1.5rem;
+    }
+
+    .featured-events-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .featured-event-card {
+        padding: 1.2rem;
+    }
+
+    .featured-event-title {
+        font-size: 1.1rem;
+    }
+
+    .timer-number {
+        font-size: 1.3rem;
+    }
+
+    .timer-separator {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .events-top-card {
+        height: 300px;
+        margin: 8rem auto 0 auto;
+    }
+
+    .featured-events-content {
+        width: 80%;
+        padding: 1rem;
+    }
+
+    .featured-events-title {
+        font-size: 1.3rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .featured-event-card {
+        padding: 1rem;
+    }
+
+    .featured-event-title {
+        font-size: 1rem;
+    }
+
+    .timer-number {
+        font-size: 1.1rem;
+    }
+
+    .timer-separator {
+        font-size: 0.9rem;
+    }
+}
+
+/* Logo Carousel Section - Events Page */
+.events-page .logo-carousel-section,
+.events-logo-carousel {
+    margin-top: 2rem !important;
+}
+
+/* === Slider Animations === */
+.featured-event-card {
+    opacity: 0;
+    transform: translateX(0);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    position: relative;
+}
+
+/* Slide in from left */
+.featured-event-card.slide-left {
+    animation: slideInFromLeft 0.6s forwards;
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-60px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Slide in from right */
+.featured-event-card.slide-right {
+    animation: slideInFromRight 0.6s forwards;
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(60px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Region Filter Styles */
+.events-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 200px;
+    margin-left: 8rem;
+    margin-right: 8rem;
+}
+
+/* Filters Container */
+.filters-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.region-filter-container {
+    position: relative;
+    display: inline-block;
+}
+
+/* Refresh Button */
+.refresh-button {
+    background: #1243AC;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    height: 40px;
+}
+
+.refresh-button:hover {
+    background: #0f3a9a;
+    transform: scale(1.05);
+}
+
+.refresh-button:active {
+    transform: scale(0.95);
+}
+
+.region-filter-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-width: 120px;
+}
+
+.region-filter-dropdown:hover {
+    border-color: #1243AC;
+    box-shadow: 0 4px 8px rgba(18, 67, 172, 0.15);
+}
+
+.filter-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.filter-line {
+    width: 12px;
+    height: 2px;
+    background-color: #666;
+    border-radius: 1px;
+}
+
+.filter-line.short {
+    width: 8px;
+}
+
+.region-filter-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+    flex: 1;
+}
+
+.dropdown-arrow {
+    font-size: 0.7rem;
+    color: #666;
+    transition: transform 0.3s ease;
+}
+
+.region-filter-dropdown:hover .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.region-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    margin-top: 4px;
+    overflow: hidden;
+}
+
+.region-dropdown-item {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 0.9rem;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.region-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.region-dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #1243AC;
+}
+
+.region-dropdown-item:active {
+    background-color: #e3f2fd;
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+    .events-page {
+        margin-top: 100px;
+    }
+
+    /* Filters Container Mobile */
+    .filters-container {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: stretch;
+    }
+
+    .refresh-button {
+        font-size: 1rem;
+        padding: 0.4rem 0.8rem;
+        height: 35px;
+    }
+
+    /* Events Top Card Mobile */
+    .events-top-card {
+        height: 12rem;
+        margin-bottom: 1rem;
+        width: 90%;
+        margin-left: 17px;
+        margin-right: auto;
+        position: relative;
+    }
+
+    .featured-events-content {
+        padding: 0.3rem;
+        height: 100%;
+        display: flex;
+        align-items: start;
+    }
+
+    .featured-event-card {
+        padding: 0.5rem;
+        height: 79%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .featured-event-title {
+        font-size: 0.8rem;
+        margin-bottom: 0.1rem;
+        text-align: left;
+    }
+
+    .featured-event-subtitle {
+        font-size: 0.5rem;
+        margin-bottom: 0.1rem;
+        text-align: left;
+    }
+
+    .featured-event-timer {
+        position: absolute;
+        top: -3px;
+        right: -202px;
+        gap: 0.02rem;
+        margin: 0;
+        justify-content: flex-start;
+        padding: 0.1rem;
+        border: 1px solid rgba(119, 201, 99, 0.3);
+        border-radius: 4px;
+    }
+
+    .timer-unit {
+        padding: 0;
+    }
+
+    .timer-number {
+        font-size: 0.3rem;
+    }
+
+    .featured-event-details {
+        margin: 0.1rem 0;
+        text-align: left;
+    }
+
+    .featured-event-date-venue-row {
+        position: absolute;
+        bottom: 27px;
+        left: 46%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        overflow: hidden;
+        width: 350px;
+        justify-content: center;
+        z-index: 10;
+        /* background: rgba(0, 0, 0, 0.1); */
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        min-width: 300px;
+    }
+
+    .featured-event-buttons-outer {
+        position: absolute;
+        bottom: -10px;
+        left: 10px;
+        flex-direction: row;
+        gap: 0.3rem;
+        margin-top: 0.1rem;
+        justify-content: flex-start;
+    }
+
+    .featured-event-btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.6rem;
+        flex: none;
+        min-width: auto;
+    }
+
+    /* Slider Navigation Mobile */
+    .featured-slider-navigation {
+        margin-top: 1rem;
+        gap: 1rem;
+    }
+
+    .slider-nav-btn {
+        width: 50px;
+        height: 50px;
+    }
+
+    /* Events Header Section Mobile */
+    .events-header-section {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        padding: 1rem;
+        margin-top: 1rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .events-header-text {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .events-top-card {
+        height: 11rem;
+        margin-bottom: 7rem;
+        width: 90%;
+        margin-left: 17px;
+        margin-right: auto;
+        position: relative;
+        margin-top: -45px;
+    }
+
+    .featured-event-buttons-outer {
+        position: absolute;
+        bottom: -31px;
+        left: 10px;
+        flex-direction: row;
+        gap: 0.3rem;
+        margin-top: 0.1rem;
+        justify-content: flex-start;
+    }
+
+    .featured-event-date-venue-row {
+        position: absolute;
+        bottom: 2px;
+        left: 26%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        overflow: hidden;
+        width: 350px;
+        justify-content: center;
+        z-index: 10;
+        /* background: rgba(0, 0, 0, 0.1); */
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+    }
+
+    .featured-slider-navigation {
+        position: absolute;
+        top: 11rem;
+        right: 15rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+
+
+
+
+
+    .featured-event-timer {
+        position: absolute;
+        top: -1px;
+        right: -45px;
+        gap: 0.02rem;
+        margin: 0;
+        justify-content: flex-start;
+        padding: 0.1rem;
+        border: 1px solid rgba(119, 201, 99, 0.3);
+        border-radius: 4px;
+    }
+
+    .featured-event-subtitle {
+        font-size: 1rem;
+        margin-bottom: 0.1rem;
+        text-align: left;
+        width: 78%;
+    }
+
+    .events-header-first {
+        font-size: 2rem;
+    }
+
+    .events-header-second {
+        font-size: 1.5rem;
+        padding: 0.5rem 1rem;
+    }
+
+    /* Events Content Container Mobile */
+    .events-content-container {
+        flex-direction: column;
+        padding: 1rem;
+        gap: 2rem;
+        margin-top: 1rem;
+    }
+
+    .events-left-section {
+        flex: none;
+        width: 100%;
+        margin-left: 0;
+        padding: 0;
+        order: 2;
+    }
+
+    .events-right-section {
+        flex: none;
+        width: 100%;
+        order: 1;
+    }
+
+    /* Search Container Mobile */
+    .search-container {
+        max-width: 100%;
+    }
+
+    .search-input {
+        font-size: 14px;
+        padding: 10px 35px 10px 0;
+    }
+
+    /* Calendar Container Mobile */
+    .calendar-container {
+        max-width: 100%;
+        padding: 12px;
+    }
+
+    .calendar-header {
+        margin-bottom: 12px;
+    }
+
+    .calendar-month-year {
+        font-size: 14px;
+    }
+
+    .calendar-days-header span {
+        font-size: 10px;
+        padding: 4px 0;
+    }
+
+    .calendar-day {
+        font-size: 12px;
+        padding: 6px 4px;
+    }
+
+    /* Events Grid Mobile - 1 card per row */
+    .events-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    /* Hide left section on mobile */
+    .events-left-section {
+        display: none;
+    }
+
+    .events-main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 2rem;
+        min-height: 300px;
+        margin-left: 153px;
+    }
+
+    .events-card {
+        padding: 1rem;
+    }
+
+    .event-title {
+        font-size: 2rem;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+
+    .event-day {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+    .event-month {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .event-venue {
+        font-size: 0.8rem;
+        font-weight: 400;
+        line-height: 1.2;
+    }
+
+    .event-image {
+        height: 172px;
+    }
+
+    .card-icon {
+        width: 30px;
+        height: 30px;
+        right: 8px;
+        top: 8px;
+    }
+
+    .event-date {
+        position: absolute;
+        top: 9.5rem;
+        left: 18%;
+        transform: translateX(-50%);
+        display: inline-block;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .event-date .event-day {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .event-date .event-month {
+        font-size: 1rem;
+        font-weight: 500;
+    }
+}
+
+/* Medium Mobile - 3 cards per row */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .events-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+}
+
+
+
+
+@media (max-width: 480px) {
+    .events-top-card {
+        height: 20rem;
+    }
+
+    .featured-event-title {
+        font-size: 1.2rem;
+    }
+
+    .featured-event-subtitle {
+        font-size: 0.8rem;
+    }
+
+    .timer-number {
+        font-size: 1rem;
+    }
+
+    .events-header-first {
+        font-size: 1.5rem;
+    }
+
+    .events-header-second {
+        font-size: 1.2rem;
+    }
+
+    .events-grid {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    .events-card {
+        padding: 0.8rem;
+    }
+
+    .event-image {
+        height: 100px;
+    }
+
+    .card-icon {
+        width: 25px;
+        height: 25px;
+    }
+}
+
+/* Mobile L - 425px */
+@media (max-width: 425px) {
+    .events-content-container {
+        flex-direction: column;
+        padding: 0rem;
+        gap: 2rem;
+        margin-top: 1rem;
+        margin-left: -11px;
+    }
+
+    .pagination-controls {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: nowrap;
+    }
+
+    .pagination-numbers {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .pagination-btn {
+        flex-shrink: 0;
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+
+    .pagination-number {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+
+    .event-image {
+        height: 178px;
+    }
+
+    .events-top-background img {
+        object-fit: unset;
+    }
+
+    .employee-cards-container {
+        gap: 2rem;
+        padding: 1rem 0.5rem;
+    }
+}
+
+/* Rotate both slider buttons 180deg at 1920px+ */
+@media (min-width: 1920px) {
+    .featured-slider-navigation .slider-nav-btn {
+        transform: rotate(180deg) !important;
+    }
+
+    .featured-slider-navigation .slider-nav-btn:hover {
+        transform: rotate(180deg) scale(1.1) !important;
+    }
+}
+
+/* Swap places of prev/next buttons at 1920px+ */
+@media (min-width: 1920px) {
+    .featured-slider-navigation {
+        flex-direction: row;
+    }
+
+    .featured-slider-navigation .slider-nav-btn.next-btn {
+        order: 0 !important;
+    }
+
+    .featured-slider-navigation .slider-nav-btn.prev-btn {
+        order: 1 !important;
+    }
+}
