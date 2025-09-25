@@ -5,6 +5,7 @@ import topImage from '../../assets/top.png'
 import homeBgImage from '../../assets/home-bg.png'
 import RequestModal from '../ui/RequestModal'
 import './Header.css'
+import StaggeredMenu from './StaggeredMenu'
 import SpotlightNav from './SpotlightNav'
 
 function Header({ showTopImage = false, customTopImage = null, hidePageName = false }) {
@@ -13,6 +14,7 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
     const [selectedLanguage, setSelectedLanguage] = useState('aze');
     const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -101,11 +103,23 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
         }
     }, [location.pathname]);
 
+    // Mobile detection
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
     return (
         <header className={isHomePage ? 'home-page-header' : isEmployeeDetailPage ? 'employee-detail-page-header' : isBlogDetailPage ? 'blog-detail-page-header' : isGalleryPage ? 'gallery-page-header' : ''}>
             {showTopImage && (
                 <div className="header-top-image">
-                    <img src={customTopImage || topImage} alt="Top Background" />
+                    <img src={customTopImage || (isMobile ? "/assets/header-mobile.png" : topImage)} alt="Top Background" />
                 </div>
             )}
             <div className={`header-container ${isHomePage ? 'home-header' : ''}`}>
@@ -115,6 +129,34 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
                         alt="Hospital Logo"
                         onClick={() => handleItemClick({ id: 'home', label: 'Ana səhifə', href: '/' })}
                         style={{ cursor: 'pointer' }}
+                    />
+                </div>
+
+                {/* Mobile Staggered Menu on Home page - aligned with logo */}
+                {/* Mobile Staggered Menu on all pages - aligned with logo */}
+                <div className="mobile-staggered-menu">
+                    <StaggeredMenu
+                        position="right"
+                        className="home-embed"
+                        items={navigationItems.map(item => ({
+                            label: item.label,
+                            ariaLabel: `Go to ${item.label}`,
+                            link: item.href
+                        }))}
+                        socialItems={languageOptions.map(lang => ({
+                            label: lang.name,
+                            link: '#'
+                        }))}
+                        displaySocials={true}
+                        displayItemNumbering={false}
+                        menuButtonColor="#000"
+                        openMenuButtonColor="#fff"
+                        changeMenuColorOnOpen={true}
+                        colors={['#B19EEF', '#5227FF']}
+                        logoUrl="/assets/footer.svg"
+                        accentColor="#ff6b6b"
+                        onMenuOpen={() => console.log('Menu opened')}
+                        onMenuClose={() => console.log('Menu closed')}
                     />
                 </div>
 
@@ -151,54 +193,6 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
                     </div>
                     <button className="uzv-btn" onClick={handleRequestModalOpen}>Üzv ol</button>
                 </div>
-
-                {/* Mobile Hamburger Menu */}
-                <button className="mobile-menu-toggle" onClick={toggleMobileMenu}>
-                    <span className="hamburger-line"></span>
-                    <span className="hamburger-line"></span>
-                    <span className="hamburger-line"></span>
-                </button>
-
-                {/* Mobile Navigation Menu */}
-                {isMobileMenuOpen && (
-                    <div className="mobile-nav-overlay">
-                        <nav className="nav-center mobile-nav">
-                            <div className="navigation-container">
-                                {navigationItems.map((item) => (
-                                    <button
-                                        key={item.id}
-                                        className={`navigation-item ${activePage === item.id ? 'active' : ''}`}
-                                        onClick={() => handleItemClick(item)}
-                                    >
-                                        {item.label}
-                                    </button>
-                                ))}
-                            </div>
-                            <div className="mobile-login-section">
-                                <div className="language-selector" onClick={toggleLanguageDropdown}>
-                                    <img src={getCurrentLanguage().flag} alt={`${getCurrentLanguage().name} Flag`} className="flag-icon" />
-                                    <span className="language-text">{getCurrentLanguage().name}</span>
-                                    <span className="dropdown-arrow">▼</span>
-                                    {isLanguageDropdownOpen && (
-                                        <div className="language-dropdown mobile-language-dropdown">
-                                            {languageOptions.map((language) => (
-                                                <div
-                                                    key={language.code}
-                                                    className={`language-option ${selectedLanguage === language.code ? 'selected' : ''}`}
-                                                    onClick={() => handleLanguageSelect(language.code)}
-                                                >
-                                                    <img src={language.flag} alt={`${language.name} Flag`} className="flag-icon" />
-                                                    <span className="language-text">{language.name}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                                <button className="uzv-btn" onClick={handleRequestModalOpen}>Üzv ol</button>
-                            </div>
-                        </nav>
-                    </div>
-                )}
             </div>
 
             {!hidePageName && (
