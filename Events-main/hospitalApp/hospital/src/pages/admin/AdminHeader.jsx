@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { STORAGE_KEYS } from '../../utils'
 import './AdminHeader.css'
 const adminGlobe = '/assets/admin-globe.png'
 const adminSettings = '/assets/admin-settings.png'
@@ -9,7 +10,7 @@ function AdminHeader({ title = "Dashboard" }) {
     const navigate = useNavigate()
 
     const handleLogout = () => {
-        localStorage.removeItem('adminAuthenticated')
+        localStorage.removeItem(STORAGE_KEYS.ADMIN_AUTH)
         navigate('/admin/login')
     }
     return (

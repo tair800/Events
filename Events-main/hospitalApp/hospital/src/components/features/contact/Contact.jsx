@@ -477,6 +477,8 @@ const Contact = () => {
                             <div className="contact-details">
                                 {contactData.contactInfo && contactData.contactInfo.length > 0 ? (
                                     contactData.contactInfo.map((item, index) => {
+                                        // Check if the item is an email type
+                                        const isEmail = item.type === 'email';
 
                                         return (
                                             <div key={`${item.type}-${item.value}-${index}`} className="contact-item">
@@ -485,7 +487,17 @@ const Contact = () => {
                                                     alt={item.type}
                                                     className="contact-icon"
                                                 />
-                                                <span>{item.value}</span>
+                                                {isEmail ? (
+                                                    <a
+                                                        href={`mailto:${item.value}`}
+                                                        className="contact-link"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        {item.value}
+                                                    </a>
+                                                ) : (
+                                                    <span>{item.value}</span>
+                                                )}
                                             </div>
                                         );
                                     })

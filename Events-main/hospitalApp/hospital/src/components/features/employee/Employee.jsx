@@ -21,14 +21,14 @@ const Employee = () => {
         handlePageChange,
         handlePreviousPage,
         handleNextPage
-    } = usePagination(employees, 8);
+    } = usePagination(employees, 9);
 
     // Fetch employees from API
     useEffect(() => {
         const fetchEmployees = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('https://ahpbca-api.webonly.io/api/employees');
+                const response = await fetch('https://localhost:5000/api/employees');
                 if (!response.ok) {
                     throw new Error('Failed to fetch employees');
                 }
@@ -116,7 +116,7 @@ const Employee = () => {
                 startIndex={startIndex}
                 endIndex={endIndex}
                 totalItems={employees.length}
-                itemsPerPage={8}
+                itemsPerPage={9}
                 showInfo={true}
                 className="employee-pagination"
             />

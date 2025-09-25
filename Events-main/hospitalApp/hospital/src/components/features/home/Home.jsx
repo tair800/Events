@@ -5,6 +5,8 @@ import circle3 from '../../../assets/circle3.png'
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
 import iconNext from '../../../assets/icon-next.svg';
+import eventNext from '/assets/event-next.svg';
+import eventPrev from '/assets/event-prev.svg';
 import homeLongButton from '../../../assets/home-long-button.svg';
 import InfoCard from '../../ui/InfoCard';
 import EmployeeSlider from '../employee/EmployeeSlider';
@@ -38,7 +40,7 @@ const Home = () => {
     useEffect(() => {
         const fetchHomeData = async () => {
             try {
-                const response = await fetch('https://ahpbca-api.webonly.io/api/HomeSection/first');
+                const response = await fetch('https://localhost:5000/api/HomeSection/first');
                 if (response.ok) {
                     const data = await response.json();
                     setHomeData({
@@ -64,7 +66,7 @@ const Home = () => {
         const fetchEvents = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('https://ahpbca-api.webonly.io/api/events');
+                const response = await fetch('https://localhost:5000/api/events');
                 if (!response.ok) {
                     throw new Error('Failed to fetch events');
                 }
@@ -106,7 +108,7 @@ const Home = () => {
     useEffect(() => {
         const fetchEmployees = async () => {
             try {
-                const response = await fetch('https://ahpbca-api.webonly.io/api/employees');
+                const response = await fetch('https://localhost:5000/api/employees');
                 if (!response.ok) {
                     throw new Error('Failed to fetch employees');
                 }
@@ -277,7 +279,8 @@ const Home = () => {
                                             <div className="home-hero-card-left-section">
                                                 <div className="home-hero-event-info">
                                                     <div className="home-hero-event-date-location">
-                                                        {day} {month}, {event.venue}
+                                                        {day} {month}
+                                                        {event.venue && `, ${event.venue}`}
                                                         {event.region && `, ${event.region}`}
                                                     </div>
                                                     <div className="home-hero-event-title">
@@ -286,9 +289,11 @@ const Home = () => {
                                                     <div className="home-hero-event-description">
                                                         <p>{event.description}</p>
                                                     </div>
-                                                    <div className="home-hero-event-price">
-                                                        Qiymət: {formattedPrice}
-                                                    </div>
+                                                    {event.price !== 0 && event.price !== '0' && event.price !== null && event.price !== undefined && (
+                                                        <div className="home-hero-event-price">
+                                                            Qiymət: {formattedPrice}
+                                                        </div>
+                                                    )}
                                                     <div className="home-hero-event-buttons">
                                                         <button
                                                             className="home-hero-btn-primary"
@@ -345,7 +350,7 @@ const Home = () => {
                                 disabled={currentSlide === 0}
                                 aria-label="Previous slide"
                             >
-                                <img src={iconNext} alt="Previous" className="home-hero-side-nav-icon left" />
+                                <img src={eventPrev} alt="Previous" className="home-hero-side-nav-icon" />
                             </button>
                             <button
                                 className="home-hero-side-nav home-hero-side-nav-right"
@@ -353,7 +358,7 @@ const Home = () => {
                                 disabled={currentSlide === heroEvents.length - 1}
                                 aria-label="Next slide"
                             >
-                                <img src={iconNext} alt="Next" className="home-hero-side-nav-icon" />
+                                <img src={eventNext} alt="Next" className="home-hero-side-nav-icon" />
                             </button>
                         </>
                     )}
@@ -454,6 +459,91 @@ const Home = () => {
                 </div>
             </div>
 
+            {/* Home Header Text */}
+            <div className="home-header-text">
+                <div className="home-header-left">
+                    <span className="home-header-first">Gözlənilən</span>
+                    <span className="home-header-second">
+                        <span>Tədbirlər</span>
+                    </span>
+                </div>
+                <button className="home-header-btn" onClick={() => {
+                    navigate('/events');
+                    window.scrollTo(0, 0);
+                }}>Hamısına bax</button>
+            </div>
+
+            {/* Event Cards */}
+            <div className="home-events-container">
+                {loading ? (
+                    <div className="loading-message">Yüklənir...</div>
+                ) : error ? (
+                    <div className="error-message">Xəta: {error}</div>
+                ) : latestEvents.length === 0 ? (
+                    <div className="no-events-message">Heç bir tədbir tapılmadı</div>
+                ) : (
+                    latestEvents.map((event, index) => {
+                        const { day, month } = formatEventDate(event.eventDate);
+                        const truncatedDescription = truncateText(event.description, 120);
+                        const formattedPrice = formatPrice(event.price, event.currency);
+
+                        return (
+                            <div key={event.id} className="home-long-card">
+                                <div className="card-left-section">
+                                    <div className="date-venue-section">
+                                        <div className="home-event-date">
+                                            <div className="date-venue-group">
+                                                <span className="home-event-day">{day}</span>
+                                                <div className="home-event-venue" title={`${event.venue || ''}${event.venue && event.region ? `, ${event.region}` : event.region ? event.region : ''}`}>
+                                                    {event.venue && event.venue.length > 20
+                                                        ? event.venue.substring(0, 20) + '...'
+                                                        : event.venue}
+                                                    {event.region && (
+                                                        <div className="home-event-region">
+                                                            {event.region.length > 15
+                                                                ? event.region.substring(0, 15) + '...'
+                                                                : event.region}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <span className="home-event-month">{month}</span>
+                                        </div>
+                                    </div>
+                                    <div className="text-content-section">
+                                        <h3 className="home-event-title">{event.title}</h3>
+                                        <p className="home-event-desc">
+                                            {truncatedDescription}
+                                        </p>
+
+                                        <div className="home-event-price">{formattedPrice}</div>
+                                    </div>
+                                </div>
+                                <div className="card-right-section">
+                                    <img
+                                        src="/assets/event-shadow.png"
+                                        alt="Event Shadow"
+                                        className="home-event-shadow"
+                                    />
+                                    <img
+                                        src={getContextualImagePath(event.mainImage, 'admin')}
+                                        alt="Event Image"
+                                        className="home-event-image"
+                                    />
+                                    <img
+                                        src={homeLongButton}
+                                        alt="Go to Event Details"
+                                        className="home-arrow-image"
+                                        onClick={() => navigate(`/event/${event.id}`)}
+                                        style={{ cursor: 'pointer' }}
+                                    />
+                                </div>
+                            </div>
+                        );
+                    })
+                )}
+            </div>
+
             {/* Home Header Text 2 */}
             <div className="home-header-text-2">
                 <div className="home-header-left-2">
@@ -530,91 +620,6 @@ const Home = () => {
                             ›
                         </button>
                     </>
-                )}
-            </div>
-
-            {/* Home Header Text */}
-            <div className="home-header-text">
-                <div className="home-header-left">
-                    <span className="home-header-first">Gözlənilən</span>
-                    <span className="home-header-second">
-                        <span>Tədbirlər</span>
-                    </span>
-                </div>
-                <button className="home-header-btn" onClick={() => {
-                    navigate('/events');
-                    window.scrollTo(0, 0);
-                }}>Hamısına bax</button>
-            </div>
-
-            {/* Event Cards */}
-            <div className="home-events-container">
-                {loading ? (
-                    <div className="loading-message">Yüklənir...</div>
-                ) : error ? (
-                    <div className="error-message">Xəta: {error}</div>
-                ) : latestEvents.length === 0 ? (
-                    <div className="no-events-message">Heç bir tədbir tapılmadı</div>
-                ) : (
-                    latestEvents.map((event, index) => {
-                        const { day, month } = formatEventDate(event.eventDate);
-                        const truncatedDescription = truncateText(event.description, 120);
-                        const formattedPrice = formatPrice(event.price, event.currency);
-
-                        return (
-                            <div key={event.id} className="home-long-card">
-                                <div className="card-left-section">
-                                    <div className="date-venue-section">
-                                        <div className="home-event-date">
-                                            <div className="date-venue-group">
-                                                <span className="home-event-day">{day}</span>
-                                                <div className="home-event-venue" title={`${event.venue}${event.region ? `, ${event.region}` : ''}`}>
-                                                    {event.venue && event.venue.length > 20
-                                                        ? event.venue.substring(0, 20) + '...'
-                                                        : event.venue}
-                                                    {event.region && (
-                                                        <div className="home-event-region">
-                                                            {event.region.length > 15
-                                                                ? event.region.substring(0, 15) + '...'
-                                                                : event.region}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <span className="home-event-month">{month}</span>
-                                        </div>
-                                    </div>
-                                    <div className="text-content-section">
-                                        <h3 className="home-event-title">{event.title}</h3>
-                                        <p className="home-event-desc">
-                                            {truncatedDescription}
-                                        </p>
-
-                                        <div className="home-event-price">{formattedPrice}</div>
-                                    </div>
-                                </div>
-                                <div className="card-right-section">
-                                    <img
-                                        src="/assets/event-shadow.png"
-                                        alt="Event Shadow"
-                                        className="home-event-shadow"
-                                    />
-                                    <img
-                                        src={getContextualImagePath(event.mainImage, 'admin')}
-                                        alt="Event Image"
-                                        className="home-event-image"
-                                    />
-                                    <img
-                                        src={homeLongButton}
-                                        alt="Go to Event Details"
-                                        className="home-arrow-image"
-                                        onClick={() => navigate(`/event/${event.id}`)}
-                                        style={{ cursor: 'pointer' }}
-                                    />
-                                </div>
-                            </div>
-                        );
-                    })
                 )}
             </div>
 

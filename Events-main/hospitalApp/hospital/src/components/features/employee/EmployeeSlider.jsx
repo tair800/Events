@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import iconNext from '../../../assets/icon-next.svg';
 import iconPrev from '../../../assets/icon-prev.svg';
+import eventNext from '/assets/event-next.svg';
+import eventPrev from '/assets/event-prev.svg';
 import { getContextualImagePath } from '../../../utils/imageUtils';
 
 const EmployeeSlider = ({ employees }) => {
@@ -100,27 +102,23 @@ const EmployeeSlider = ({ employees }) => {
             {/* Navigation Controls - Always show if there are multiple pages */}
             {displayTotalPages > 1 && (
                 <>
-                    <img
-                        src={iconPrev}
-                        alt="Previous"
+                    <button
                         className="slider-nav-btn prev-btn"
                         onClick={goToPrevPage}
-                        style={{
-                            cursor: currentPage === 0 ? 'not-allowed' : 'pointer',
-                            opacity: currentPage === 0 ? 0.3 : 1
-                        }}
-                    />
+                        disabled={currentPage === 0}
+                        aria-label="Previous page"
+                    >
+                        <img src={eventPrev} alt="Previous" className="slider-nav-icon" />
+                    </button>
 
-                    <img
-                        src={iconNext}
-                        alt="Next"
+                    <button
                         className="slider-nav-btn next-btn"
                         onClick={goToNextPage}
-                        style={{
-                            cursor: currentPage === displayTotalPages - 1 ? 'not-allowed' : 'pointer',
-                            opacity: currentPage === displayTotalPages - 1 ? 0.3 : 1
-                        }}
-                    />
+                        disabled={currentPage === displayTotalPages - 1}
+                        aria-label="Next page"
+                    >
+                        <img src={eventNext} alt="Next" className="slider-nav-icon" />
+                    </button>
                 </>
             )}
         </div>

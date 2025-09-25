@@ -23,7 +23,7 @@ function AdminHome() {
 
     const fetchHomeData = async () => {
         try {
-            const response = await fetch('https://ahpbca-api.webonly.io/api/HomeSection/first');
+            const response = await fetch('https://localhost:5000/api/HomeSection/first');
             if (response.ok) {
                 const data = await response.json();
                 setHomeData({
@@ -63,7 +63,7 @@ function AdminHome() {
                     const formData = new FormData();
                     formData.append('file', file);
 
-                    const endpoint = 'https://ahpbca-api.webonly.io/api/ImageUpload/home';
+                    const endpoint = 'https://localhost:5000/api/ImageUpload/home';
 
                     const response = await fetch(endpoint, {
                         method: 'POST',
@@ -117,7 +117,7 @@ function AdminHome() {
         try {
             setLoading(true);
 
-            const response = await fetch('https://ahpbca-api.webonly.io/api/HomeSection/first', {
+            const response = await fetch('https://localhost:5000/api/HomeSection/first', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

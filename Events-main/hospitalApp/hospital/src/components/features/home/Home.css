@@ -289,7 +289,7 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: transparent;
+    background: rgba(75, 132, 255, 1);
     border: none;
     color: inherit;
     padding: 0;
@@ -300,39 +300,48 @@
     transition: opacity 0.18s ease, transform 0.18s ease;
     z-index: 15;
     outline: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
 }
 
 /* Icon inside the side nav buttons */
 .home-hero-side-nav-icon {
-    width: 40px;
-    height: 40px;
+    width: 24px;
+    height: 24px;
     transition: transform 0.18s ease, opacity 0.18s ease;
+    filter: brightness(0) invert(1);
+    margin-top: -2px;
+    margin-left: 3px;
 }
 
-.home-hero-side-nav-icon.left {
-    transform: rotate(180deg);
+
+/* Button hover animations */
+.home-hero-side-nav:hover {
+    transform: translateY(-50%) scale(1.1);
+    opacity: 0.9;
+    box-shadow: 0 4px 12px rgba(75, 132, 255, 0.3);
 }
 
-/* Direction-aware hover animations */
-.home-hero-side-nav-right:hover .home-hero-side-nav-icon {
-    transform: scale(1.08) translateX(2px);
+.home-hero-side-nav-right:hover {
+    transform: translateY(-50%) scale(1.1) translateX(2px);
 }
 
-.home-hero-side-nav-left:hover .home-hero-side-nav-icon.left {
-    transform: rotate(180deg) scale(1.08) translateX(-2px);
+.home-hero-side-nav-left:hover {
+    transform: translateY(-50%) scale(1.1) translateX(-2px);
 }
 
 /* Click (active) feedback */
-.home-hero-side-nav-right:active .home-hero-side-nav-icon {
-    transform: scale(0.92) translateX(1px);
+.home-hero-side-nav:active {
+    transform: translateY(-50%) scale(0.95);
 }
 
-.home-hero-side-nav-left:active .home-hero-side-nav-icon.left {
-    transform: rotate(180deg) scale(0.92) translateX(-1px);
+.home-hero-side-nav-right:active {
+    transform: translateY(-50%) scale(0.95) translateX(1px);
 }
 
-.home-hero-side-nav:hover {
-    opacity: 0.9;
+.home-hero-side-nav-left:active {
+    transform: translateY(-50%) scale(0.95) translateX(-1px);
 }
 
 .home-hero-side-nav:disabled {
@@ -1205,10 +1214,12 @@
         top: auto;
         bottom: 10px;
         transform: none;
+        border-radius: 50%;
     }
 
     .home-hero-side-nav:hover {
         transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(75, 132, 255, 0.3);
     }
 
     .home-hero-side-nav:disabled {
@@ -1913,6 +1924,7 @@
         width: 35px;
         height: 35px;
         font-size: 1rem;
+        border-radius: 50%;
     }
 
     .home-hero-side-nav-left {
@@ -2602,6 +2614,22 @@
     position: absolute;
     bottom: -70px;
     z-index: 10;
+    background: rgba(75, 132, 255, 1);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+}
+
+.slider-nav-icon {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.18s ease, opacity 0.18s ease;
+    filter: brightness(0) invert(1);
+    margin-top: -2px;
+    margin-left: 1px;
 }
 
 .slider-nav-btn.prev-btn {
@@ -2614,8 +2642,15 @@
 
 /* Hover effects removed */
 
-.slider-nav-btn:hover {
+.slider-nav-btn:hover:not(:disabled) {
     transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(27, 27, 63, 0.3);
+}
+
+.slider-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
 }
 
 /* Use direct prev icon without rotation */
@@ -3112,7 +3147,7 @@
         bottom: -10rem;
         width: 80px;
         height: 80px;
-        background: #1B1B3F;
+        background: rgba(75, 132, 255, 1);
         border: none;
         border-radius: 50%;
         cursor: pointer;
@@ -3120,7 +3155,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 12px rgba(27, 27, 63, 0.3);
+        box-shadow: 0 4px 12px rgba(75, 132, 255, 0.3);
         z-index: 10;
         pointer-events: auto;
     }
@@ -3131,7 +3166,7 @@
         bottom: -10rem;
         width: 80px;
         height: 80px;
-        background: #1B1B3F;
+        background: rgba(75, 132, 255, 1);
         border: none;
         border-radius: 50%;
         cursor: pointer;
@@ -3139,14 +3174,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 12px rgba(27, 27, 63, 0.3);
+        box-shadow: 0 4px 12px rgba(75, 132, 255, 0.3);
         z-index: 10;
         pointer-events: auto;
     }
 
     .slider-nav-btn:hover:not(:disabled) {
-        background: #4B84FF;
-        transform: translateY(-2px);
+        transform: scale(1.1) translateY(-2px);
         box-shadow: 0 6px 16px rgba(75, 132, 255, 0.4);
     }
 

@@ -15,7 +15,7 @@ const LogoCarousel = () => {
         const fetchLogoData = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('https://ahpbca-api.webonly.io/api/logos');
+                const response = await fetch('https://localhost:5000/api/logos');
                 if (!response.ok) {
                     throw new Error('Failed to fetch logo data');
                 }
@@ -72,6 +72,7 @@ const LogoCarousel = () => {
         const speedPxPerSec = 30; // pixels per second
         let rafId = null;
         let lastTs = null;
+        let accumulatedTime = 0;
 
         const step = (ts) => {
             if (!wrapper) return;
@@ -80,13 +81,19 @@ const LogoCarousel = () => {
             }
             const deltaSec = (ts - lastTs) / 1000;
             lastTs = ts;
+            accumulatedTime += deltaSec;
 
-            let next = wrapper.scrollLeft + speedPxPerSec * deltaSec;
-            // When we reach near the end of the second set, jump back by one set width instantly
-            if (next >= singleSetWidth * 2) {
-                next -= singleSetWidth;
+            // Use a more stable animation approach
+            const frameTime = 1 / 60; // Target 60fps
+            if (accumulatedTime >= frameTime) {
+                let next = wrapper.scrollLeft + speedPxPerSec * accumulatedTime;
+                // When we reach near the end of the second set, jump back by one set width instantly
+                if (next >= singleSetWidth * 2) {
+                    next -= singleSetWidth;
+                }
+                wrapper.scrollLeft = next;
+                accumulatedTime = 0;
             }
-            wrapper.scrollLeft = next;
             rafId = requestAnimationFrame(step);
         };
 

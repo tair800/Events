@@ -163,6 +163,21 @@
     pointer-events: none;
 }
 
+.contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
 .contact-heading h2 {
     font-size: 2rem;
     font-weight: 600;
@@ -184,6 +199,18 @@
     gap: 0.6rem;
     font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.9);
+}
+
+.contact-link {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    pointer-events: auto;
+}
+
+.contact-link:hover {
+    color: #4A90E2;
+    text-decoration: underline;
 }
 
 .contact-icon {

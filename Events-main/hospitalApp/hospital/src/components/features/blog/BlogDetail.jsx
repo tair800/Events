@@ -19,7 +19,7 @@ const BlogDetail = () => {
         const fetchBlogData = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('https://ahpbca-api.webonly.io/api/blogs');
+                const response = await fetch('https://localhost:5000/api/blogs');
                 if (!response.ok) {
                     throw new Error('Failed to fetch blog data');
                 }
@@ -113,7 +113,7 @@ const BlogDetail = () => {
                         <div className="blog-meta-container">
                             <div className="blog-date-component">
                                 <img
-                                    src="/assets/calendar.png"
+                                    src="/assets/blog-calendar.svg"
                                     alt="Calendar"
                                     className="calendar-icon"
                                 />

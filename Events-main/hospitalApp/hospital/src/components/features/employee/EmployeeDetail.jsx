@@ -34,7 +34,7 @@ const EmployeeDetail = () => {
         const fetchEmployee = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(`https://ahpbca-api.webonly.io/api/employees/${employeeId}`);
+                const response = await fetch(`https://localhost:5000/api/employees/${employeeId}`);
                 if (!response.ok) {
                     throw new Error('Employee not found');
                 }
@@ -245,25 +245,25 @@ const EmployeeDetail = () => {
                         <div className="contact-info">
                             {employee.phone && (
                                 <div className="contact-item">
-                                    <img src="/assets/phone-icon.png" alt="Phone" className="contact-icon" />
+                                    <img src="/assets/uzv-phone.svg" alt="Phone" className="contact-icon" />
                                     <span>{employee.phone}</span>
                                 </div>
                             )}
                             {employee.whatsApp && (
                                 <div className="contact-item">
-                                    <img src="/assets/whatsapp-icon.png" alt="WhatsApp" className="contact-icon" />
+                                    <img src="/assets/uzv-whatsapp.svg" alt="WhatsApp" className="contact-icon" />
                                     <span>{employee.whatsApp}</span>
                                 </div>
                             )}
                             {employee.email && (
                                 <div className="contact-item">
-                                    <img src="/assets/mail-icon.png" alt="Email" className="contact-icon" />
+                                    <img src="/assets/uzv-email.svg" alt="Email" className="contact-icon" />
                                     <span>{employee.email}</span>
                                 </div>
                             )}
                             {employee.location && (
                                 <div className="contact-item">
-                                    <img src="/assets/location-icon.png" alt="Location" className="contact-icon" />
+                                    <img src="/assets/uzv-location.svg" alt="Location" className="contact-icon" />
                                     <span>{employee.location}</span>
                                 </div>
                             )}

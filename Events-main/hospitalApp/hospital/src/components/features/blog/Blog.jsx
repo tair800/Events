@@ -4,7 +4,7 @@ import { getImagePath } from '../../../utils/imageUtils';
 import blog1Image from '../../../assets/blog1.png';
 import iconNext from '../../../assets/icon-next.svg';
 import iconPrev from '../../../assets/icon-prev.svg';
-import blogCardButton from '../../../assets/blog-card-button.svg';
+import eventNext from '/assets/event-next.svg';
 import './Blog.css';
 import LogoCarousel from '../../ui/LogoCarousel';
 
@@ -21,7 +21,7 @@ const Blog = () => {
         const fetchBlogData = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('https://ahpbca-api.webonly.io/api/blogs');
+                const response = await fetch('https://localhost:5000/api/blogs');
                 if (!response.ok) {
                     throw new Error('Failed to fetch blog data');
                 }
@@ -199,7 +199,7 @@ const Blog = () => {
                                 style={{ cursor: 'pointer' }}
                             >
                                 <img
-                                    src={blogCardButton}
+                                    src={eventNext}
                                     alt="Arrow"
                                     style={{
                                         width: 'auto',

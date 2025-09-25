@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { STORAGE_KEYS } from '../../utils'
 import './AdminLogin.css'
 
 function AdminLogin() {
@@ -16,7 +17,7 @@ function AdminLogin() {
         // Simple password check
         if (password === 'admin123') {
             // Store authentication in localStorage
-            localStorage.setItem('adminAuthenticated', 'true')
+            localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, 'true')
             navigate('/admin')
         } else {
             setError('Incorrect password. Please try again.')

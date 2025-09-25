@@ -7,12 +7,12 @@ export default defineConfig({
   server: {
     proxy: {
       '/uploads': {
-        target: 'https://ahpbca-api.webonly.io',
+        target: 'https://localhost:5000',
         changeOrigin: true,
         secure: false
       },
       '/api': {
-        target: 'https://ahpbca-api.webonly.io',
+        target: 'https://localhost:5000',
         changeOrigin: true,
         secure: false
       }
