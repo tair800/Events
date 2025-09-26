@@ -30,7 +30,13 @@ const translations = {
         loadingEmployees: 'İşçilər yüklənir...',
         errorLoadingEmployees: 'İşçilər yüklənərkən xəta',
         retry: 'Yenidən cəhd et',
-        noEmployeesFound: 'Həkim tapılmadı'
+        noEmployeesFound: 'Həkim tapılmadı',
+        // Event detail page
+        conferenceSpeakers: 'Konfrans spikerləri',
+        conferencePlanning: 'Konfrans planlaması',
+        loadingData: 'Məlumatlar yüklənir...',
+        noInformationAvailable: 'Məlumat mövcud deyil',
+        noTimelineData: 'Timeline məlumatları mövcud deyil'
     },
     en: {
         // About page
@@ -61,7 +67,13 @@ const translations = {
         loadingEmployees: 'Loading employees...',
         errorLoadingEmployees: 'Error loading employees',
         retry: 'Retry',
-        noEmployeesFound: 'No employees found'
+        noEmployeesFound: 'No employees found',
+        // Event detail page
+        conferenceSpeakers: 'Conference Speakers',
+        conferencePlanning: 'Conference Planning',
+        loadingData: 'Loading data...',
+        noInformationAvailable: 'No information available',
+        noTimelineData: 'No timeline data available'
     },
     ru: {
         // About page
@@ -92,7 +104,13 @@ const translations = {
         loadingEmployees: 'Загрузка сотрудников...',
         errorLoadingEmployees: 'Ошибка загрузки сотрудников',
         retry: 'Повторить',
-        noEmployeesFound: 'Сотрудники не найдены'
+        noEmployeesFound: 'Сотрудники не найдены',
+        // Event detail page
+        conferenceSpeakers: 'Спикеры конференции',
+        conferencePlanning: 'Планирование конференции',
+        loadingData: 'Загрузка данных...',
+        noInformationAvailable: 'Информация недоступна',
+        noTimelineData: 'Данные временной шкалы недоступны'
     }
 }
 

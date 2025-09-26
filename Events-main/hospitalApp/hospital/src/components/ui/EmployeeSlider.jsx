@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getContextualImagePath } from '../../utils/imageUtils';
+import { useLanguage } from '../../context/LanguageContext';
 import employeeBg from '../../assets/employee-bg.png';
 const iconNext = '/assets/event-next.svg';
 const iconPrev = '/assets/event-prev.svg';
@@ -15,6 +16,7 @@ const EmployeeSlider = ({ eventId = 1 }) => {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const navigate = useNavigate();
+    const { selectedLanguage } = useLanguage();
 
     const itemsPerPage = 4;
 
@@ -33,7 +35,7 @@ const EmployeeSlider = ({ eventId = 1 }) => {
                 setEmployees(employeeData);
 
                 // Fetch speakers for the specific event
-                const speakerResponse = await fetch(`https://localhost:5000/api/eventspeakers/event/${eventId}`);
+                const speakerResponse = await fetch(`https://localhost:5000/api/eventspeakers/event/${eventId}/language/${selectedLanguage}`);
                 let speakerData = [];
                 if (speakerResponse.ok) {
                     speakerData = await speakerResponse.json();
@@ -57,7 +59,7 @@ const EmployeeSlider = ({ eventId = 1 }) => {
         };
 
         fetchData();
-    }, [eventId]); // Add eventId dependency to refetch when event changes
+    }, [eventId, selectedLanguage]); // Add eventId and selectedLanguage dependency to refetch when event or language changes
 
     const handleItemClick = (item) => {
         if (item.type === 'employee') {

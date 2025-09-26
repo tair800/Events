@@ -151,6 +151,44 @@ namespace HospitalAPI.Controllers
             }
         }
 
+        // GET: api/events/featured/language/{lang} - Get main/featured events in specific language
+        [HttpGet("featured/language/{lang}")]
+        public async Task<ActionResult<IEnumerable<Event>>> GetFeaturedEventsByLanguage(string lang)
+        {
+            try
+            {
+                var featuredEvents = await _context.Events
+                    .Where(e => e.IsMain)
+                    .OrderByDescending(e => e.EventDate)
+                    .Take(3)
+                    .ToListAsync();
+                
+                // Apply language-specific content
+                foreach (var eventItem in featuredEvents)
+                {
+                    eventItem.Title = GetLocalizedTitle(eventItem, lang);
+                    eventItem.Subtitle = GetLocalizedSubtitle(eventItem, lang);
+                    eventItem.Description = GetLocalizedDescription(eventItem, lang);
+                    eventItem.LongDescription = GetLocalizedLongDescription(eventItem, lang);
+                    eventItem.Venue = GetLocalizedVenue(eventItem, lang);
+                    eventItem.Trainer = GetLocalizedTrainer(eventItem, lang);
+                    eventItem.Region = GetLocalizedRegion(eventItem, lang);
+                    
+                    // Format image paths for frontend
+                    eventItem.MainImage = ImagePathService.FormatContextualImagePath(eventItem.MainImage, "admin");
+                    eventItem.DetailImageLeft = ImagePathService.FormatContextualImagePath(eventItem.DetailImageLeft, "admin");
+                    eventItem.DetailImageMain = ImagePathService.FormatContextualImagePath(eventItem.DetailImageMain, "admin");
+                    eventItem.DetailImageRight = ImagePathService.FormatContextualImagePath(eventItem.DetailImageRight, "admin");
+                }
+                
+                return Ok(featuredEvents);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         // GET: api/events/upcoming - Get upcoming events
         [HttpGet("upcoming")]
         public async Task<ActionResult<IEnumerable<Event>>> GetUpcomingEvents()

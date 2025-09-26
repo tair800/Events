@@ -12,6 +12,8 @@ const EventsDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const eventId = parseInt(id);
+    const { selectedLanguage } = useLanguage();
+    const { t } = useTranslation();
 
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -29,7 +31,7 @@ const EventsDetail = () => {
         const fetchTimelineData = async () => {
             try {
                 setTimelineLoading(true);
-                const response = await fetch(`https://localhost:5000/api/eventtimeline/event/${eventId}`);
+                const response = await fetch(`https://localhost:5000/api/eventtimeline/event/${eventId}/language/${selectedLanguage}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch timeline data');
                 }
@@ -50,7 +52,7 @@ const EventsDetail = () => {
         if (eventId) {
             fetchTimelineData();
         }
-    }, [eventId]);
+    }, [eventId, selectedLanguage]);
 
     // Update CSS custom property for dynamic height based on timeline slots count
     useEffect(() => {
@@ -70,7 +72,7 @@ const EventsDetail = () => {
         const fetchEvent = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(`https://localhost:5000/api/events/${eventId}`);
+                const response = await fetch(`https://localhost:5000/api/events/${eventId}/language/${selectedLanguage}`);
                 if (!response.ok) {
                     throw new Error('Event not found');
                 }
@@ -87,7 +89,7 @@ const EventsDetail = () => {
         if (eventId) {
             fetchEvent();
         }
-    }, [eventId]);
+    }, [eventId, selectedLanguage]);
 
     // Countdown timer effect
     useEffect(() => {
@@ -315,7 +317,7 @@ const EventsDetail = () => {
                 <div className="event-detail-employee-header">
                     <div className="event-detail-employee-header-left">
                         <span className="event-detail-employee-header-second">
-                            <span>Konfrans spikerləri</span>
+                            <span>{t('conferenceSpeakers')}</span>
                         </span>
                     </div>
                 </div>
@@ -325,7 +327,7 @@ const EventsDetail = () => {
                 <div className="event-detail-timeline-header">
                     <div className="event-detail-timeline-header-left">
                         <span className="event-detail-timeline-header-second">
-                            <span>Konfrans planlaması</span>
+                            <span>{t('conferencePlanning')}</span>
                         </span>
                     </div>
                 </div>
@@ -392,7 +394,7 @@ const EventsDetail = () => {
                         {timelineLoading ? (
                             <div className="timeline-loading">
                                 <div className="loading-spinner"></div>
-                                <p>Məlumatlar yüklənir...</p>
+                                <p>{t('loadingData')}</p>
                             </div>
                         ) : timelineSlots.length > 0 && selectedTimeSlot < timelineSlots.length ? (
                             <div key={selectedTimeSlot} className="timeline-slot-details">
@@ -414,7 +416,7 @@ const EventsDetail = () => {
                                                 <div
                                                     className="info-text"
                                                     dangerouslySetInnerHTML={{
-                                                        __html: timelineSlots[selectedTimeSlot].info || 'Məlumat mövcud deyil'
+                                                        __html: timelineSlots[selectedTimeSlot].info || t('noInformationAvailable')
                                                     }}
                                                 />
                                             </div>
@@ -424,7 +426,7 @@ const EventsDetail = () => {
                             </div>
                         ) : (
                             <div className="timeline-no-data">
-                                <p>Timeline məlumatları mövcud deyil</p>
+                                <p>{t('noTimelineData')}</p>
                             </div>
                         )}
                     </div>

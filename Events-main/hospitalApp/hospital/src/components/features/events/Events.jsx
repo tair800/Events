@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getContextualImagePath } from '../../../utils/imageUtils';
+import { useLanguage } from '../../../context/LanguageContext';
+import { useTranslation } from '../../../hooks/useTranslation';
 const searchIcon = '/assets/search.svg';
 const cardIcon = '/assets/event-arrow.svg';
 const eventImg = '/assets/event-img.png';
@@ -12,6 +14,8 @@ import './Events.css';
 
 const Events = () => {
     const navigate = useNavigate();
+    const { selectedLanguage } = useLanguage();
+    const { t } = useTranslation();
 
     // API state
     const [events, setEvents] = useState([]);
@@ -129,8 +133,8 @@ const Events = () => {
             try {
                 setLoading(true);
                 const [eventsResponse, mainEventsResponse] = await Promise.all([
-                    fetch('https://localhost:5000/api/events'),
-                    fetch('https://localhost:5000/api/events/featured')
+                    fetch(`https://localhost:5000/api/events/language/${selectedLanguage}`),
+                    fetch(`https://localhost:5000/api/events/featured/language/${selectedLanguage}`)
                 ]);
 
                 if (!eventsResponse.ok || !mainEventsResponse.ok) {
@@ -151,7 +155,7 @@ const Events = () => {
         };
 
         fetchEvents();
-    }, []);
+    }, [selectedLanguage]);
 
     // Close dropdown when clicking outside
     useEffect(() => {
