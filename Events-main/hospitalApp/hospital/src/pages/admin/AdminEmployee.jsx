@@ -21,9 +21,91 @@ function AdminEmployee() {
         image: '',
         detailImage: '',
         firstDesc: '',
-        secondDesc: ''
+        secondDesc: '',
+        // English language fields
+        fullnameEn: '',
+        fieldEn: '',
+        clinicEn: '',
+        locationEn: '',
+        firstDescEn: '',
+        secondDescEn: '',
+        // Russian language fields
+        fullnameRu: '',
+        fieldRu: '',
+        clinicRu: '',
+        locationRu: '',
+        firstDescRu: '',
+        secondDescRu: ''
     });
+    const [activeLanguage, setActiveLanguage] = useState('aze');
     const [editingCertificates, setEditingCertificates] = useState({});
+
+    const languageOptions = [
+        { code: 'aze', name: 'Azerbaijani', flag: '🇦🇿' },
+        { code: 'en', name: 'English', flag: '🇺🇸' },
+        { code: 'ru', name: 'Russian', flag: '🇷🇺' }
+    ];
+
+    // Helper functions for language-specific fields
+    const getCurrentFieldName = (field) => {
+        if (activeLanguage === 'aze') return field;
+        if (activeLanguage === 'en') return field + 'En';
+        if (activeLanguage === 'ru') return field + 'Ru';
+        return field;
+    };
+
+    const getCurrentFieldValue = (field, data = employeeData) => {
+        const fieldName = getCurrentFieldName(field);
+        return data[fieldName] || '';
+    };
+
+    // Helper function for localized placeholder texts
+    const getLocalizedPlaceholder = (field) => {
+        const placeholders = {
+            fullname: {
+                aze: 'İşçinin tam adını daxil edin',
+                en: 'Enter employee full name',
+                ru: 'Введите полное имя сотрудника'
+            },
+            field: {
+                aze: 'Tibbi sahə və ya ixtisas daxil edin',
+                en: 'Enter medical field or specialization',
+                ru: 'Введите медицинскую область или специализацию'
+            },
+            clinic: {
+                aze: 'Klinika adını daxil edin',
+                en: 'Enter clinic name',
+                ru: 'Введите название клиники'
+            },
+            location: {
+                aze: 'Yerləşmə daxil edin',
+                en: 'Enter location',
+                ru: 'Введите местоположение'
+            },
+            firstDesc: {
+                aze: 'İşçi haqqında birinci təsviri daxil edin',
+                en: 'Enter first description about the employee',
+                ru: 'Введите первое описание сотрудника'
+            },
+            secondDesc: {
+                aze: 'İşçi haqqında ikinci təsviri daxil edin',
+                en: 'Enter second description about the employee',
+                ru: 'Введите второе описание сотрудника'
+            },
+            certificateName: {
+                aze: 'Sertifikat adını daxil edin',
+                en: 'Enter certificate name',
+                ru: 'Введите название сертификата'
+            },
+            universityName: {
+                aze: 'Universitet adını daxil edin',
+                en: 'Enter university name',
+                ru: 'Введите название университета'
+            }
+        };
+
+        return placeholders[field]?.[activeLanguage] || placeholders[field]?.aze || '';
+    };
     const [editingDegrees, setEditingDegrees] = useState({});
     const [certificateEditData, setCertificateEditData] = useState({});
     const [degreeEditData, setDegreeEditData] = useState({});
@@ -33,12 +115,20 @@ function AdminEmployee() {
     const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
     const [certificateData, setCertificateData] = useState({
         certificateName: '',
-        certificateImage: ''
+        certificateImage: '',
+        // English language field
+        certificateNameEn: '',
+        // Russian language field
+        certificateNameRu: ''
     });
     const [degreeData, setDegreeData] = useState({
         universityName: '',
         startYear: '',
-        endYear: ''
+        endYear: '',
+        // English language field
+        universityNameEn: '',
+        // Russian language field
+        universityNameRu: ''
     });
     const [loading, setLoading] = useState(false);
     const [editingEmployees, setEditingEmployees] = useState({});
@@ -178,14 +268,50 @@ function AdminEmployee() {
             setLoading(true);
             const editedData = editingEmployees[employeeId];
 
+            console.log('Saving employee with ID:', employeeId);
+            console.log('Edited data being sent:', editedData);
 
+            // Ensure required fields are not null/undefined and have proper values
+            // Exclude Degrees and Certificates arrays as they are managed separately
+            const { degrees, certificates, ...employeeDataWithoutCredentials } = editedData;
+
+            const dataToSend = {
+                ...employeeDataWithoutCredentials,
+                fullname: editedData.fullname || '',
+                field: editedData.field || '',
+                clinic: editedData.clinic || '',
+                // Ensure all fields have proper values
+                phone: editedData.phone || null,
+                whatsApp: editedData.whatsApp || null,
+                email: editedData.email || null,
+                location: editedData.location || null,
+                image: editedData.image || null,
+                detailImage: editedData.detailImage || null,
+                firstDesc: editedData.firstDesc || null,
+                secondDesc: editedData.secondDesc || null,
+                // Language fields
+                fullnameEn: editedData.fullnameEn || null,
+                fieldEn: editedData.fieldEn || null,
+                clinicEn: editedData.clinicEn || null,
+                locationEn: editedData.locationEn || null,
+                firstDescEn: editedData.firstDescEn || null,
+                secondDescEn: editedData.secondDescEn || null,
+                fullnameRu: editedData.fullnameRu || null,
+                fieldRu: editedData.fieldRu || null,
+                clinicRu: editedData.clinicRu || null,
+                locationRu: editedData.locationRu || null,
+                firstDescRu: editedData.firstDescRu || null,
+                secondDescRu: editedData.secondDescRu || null
+            };
+
+            console.log('Data being sent to API:', dataToSend);
 
             const response = await fetch(`https://localhost:5000/api/employees/${employeeId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(editedData),
+                body: JSON.stringify(dataToSend),
             });
 
 
@@ -229,7 +355,9 @@ function AdminEmployee() {
                 showAlert('success', 'Success!', 'Employee and credentials updated successfully!');
                 return;
             } else {
-                showAlert('error', 'Error!', `Failed to update employee. Status: ${response.status}`);
+                const errorText = await response.text();
+                console.error('Employee update failed:', response.status, errorText);
+                showAlert('error', 'Error!', `Failed to update employee. Status: ${response.status}. ${errorText}`);
             }
         } catch (error) {
             showAlert('error', 'Error!', 'Failed to save employee data.');
@@ -251,7 +379,21 @@ function AdminEmployee() {
             image: '',
             detailImage: '',
             firstDesc: '',
-            secondDesc: ''
+            secondDesc: '',
+            // English language fields
+            fullnameEn: '',
+            fieldEn: '',
+            clinicEn: '',
+            locationEn: '',
+            firstDescEn: '',
+            secondDescEn: '',
+            // Russian language fields
+            fullnameRu: '',
+            fieldRu: '',
+            clinicRu: '',
+            locationRu: '',
+            firstDescRu: '',
+            secondDescRu: ''
         });
     };
 
@@ -578,14 +720,28 @@ function AdminEmployee() {
     // Certificate CRUD Functions
     const openCertificateModal = (employeeId) => {
         setSelectedEmployeeId(employeeId);
-        setCertificateData({ certificateName: '', certificateImage: '' });
+        setCertificateData({
+            certificateName: '',
+            certificateImage: '',
+            // English language field
+            certificateNameEn: '',
+            // Russian language field
+            certificateNameRu: ''
+        });
         setShowCertificateModal(true);
     };
 
     const closeCertificateModal = () => {
         setShowCertificateModal(false);
         setSelectedEmployeeId(null);
-        setCertificateData({ certificateName: '', certificateImage: '' });
+        setCertificateData({
+            certificateName: '',
+            certificateImage: '',
+            // English language field
+            certificateNameEn: '',
+            // Russian language field
+            certificateNameRu: ''
+        });
     };
 
     const handleCertificateSubmit = async (e) => {
@@ -662,14 +818,26 @@ function AdminEmployee() {
         }
 
         setSelectedEmployeeId(employeeId);
-        setDegreeData({ universityName: '', startYear: '', endYear: '' });
+        setDegreeData({
+            universityName: '',
+            startYear: '',
+            endYear: '',
+            universityNameEn: '',
+            universityNameRu: ''
+        });
         setShowDegreeModal(true);
     };
 
     const closeDegreeModal = () => {
         setShowDegreeModal(false);
         setSelectedEmployeeId(null);
-        setDegreeData({ universityName: '', startYear: '', endYear: '' });
+        setDegreeData({
+            universityName: '',
+            startYear: '',
+            endYear: '',
+            universityNameEn: '',
+            universityNameRu: ''
+        });
     };
 
     const handleDegreeSubmit = async (e) => {
@@ -753,7 +921,11 @@ function AdminEmployee() {
             ...prev,
             [certificateId]: {
                 certificateName: certificate.certificateName,
-                certificateImage: certificate.certificateImage
+                certificateImage: certificate.certificateImage,
+                // English language field
+                certificateNameEn: certificate.certificateNameEn || '',
+                // Russian language field
+                certificateNameRu: certificate.certificateNameRu || ''
             }
         }));
     };
@@ -823,6 +995,16 @@ function AdminEmployee() {
                     hasChanges = true;
                 }
 
+                // Check language fields
+                if (editData.certificateNameEn !== undefined && editData.certificateNameEn !== (originalCertificate.certificateNameEn || '')) {
+                    dataToSend.certificateNameEn = editData.certificateNameEn;
+                    hasChanges = true;
+                }
+                if (editData.certificateNameRu !== undefined && editData.certificateNameRu !== (originalCertificate.certificateNameRu || '')) {
+                    dataToSend.certificateNameRu = editData.certificateNameRu;
+                    hasChanges = true;
+                }
+
                 if (!hasChanges) {
 
                     continue;
@@ -883,6 +1065,16 @@ function AdminEmployee() {
 
                 if (editData.universityName !== undefined && editData.universityName !== original.universityName) {
                     payload.universityName = editData.universityName;
+                    hasChanges = true;
+                }
+
+                if (editData.universityNameEn !== undefined && editData.universityNameEn !== original.universityNameEn) {
+                    payload.universityNameEn = editData.universityNameEn;
+                    hasChanges = true;
+                }
+
+                if (editData.universityNameRu !== undefined && editData.universityNameRu !== original.universityNameRu) {
+                    payload.universityNameRu = editData.universityNameRu;
                     hasChanges = true;
                 }
 
@@ -1000,7 +1192,9 @@ function AdminEmployee() {
             [degreeId]: {
                 universityName: degree.universityName,
                 startYear: degree.startYear,
-                endYear: degree.endYear
+                endYear: degree.endYear,
+                universityNameEn: degree.universityNameEn,
+                universityNameRu: degree.universityNameRu
             }
         }));
     };
@@ -1033,6 +1227,12 @@ function AdminEmployee() {
             const original = employees.flatMap(emp => emp.degrees || []).find(d => d.id === degreeId);
             if (editData?.universityName !== undefined && editData.universityName !== original?.universityName) {
                 payload.universityName = editData.universityName;
+            }
+            if (editData?.universityNameEn !== undefined && editData.universityNameEn !== original?.universityNameEn) {
+                payload.universityNameEn = editData.universityNameEn;
+            }
+            if (editData?.universityNameRu !== undefined && editData.universityNameRu !== original?.universityNameRu) {
+                payload.universityNameRu = editData.universityNameRu;
             }
             if (editData?.startYear !== undefined) {
                 const sy = parseInt(editData.startYear);
@@ -1135,6 +1335,23 @@ function AdminEmployee() {
                                         />
                                     </div>
 
+                                    {/* Language Tabs for Inline Editing */}
+                                    <div className="language-tabs-container">
+                                        <div className="language-tabs">
+                                            {languageOptions.map((lang) => (
+                                                <button
+                                                    key={lang.code}
+                                                    type="button"
+                                                    className={`language-tab ${activeLanguage === lang.code ? 'active' : ''}`}
+                                                    onClick={() => setActiveLanguage(lang.code)}
+                                                >
+                                                    <span className="language-flag">{lang.flag}</span>
+                                                    <span className="language-name">{lang.name}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
                                     <div className="admin-employee-form">
                                         <div className="form-fields-left">
                                             <div className="form-group">
@@ -1143,8 +1360,11 @@ function AdminEmployee() {
                                                     <input
                                                         type="text"
                                                         className="form-input"
-                                                        value={currentData.fullname || ''}
-                                                        onChange={(e) => handleInlineInputChange(employee.id, 'fullname', e.target.value)}
+                                                        value={getCurrentFieldValue('fullname', currentData)}
+                                                        onChange={(e) => {
+                                                            const fieldName = getCurrentFieldName('fullname');
+                                                            handleInlineInputChange(employee.id, fieldName, e.target.value);
+                                                        }}
                                                         maxLength={200}
                                                         placeholder="Employee full name"
                                                     />
@@ -1157,8 +1377,11 @@ function AdminEmployee() {
                                                     <input
                                                         type="text"
                                                         className="form-input"
-                                                        value={currentData.field || ''}
-                                                        onChange={(e) => handleInlineInputChange(employee.id, 'field', e.target.value)}
+                                                        value={getCurrentFieldValue('field', currentData)}
+                                                        onChange={(e) => {
+                                                            const fieldName = getCurrentFieldName('field');
+                                                            handleInlineInputChange(employee.id, fieldName, e.target.value);
+                                                        }}
                                                         maxLength={200}
                                                         placeholder="Medical field or specialization"
                                                     />
@@ -1171,8 +1394,11 @@ function AdminEmployee() {
                                                     <input
                                                         type="text"
                                                         className="form-input"
-                                                        value={currentData.clinic || ''}
-                                                        onChange={(e) => handleInlineInputChange(employee.id, 'clinic', e.target.value)}
+                                                        value={getCurrentFieldValue('clinic', currentData)}
+                                                        onChange={(e) => {
+                                                            const fieldName = getCurrentFieldName('clinic');
+                                                            handleInlineInputChange(employee.id, fieldName, e.target.value);
+                                                        }}
                                                         maxLength={200}
                                                         placeholder="Clinic name"
                                                     />
@@ -1227,8 +1453,11 @@ function AdminEmployee() {
                                                     <input
                                                         type="text"
                                                         className="form-input"
-                                                        value={currentData.location || ''}
-                                                        onChange={(e) => handleInlineInputChange(employee.id, 'location', e.target.value)}
+                                                        value={getCurrentFieldValue('location', currentData)}
+                                                        onChange={(e) => {
+                                                            const fieldName = getCurrentFieldName('location');
+                                                            handleInlineInputChange(employee.id, fieldName, e.target.value);
+                                                        }}
                                                         maxLength={200}
                                                         placeholder="Location"
                                                     />
@@ -1239,8 +1468,11 @@ function AdminEmployee() {
                                                 <label>First Description</label>
                                                 <textarea
                                                     className="form-textarea"
-                                                    value={currentData.firstDesc || ''}
-                                                    onChange={(e) => handleInlineInputChange(employee.id, 'firstDesc', e.target.value)}
+                                                    value={getCurrentFieldValue('firstDesc', currentData)}
+                                                    onChange={(e) => {
+                                                        const fieldName = getCurrentFieldName('firstDesc');
+                                                        handleInlineInputChange(employee.id, fieldName, e.target.value);
+                                                    }}
                                                     maxLength={1000}
                                                     placeholder="First description about the employee"
                                                     rows={4}
@@ -1251,8 +1483,11 @@ function AdminEmployee() {
                                                 <label>Second Description</label>
                                                 <textarea
                                                     className="form-textarea"
-                                                    value={currentData.secondDesc || ''}
-                                                    onChange={(e) => handleInlineInputChange(employee.id, 'secondDesc', e.target.value)}
+                                                    value={getCurrentFieldValue('secondDesc', currentData)}
+                                                    onChange={(e) => {
+                                                        const fieldName = getCurrentFieldName('secondDesc');
+                                                        handleInlineInputChange(employee.id, fieldName, e.target.value);
+                                                    }}
                                                     maxLength={1000}
                                                     placeholder="Second description about the employee"
                                                     rows={4}
@@ -1370,6 +1605,23 @@ function AdminEmployee() {
                                             </div>
                                         </div>
 
+                                        {/* Language Tabs for Certificates */}
+                                        <div className="language-tabs-container">
+                                            <div className="language-tabs">
+                                                {languageOptions.map((lang) => (
+                                                    <button
+                                                        key={lang.code}
+                                                        type="button"
+                                                        className={`language-tab ${activeLanguage === lang.code ? 'active' : ''}`}
+                                                        onClick={() => setActiveLanguage(lang.code)}
+                                                    >
+                                                        <span className="language-flag">{lang.flag}</span>
+                                                        <span className="language-name">{lang.name}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
                                         <div className="credentials-compact-list">
                                             {/* Certificates (Admin-About like grid) */}
                                             <div className="credentials-section-compact">
@@ -1421,9 +1673,12 @@ function AdminEmployee() {
                                                                     <input
                                                                         type="text"
                                                                         className="field-input certificate-name-input"
-                                                                        value={certificateEditData[certificate.id]?.certificateName || certificate.certificateName || ''}
-                                                                        onChange={(e) => handleCertificateEditChange(certificate.id, 'certificateName', e.target.value)}
-                                                                        placeholder="Certificate name"
+                                                                        value={getCurrentFieldValue('certificateName', certificateEditData[certificate.id] || certificate)}
+                                                                        onChange={(e) => {
+                                                                            const fieldName = getCurrentFieldName('certificateName');
+                                                                            handleCertificateEditChange(certificate.id, fieldName, e.target.value);
+                                                                        }}
+                                                                        placeholder={getLocalizedPlaceholder('certificateName')}
                                                                     />
                                                                     <input
                                                                         type="text"
@@ -1444,6 +1699,24 @@ function AdminEmployee() {
                                             {/* Degrees */}
                                             <div className="credentials-section-compact">
                                                 <h5 className="section-title">Degrees</h5>
+
+                                                {/* Language Tabs for Degrees */}
+                                                <div className="language-tabs-container">
+                                                    <div className="language-tabs">
+                                                        {languageOptions.map((lang) => (
+                                                            <button
+                                                                key={lang.code}
+                                                                type="button"
+                                                                className={`language-tab ${activeLanguage === lang.code ? 'active' : ''}`}
+                                                                onClick={() => setActiveLanguage(lang.code)}
+                                                            >
+                                                                <span className="language-flag">{lang.flag}</span>
+                                                                <span className="language-name">{lang.name}</span>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
                                                 {currentData.degrees && currentData.degrees.length > 0 ? (
                                                     currentData.degrees.map((degree, index) => (
                                                         <div key={degree.id} className="credential-item-compact">
@@ -1453,9 +1726,12 @@ function AdminEmployee() {
                                                                     <input
                                                                         type="text"
                                                                         className="field-input degree-university-input"
-                                                                        value={degreeEditData[degree.id]?.universityName || degree.universityName || ''}
-                                                                        onChange={(e) => handleDegreeEditChange(degree.id, 'universityName', e.target.value)}
-                                                                        placeholder="University name"
+                                                                        value={getCurrentFieldValue('universityName', degreeEditData[degree.id] || degree)}
+                                                                        onChange={(e) => {
+                                                                            const fieldName = getCurrentFieldName('universityName');
+                                                                            handleDegreeEditChange(degree.id, fieldName, e.target.value);
+                                                                        }}
+                                                                        placeholder={getLocalizedPlaceholder('universityName')}
                                                                     />
                                                                     <div className="year-inputs">
                                                                         <input
@@ -1535,7 +1811,10 @@ function AdminEmployee() {
 
             {/* Create Modal */}
             {showModal && (
-                <div className="admin-employee-modal-overlay" onClick={closeModal}>
+                <div className="admin-employee-modal-overlay" onClick={() => {
+                    setShowModal(false);
+                    resetForm();
+                }}>
                     <div className="admin-employee-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="admin-employee-modal-header">
                             <h2>Create New Employee</h2>
@@ -1545,6 +1824,23 @@ function AdminEmployee() {
                             >
                                 ×
                             </button>
+                        </div>
+
+                        {/* Language Tabs */}
+                        <div className="language-tabs-container">
+                            <div className="language-tabs">
+                                {languageOptions.map((lang) => (
+                                    <button
+                                        key={lang.code}
+                                        type="button"
+                                        className={`language-tab ${activeLanguage === lang.code ? 'active' : ''}`}
+                                        onClick={() => setActiveLanguage(lang.code)}
+                                    >
+                                        <span className="language-flag">{lang.flag}</span>
+                                        <span className="language-name">{lang.name}</span>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
                         <form className="admin-employee-modal-form" onSubmit={handleSubmit}>
@@ -1558,11 +1854,14 @@ function AdminEmployee() {
                                             id="fullname"
                                             name="fullname"
                                             className="admin-employee-form-input"
-                                            value={employeeData.fullname}
-                                            onChange={(e) => setEmployeeData(prev => ({ ...prev, fullname: e.target.value }))}
+                                            value={getCurrentFieldValue('fullname')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('fullname');
+                                                setEmployeeData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={200}
                                             required
-                                            placeholder="Enter employee full name"
+                                            placeholder={getLocalizedPlaceholder('fullname')}
                                         />
                                     </div>
 
@@ -1573,11 +1872,14 @@ function AdminEmployee() {
                                             id="field"
                                             name="field"
                                             className="admin-employee-form-input"
-                                            value={employeeData.field}
-                                            onChange={(e) => setEmployeeData(prev => ({ ...prev, field: e.target.value }))}
+                                            value={getCurrentFieldValue('field')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('field');
+                                                setEmployeeData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={200}
                                             required
-                                            placeholder="Enter medical field or specialization"
+                                            placeholder={getLocalizedPlaceholder('field')}
                                         />
                                     </div>
 
@@ -1588,10 +1890,13 @@ function AdminEmployee() {
                                             id="clinic"
                                             name="clinic"
                                             className="admin-employee-form-input"
-                                            value={employeeData.clinic}
-                                            onChange={(e) => setEmployeeData(prev => ({ ...prev, clinic: e.target.value }))}
+                                            value={getCurrentFieldValue('clinic')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('clinic');
+                                                setEmployeeData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={200}
-                                            placeholder="Enter clinic name"
+                                            placeholder={getLocalizedPlaceholder('clinic')}
                                         />
                                     </div>
 
@@ -1644,10 +1949,13 @@ function AdminEmployee() {
                                             id="location"
                                             name="location"
                                             className="admin-employee-form-input"
-                                            value={employeeData.location}
-                                            onChange={(e) => setEmployeeData(prev => ({ ...prev, location: e.target.value }))}
+                                            value={getCurrentFieldValue('location')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('location');
+                                                setEmployeeData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={200}
-                                            placeholder="Enter location"
+                                            placeholder={getLocalizedPlaceholder('location')}
                                         />
                                     </div>
                                 </div>
@@ -1660,11 +1968,14 @@ function AdminEmployee() {
                                             id="firstDesc"
                                             name="firstDesc"
                                             className="admin-employee-form-textarea"
-                                            value={employeeData.firstDesc}
-                                            onChange={(e) => setEmployeeData(prev => ({ ...prev, firstDesc: e.target.value }))}
+                                            value={getCurrentFieldValue('firstDesc')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('firstDesc');
+                                                setEmployeeData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={1000}
                                             rows={4}
-                                            placeholder="Enter first description about the employee"
+                                            placeholder={getLocalizedPlaceholder('firstDesc')}
                                         />
                                     </div>
 
@@ -1674,11 +1985,14 @@ function AdminEmployee() {
                                             id="secondDesc"
                                             name="secondDesc"
                                             className="admin-employee-form-textarea"
-                                            value={employeeData.secondDesc}
-                                            onChange={(e) => setEmployeeData(prev => ({ ...prev, secondDesc: e.target.value }))}
+                                            value={getCurrentFieldValue('secondDesc')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('secondDesc');
+                                                setEmployeeData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={1000}
                                             rows={4}
-                                            placeholder="Enter second description about the employee"
+                                            placeholder={getLocalizedPlaceholder('secondDesc')}
                                         />
                                     </div>
 
@@ -1798,7 +2112,16 @@ function AdminEmployee() {
 
             {/* Certificate Modal */}
             {showCertificateModal && (
-                <div className="admin-employee-modal-overlay" onClick={closeCertificateModal}>
+                <div className="admin-employee-modal-overlay" onClick={() => {
+                    setShowCertificateModal(false);
+                    setSelectedEmployeeId(null);
+                    setCertificateData({
+                        certificateName: '',
+                        certificateImage: '',
+                        certificateNameEn: '',
+                        certificateNameRu: ''
+                    });
+                }}>
                     <div className="admin-employee-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="admin-employee-modal-header">
                             <h2>Add Certificate</h2>
@@ -1810,6 +2133,23 @@ function AdminEmployee() {
                             </button>
                         </div>
 
+                        {/* Language Tabs for Certificate Modal */}
+                        <div className="language-tabs-container">
+                            <div className="language-tabs">
+                                {languageOptions.map((lang) => (
+                                    <button
+                                        key={lang.code}
+                                        type="button"
+                                        className={`language-tab ${activeLanguage === lang.code ? 'active' : ''}`}
+                                        onClick={() => setActiveLanguage(lang.code)}
+                                    >
+                                        <span className="language-flag">{lang.flag}</span>
+                                        <span className="language-name">{lang.name}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                         <form className="admin-employee-modal-form" onSubmit={handleCertificateSubmit}>
                             <div className="admin-employee-form-group">
                                 <label htmlFor="certificateName">Certificate Name</label>
@@ -1818,11 +2158,14 @@ function AdminEmployee() {
                                     id="certificateName"
                                     name="certificateName"
                                     className="admin-employee-form-input"
-                                    value={certificateData.certificateName}
-                                    onChange={(e) => setCertificateData(prev => ({ ...prev, certificateName: e.target.value }))}
+                                    value={getCurrentFieldValue('certificateName', certificateData)}
+                                    onChange={(e) => {
+                                        const fieldName = getCurrentFieldName('certificateName');
+                                        setCertificateData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                    }}
                                     maxLength={255}
                                     required
-                                    placeholder="Enter certificate name"
+                                    placeholder={getLocalizedPlaceholder('certificateName')}
                                 />
                             </div>
 
@@ -1900,16 +2243,53 @@ function AdminEmployee() {
 
             {/* Degree Modal */}
             {showDegreeModal && (
-                <div className="admin-employee-modal-overlay" onClick={closeDegreeModal}>
+                <div className="admin-employee-modal-overlay" onClick={() => {
+                    setShowDegreeModal(false);
+                    setSelectedEmployeeId(null);
+                    setDegreeData({
+                        universityName: '',
+                        startYear: '',
+                        endYear: '',
+                        universityNameEn: '',
+                        universityNameRu: ''
+                    });
+                }}>
                     <div className="admin-employee-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="admin-employee-modal-header">
                             <h2>Add Degree</h2>
                             <button
                                 className="admin-employee-modal-close"
-                                onClick={closeDegreeModal}
+                                onClick={() => {
+                                    setShowDegreeModal(false);
+                                    setSelectedEmployeeId(null);
+                                    setDegreeData({
+                                        universityName: '',
+                                        startYear: '',
+                                        endYear: '',
+                                        universityNameEn: '',
+                                        universityNameRu: ''
+                                    });
+                                }}
                             >
                                 ×
                             </button>
+                        </div>
+
+                        {/* Language Tabs */}
+                        <div className="language-tabs-container">
+                            <div className="language-tabs">
+                                {languageOptions.map((lang) => (
+                                    <button
+                                        key={lang.code}
+                                        type="button"
+                                        className={`language-tab ${activeLanguage === lang.code ? 'active' : ''}`}
+                                        onClick={() => setActiveLanguage(lang.code)}
+                                    >
+                                        <span className="language-flag">{lang.flag}</span>
+                                        <span className="language-name">{lang.name}</span>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
                         <form className="admin-employee-modal-form" onSubmit={handleDegreeSubmit}>
@@ -1920,11 +2300,14 @@ function AdminEmployee() {
                                     id="universityName"
                                     name="universityName"
                                     className="admin-employee-form-input"
-                                    value={degreeData.universityName}
-                                    onChange={(e) => setDegreeData(prev => ({ ...prev, universityName: e.target.value }))}
+                                    value={getCurrentFieldValue('universityName', degreeData)}
+                                    onChange={(e) => {
+                                        const fieldName = getCurrentFieldName('universityName');
+                                        setDegreeData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                    }}
                                     maxLength={255}
                                     required
-                                    placeholder="Enter university name"
+                                    placeholder={getLocalizedPlaceholder('universityName')}
                                 />
                             </div>
 

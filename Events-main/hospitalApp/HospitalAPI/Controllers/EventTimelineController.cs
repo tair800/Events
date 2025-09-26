@@ -35,6 +35,33 @@ namespace HospitalAPI.Controllers
             }
         }
 
+        // GET: api/eventtimeline/event/{eventId}/language/{lang}
+        [HttpGet("event/{eventId}/language/{lang}")]
+        public async Task<ActionResult<IEnumerable<EventTimeline>>> GetTimelineByEventLanguage(int eventId, string lang)
+        {
+            try
+            {
+                var timeline = await _context.EventTimeline
+                    .Where(et => et.EventId == eventId)
+                    .OrderBy(et => et.OrderIndex)
+                    .ToListAsync();
+
+                // Apply language-specific content
+                foreach (var timelineItem in timeline)
+                {
+                    timelineItem.Title = GetLocalizedTitle(timelineItem, lang);
+                    timelineItem.Description = GetLocalizedDescription(timelineItem, lang);
+                    timelineItem.Info = GetLocalizedInfo(timelineItem, lang);
+                }
+
+                return Ok(timeline);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         // GET: api/eventtimeline/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<EventTimeline>> GetEventTimeline(int id)
@@ -86,7 +113,28 @@ namespace HospitalAPI.Controllers
 
             try
             {
-                _context.Entry(eventTimeline).State = EntityState.Modified;
+                var existingTimeline = await _context.EventTimeline.FindAsync(id);
+                if (existingTimeline == null)
+                {
+                    return NotFound();
+                }
+
+                // Update all fields including language fields
+                existingTimeline.EventId = eventTimeline.EventId;
+                existingTimeline.StartTime = eventTimeline.StartTime;
+                existingTimeline.EndTime = eventTimeline.EndTime;
+                existingTimeline.Title = eventTimeline.Title;
+                existingTimeline.Description = eventTimeline.Description;
+                existingTimeline.Info = eventTimeline.Info;
+                existingTimeline.OrderIndex = eventTimeline.OrderIndex;
+                existingTimeline.TitleEn = eventTimeline.TitleEn;
+                existingTimeline.DescriptionEn = eventTimeline.DescriptionEn;
+                existingTimeline.InfoEn = eventTimeline.InfoEn;
+                existingTimeline.TitleRu = eventTimeline.TitleRu;
+                existingTimeline.DescriptionRu = eventTimeline.DescriptionRu;
+                existingTimeline.InfoRu = eventTimeline.InfoRu;
+                existingTimeline.UpdatedAt = DateTime.UtcNow.ToString();
+
                 await _context.SaveChangesAsync();
 
                 return NoContent();
@@ -134,6 +182,37 @@ namespace HospitalAPI.Controllers
         private bool EventTimelineExists(int id)
         {
             return _context.EventTimeline.Any(e => e.Id == id);
+        }
+
+        // Helper methods for localization
+        private string GetLocalizedTitle(EventTimeline timeline, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(timeline.TitleEn) ? timeline.TitleEn : timeline.Title,
+                "ru" => !string.IsNullOrEmpty(timeline.TitleRu) ? timeline.TitleRu : timeline.Title,
+                _ => timeline.Title
+            };
+        }
+
+        private string GetLocalizedDescription(EventTimeline timeline, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(timeline.DescriptionEn) ? timeline.DescriptionEn : timeline.Description,
+                "ru" => !string.IsNullOrEmpty(timeline.DescriptionRu) ? timeline.DescriptionRu : timeline.Description,
+                _ => timeline.Description
+            };
+        }
+
+        private string GetLocalizedInfo(EventTimeline timeline, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(timeline.InfoEn) ? timeline.InfoEn : timeline.Info,
+                "ru" => !string.IsNullOrEmpty(timeline.InfoRu) ? timeline.InfoRu : timeline.Info,
+                _ => timeline.Info
+            };
         }
     }
 }

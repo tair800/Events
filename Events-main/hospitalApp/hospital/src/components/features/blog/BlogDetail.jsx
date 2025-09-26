@@ -5,6 +5,7 @@ import blog1Image from '../../../assets/blog1.png';
 import blogDetailArrow from '../../../assets/blog-detail-arrow.svg';
 import './BlogDetail.css';
 import LogoCarousel from '../../ui/LogoCarousel';
+import { useLanguage } from '../../../context';
 
 const BlogDetail = () => {
     const { id } = useParams();
@@ -13,17 +14,46 @@ const BlogDetail = () => {
     const [blogData, setBlogData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [cachedData, setCachedData] = useState({});
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const { selectedLanguage } = useLanguage();
 
-    // Fetch blog data from API
+    // Fetch blog data from API with language support
     useEffect(() => {
         const fetchBlogData = async () => {
             try {
+                // Check if we have cached data for this language
+                if (cachedData[selectedLanguage]) {
+                    setBlogData(cachedData[selectedLanguage]);
+                    const foundBlog = cachedData[selectedLanguage].find(b => b.id === parseInt(id));
+                    if (foundBlog) {
+                        setBlog(foundBlog);
+                    }
+                    setLoading(false);
+                    return;
+                }
+
+                setIsTransitioning(true);
                 setLoading(true);
-                const response = await fetch('https://localhost:5000/api/blogs');
+
+                let apiUrl = 'https://localhost:5000/api/blogs';
+
+                // Use language-specific endpoint if not Azerbaijani
+                if (selectedLanguage !== 'aze') {
+                    apiUrl = `https://localhost:5000/api/blogs/language/${selectedLanguage}`;
+                }
+
+                const response = await fetch(apiUrl);
                 if (!response.ok) {
                     throw new Error('Failed to fetch blog data');
                 }
                 const data = await response.json();
+
+                // Cache the data for this language
+                setCachedData(prev => ({
+                    ...prev,
+                    [selectedLanguage]: data
+                }));
 
                 setBlogData(data);
 
@@ -37,18 +67,28 @@ const BlogDetail = () => {
                 setError(err.message);
             } finally {
                 setLoading(false);
+                // Add a small delay for smooth transition
+                setTimeout(() => {
+                    setIsTransitioning(false);
+                }, 150);
             }
         };
 
         fetchBlogData();
-    }, [id]);
+    }, [id, selectedLanguage, cachedData]);
 
-    // Show loading state
-    if (loading) {
+    // Show loading state only for initial load, not for language changes
+    if (loading && !cachedData[selectedLanguage]) {
         return (
             <div className="blog-detail-page">
                 <div className="blog-detail-container">
-                    <div style={{ textAlign: 'center', padding: '50px' }}>
+                    <div style={{
+                        textAlign: 'center',
+                        padding: '50px',
+                        color: 'white',
+                        opacity: 0.7,
+                        transition: 'opacity 0.3s ease'
+                    }}>
                         <p>Loading blog...</p>
                     </div>
                 </div>
@@ -87,7 +127,7 @@ const BlogDetail = () => {
     }
 
     return (
-        <div className="blog-detail-page">
+        <div className={`blog-detail-page ${isTransitioning ? 'transitioning' : ''}`} data-language={selectedLanguage}>
             {/* Background Images */}
             <img
                 src="/assets/blogdetail-bg1.png"

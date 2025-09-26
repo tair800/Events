@@ -59,6 +59,150 @@ namespace HospitalAPI.Controllers
             }
         }
 
+        // GET: api/blogs/language/{lang} - Get blogs by language
+        [HttpGet("language/{lang}")]
+        public async Task<ActionResult<IEnumerable<object>>> GetBlogsByLanguage(string lang)
+        {
+            try
+            {
+                var blogs = await _context.Blogs.ToListAsync();
+                
+                // Sort blogs by Number field numerically
+                var sortedBlogs = blogs
+                    .Where(b => !string.IsNullOrEmpty(b.Number) && int.TryParse(b.Number, out _))
+                    .OrderBy(b => int.Parse(b.Number))
+                    .ToList();
+                
+                var result = sortedBlogs.Select(blog => new
+                {
+                    Id = blog.Id,
+                    Number = blog.Number,
+                    Title = GetLocalizedTitle(blog, lang),
+                    Description = GetLocalizedDescription(blog, lang),
+                    Date = blog.Date,
+                    Visitors = blog.Visitors,
+                    SecondDescTitle = GetLocalizedSecondDescTitle(blog, lang),
+                    SecondDescBody = GetLocalizedSecondDescBody(blog, lang),
+                    ThirdTextTitle = GetLocalizedThirdTextTitle(blog, lang),
+                    ThirdTextBody = GetLocalizedThirdTextBody(blog, lang),
+                    Image = ImagePathService.FormatContextualImagePath(blog.Image, "blog"),
+                    CreatedAt = blog.CreatedAt,
+                    UpdatedAt = blog.UpdatedAt
+                }).ToList();
+                
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ERROR in GetBlogsByLanguage: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        // GET: api/blogs/{id}/language/{lang} - Get specific blog by language
+        [HttpGet("{id:int}/language/{lang}")]
+        public async Task<ActionResult<object>> GetBlogByLanguage(int id, string lang)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    return BadRequest("Invalid blog ID");
+                }
+
+                var blog = await _context.Blogs.FindAsync(id);
+
+                if (blog == null)
+                {
+                    return NotFound($"Blog with ID {id} not found");
+                }
+
+                var result = new
+                {
+                    Id = blog.Id,
+                    Number = blog.Number,
+                    Title = GetLocalizedTitle(blog, lang),
+                    Description = GetLocalizedDescription(blog, lang),
+                    Date = blog.Date,
+                    Visitors = blog.Visitors,
+                    SecondDescTitle = GetLocalizedSecondDescTitle(blog, lang),
+                    SecondDescBody = GetLocalizedSecondDescBody(blog, lang),
+                    ThirdTextTitle = GetLocalizedThirdTextTitle(blog, lang),
+                    ThirdTextBody = GetLocalizedThirdTextBody(blog, lang),
+                    Image = ImagePathService.FormatContextualImagePath(blog.Image, "blog"),
+                    CreatedAt = blog.CreatedAt,
+                    UpdatedAt = blog.UpdatedAt
+                };
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        // Helper methods for localized content
+        private string GetLocalizedTitle(Blog blog, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(blog.TitleEn) ? blog.TitleEn : blog.Title,
+                "ru" => !string.IsNullOrEmpty(blog.TitleRu) ? blog.TitleRu : blog.Title,
+                _ => blog.Title
+            };
+        }
+
+        private string GetLocalizedDescription(Blog blog, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(blog.DescriptionEn) ? blog.DescriptionEn : blog.Description,
+                "ru" => !string.IsNullOrEmpty(blog.DescriptionRu) ? blog.DescriptionRu : blog.Description,
+                _ => blog.Description
+            };
+        }
+
+        private string GetLocalizedSecondDescTitle(Blog blog, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(blog.SecondDescTitleEn) ? blog.SecondDescTitleEn : blog.SecondDescTitle,
+                "ru" => !string.IsNullOrEmpty(blog.SecondDescTitleRu) ? blog.SecondDescTitleRu : blog.SecondDescTitle,
+                _ => blog.SecondDescTitle
+            };
+        }
+
+        private string GetLocalizedSecondDescBody(Blog blog, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(blog.SecondDescBodyEn) ? blog.SecondDescBodyEn : blog.SecondDescBody,
+                "ru" => !string.IsNullOrEmpty(blog.SecondDescBodyRu) ? blog.SecondDescBodyRu : blog.SecondDescBody,
+                _ => blog.SecondDescBody
+            };
+        }
+
+        private string GetLocalizedThirdTextTitle(Blog blog, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(blog.ThirdTextTitleEn) ? blog.ThirdTextTitleEn : blog.ThirdTextTitle,
+                "ru" => !string.IsNullOrEmpty(blog.ThirdTextTitleRu) ? blog.ThirdTextTitleRu : blog.ThirdTextTitle,
+                _ => blog.ThirdTextTitle
+            };
+        }
+
+        private string GetLocalizedThirdTextBody(Blog blog, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(blog.ThirdTextBodyEn) ? blog.ThirdTextBodyEn : blog.ThirdTextBody,
+                "ru" => !string.IsNullOrEmpty(blog.ThirdTextBodyRu) ? blog.ThirdTextBodyRu : blog.ThirdTextBody,
+                _ => blog.ThirdTextBody
+            };
+        }
+
         // GET: api/blogs/featured - Get featured blogs (most visited)
         [HttpGet("featured")]
         public async Task<ActionResult<IEnumerable<Blog>>> GetFeaturedBlogs()
@@ -205,7 +349,7 @@ namespace HospitalAPI.Controllers
                     return NotFound($"Blog with ID {id} not found");
                 }
 
-                // Update all fields including Image
+                // Update all fields including Image and language fields
                 existingBlog.Number = blog.Number ?? existingBlog.Number;
                 existingBlog.Title = blog.Title ?? existingBlog.Title;
                 existingBlog.Description = blog.Description;
@@ -216,6 +360,23 @@ namespace HospitalAPI.Controllers
                 existingBlog.ThirdTextTitle = blog.ThirdTextTitle;
                 existingBlog.ThirdTextBody = blog.ThirdTextBody;
                 existingBlog.Image = blog.Image ?? existingBlog.Image;
+                
+                // Update English language fields
+                existingBlog.TitleEn = blog.TitleEn;
+                existingBlog.DescriptionEn = blog.DescriptionEn;
+                existingBlog.SecondDescTitleEn = blog.SecondDescTitleEn;
+                existingBlog.SecondDescBodyEn = blog.SecondDescBodyEn;
+                existingBlog.ThirdTextTitleEn = blog.ThirdTextTitleEn;
+                existingBlog.ThirdTextBodyEn = blog.ThirdTextBodyEn;
+                
+                // Update Russian language fields
+                existingBlog.TitleRu = blog.TitleRu;
+                existingBlog.DescriptionRu = blog.DescriptionRu;
+                existingBlog.SecondDescTitleRu = blog.SecondDescTitleRu;
+                existingBlog.SecondDescBodyRu = blog.SecondDescBodyRu;
+                existingBlog.ThirdTextTitleRu = blog.ThirdTextTitleRu;
+                existingBlog.ThirdTextBodyRu = blog.ThirdTextBodyRu;
+                
                 existingBlog.UpdatedAt = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();

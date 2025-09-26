@@ -110,8 +110,6 @@
 
 .search-input:focus {
     border-bottom-color: #1243AC;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(18, 67, 172, 0.1);
 }
 
 .search-input::placeholder {
@@ -1031,6 +1029,7 @@
 
 .featured-event-subtitle {
     font-size: 1.6rem;
+    font-weight: 800;
     color: white;
     margin: 0 0 0.5rem 0;
     text-align: center;
@@ -1551,7 +1550,7 @@
     }
 
     .featured-event-subtitle {
-        font-size: 0.5rem;
+        font-size: 1rem;
         margin-bottom: 0.1rem;
         text-align: left;
     }
@@ -1887,7 +1886,7 @@
     }
 
     .featured-event-subtitle {
-        font-size: 0.8rem;
+        font-size: 1.4rem;
     }
 
     .timer-number {

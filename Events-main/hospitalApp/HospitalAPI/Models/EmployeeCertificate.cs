@@ -20,5 +20,15 @@ namespace HospitalAPI.Models
         [MaxLength(255)]
         [Column("certificate_name")]
         public string CertificateName { get; set; } = string.Empty;
+        
+        // English language field
+        [MaxLength(255)]
+        [Column("certificate_name_en")]
+        public string? CertificateNameEn { get; set; }
+        
+        // Russian language field
+        [MaxLength(255)]
+        [Column("certificate_name_ru")]
+        public string? CertificateNameRu { get; set; }
     }
 }

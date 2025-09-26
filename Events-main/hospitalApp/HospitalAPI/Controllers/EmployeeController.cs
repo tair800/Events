@@ -33,6 +33,98 @@ namespace HospitalAPI.Controllers
             return Ok(employees);
         }
 
+        // GET: api/employees/language/{lang} - Get employees by language
+        [HttpGet("language/{lang}")]
+        public async Task<ActionResult<IEnumerable<object>>> GetEmployeesByLanguage(string lang)
+        {
+            try
+            {
+                var employees = await _context.Employees.ToListAsync();
+                
+                var result = employees.Select(employee => new
+                {
+                    Id = employee.Id,
+                    Fullname = GetLocalizedFullname(employee, lang),
+                    Field = GetLocalizedField(employee, lang),
+                    Clinic = GetLocalizedClinic(employee, lang),
+                    Image = ImagePathService.FormatContextualImagePath(employee.Image, "employee"),
+                    DetailImage = ImagePathService.FormatContextualImagePath(employee.DetailImage, "employee"),
+                    Phone = employee.Phone,
+                    WhatsApp = employee.WhatsApp,
+                    Email = employee.Email,
+                    Location = GetLocalizedLocation(employee, lang),
+                    FirstDesc = GetLocalizedFirstDesc(employee, lang),
+                    SecondDesc = GetLocalizedSecondDesc(employee, lang),
+                    CreatedAt = employee.CreatedAt,
+                    UpdatedAt = employee.UpdatedAt,
+                    Degrees = employee.Degrees,
+                    Certificates = employee.Certificates
+                }).ToList();
+                
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ERROR in GetEmployeesByLanguage: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        // GET: api/employees/{id}/language/{lang} - Get specific employee by language
+        [HttpGet("{id:int}/language/{lang}")]
+        public async Task<ActionResult<object>> GetEmployeeByLanguage(int id, string lang)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    return BadRequest("Invalid employee ID");
+                }
+
+                var employee = await _context.Employees.FindAsync(id);
+
+                if (employee == null)
+                {
+                    return NotFound($"Employee with ID {id} not found");
+                }
+
+                // Manually fetch related data
+                employee.Degrees = await _context.EmployeeDegrees
+                    .Where(ed => ed.EmployeeId == id)
+                    .ToListAsync();
+                    
+                employee.Certificates = await _context.EmployeeCertificates
+                    .Where(ec => ec.EmployeeId == id)
+                    .ToListAsync();
+
+                var result = new
+                {
+                    Id = employee.Id,
+                    Fullname = GetLocalizedFullname(employee, lang),
+                    Field = GetLocalizedField(employee, lang),
+                    Clinic = GetLocalizedClinic(employee, lang),
+                    Image = ImagePathService.FormatContextualImagePath(employee.Image, "employee"),
+                    DetailImage = ImagePathService.FormatContextualImagePath(employee.DetailImage, "employee"),
+                    Phone = employee.Phone,
+                    WhatsApp = employee.WhatsApp,
+                    Email = employee.Email,
+                    Location = GetLocalizedLocation(employee, lang),
+                    FirstDesc = GetLocalizedFirstDesc(employee, lang),
+                    SecondDesc = GetLocalizedSecondDesc(employee, lang),
+                    CreatedAt = employee.CreatedAt,
+                    UpdatedAt = employee.UpdatedAt,
+                    Degrees = employee.Degrees,
+                    Certificates = employee.Certificates
+                };
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         // GET: api/employees/recent - Get recent employees (last 5)
         [HttpGet("recent")]
         public async Task<ActionResult<IEnumerable<Employee>>> GetRecentEmployees()
@@ -96,47 +188,74 @@ namespace HospitalAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateEmployee(int id, Employee employee)
         {
-            if (id != employee.Id)
-            {
-                return BadRequest();
-            }
-
-            var existingEmployee = await _context.Employees.FindAsync(id);
-            if (existingEmployee == null)
-            {
-                return NotFound();
-            }
-
-            existingEmployee.Fullname = employee.Fullname;
-            existingEmployee.Field = employee.Field;
-            existingEmployee.Clinic = employee.Clinic;
-            existingEmployee.Image = employee.Image;
-            existingEmployee.DetailImage = employee.DetailImage;
-            existingEmployee.Phone = employee.Phone;
-            existingEmployee.WhatsApp = employee.WhatsApp;
-            existingEmployee.Email = employee.Email;
-            existingEmployee.Location = employee.Location;
-            existingEmployee.FirstDesc = employee.FirstDesc;
-            existingEmployee.SecondDesc = employee.SecondDesc;
-            existingEmployee.UpdatedAt = DateTime.UtcNow;
-
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!EmployeeExists(id))
+                // Check model validation
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                // Check required fields manually
+                if (string.IsNullOrEmpty(employee.Fullname))
+                {
+                    return BadRequest("Fullname is required");
+                }
+                if (string.IsNullOrEmpty(employee.Field))
+                {
+                    return BadRequest("Field is required");
+                }
+                if (string.IsNullOrEmpty(employee.Clinic))
+                {
+                    return BadRequest("Clinic is required");
+                }
+
+                var existingEmployee = await _context.Employees.FindAsync(id);
+                if (existingEmployee == null)
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
-            }
 
-            return Ok(existingEmployee);
+                existingEmployee.Fullname = employee.Fullname;
+                existingEmployee.Field = employee.Field;
+                existingEmployee.Clinic = employee.Clinic;
+                existingEmployee.Image = employee.Image;
+                existingEmployee.DetailImage = employee.DetailImage;
+                existingEmployee.Phone = employee.Phone;
+                existingEmployee.WhatsApp = employee.WhatsApp;
+                existingEmployee.Email = employee.Email;
+                existingEmployee.Location = employee.Location;
+                existingEmployee.FirstDesc = employee.FirstDesc;
+                existingEmployee.SecondDesc = employee.SecondDesc;
+                
+                // Update English language fields
+                existingEmployee.FullnameEn = employee.FullnameEn;
+                existingEmployee.FieldEn = employee.FieldEn;
+                existingEmployee.ClinicEn = employee.ClinicEn;
+                existingEmployee.LocationEn = employee.LocationEn;
+                existingEmployee.FirstDescEn = employee.FirstDescEn;
+                existingEmployee.SecondDescEn = employee.SecondDescEn;
+                
+                // Update Russian language fields
+                existingEmployee.FullnameRu = employee.FullnameRu;
+                existingEmployee.FieldRu = employee.FieldRu;
+                existingEmployee.ClinicRu = employee.ClinicRu;
+                existingEmployee.LocationRu = employee.LocationRu;
+                existingEmployee.FirstDescRu = employee.FirstDescRu;
+                existingEmployee.SecondDescRu = employee.SecondDescRu;
+                
+                existingEmployee.UpdatedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(existingEmployee);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in UpdateEmployee: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return BadRequest($"Error processing request: {ex.Message}");
+            }
         }
 
         // DELETE: api/employees/{id}
@@ -300,6 +419,67 @@ namespace HospitalAPI.Controllers
         private bool EmployeeExists(int id)
         {
             return _context.Employees.Any(e => e.Id == id);
+        }
+
+        // Helper methods for localized content
+        private string GetLocalizedFullname(Employee employee, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(employee.FullnameEn) ? employee.FullnameEn : employee.Fullname,
+                "ru" => !string.IsNullOrEmpty(employee.FullnameRu) ? employee.FullnameRu : employee.Fullname,
+                _ => employee.Fullname
+            };
+        }
+
+        private string GetLocalizedField(Employee employee, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(employee.FieldEn) ? employee.FieldEn : employee.Field,
+                "ru" => !string.IsNullOrEmpty(employee.FieldRu) ? employee.FieldRu : employee.Field,
+                _ => employee.Field
+            };
+        }
+
+        private string GetLocalizedClinic(Employee employee, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(employee.ClinicEn) ? employee.ClinicEn : employee.Clinic,
+                "ru" => !string.IsNullOrEmpty(employee.ClinicRu) ? employee.ClinicRu : employee.Clinic,
+                _ => employee.Clinic
+            };
+        }
+
+        private string GetLocalizedLocation(Employee employee, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(employee.LocationEn) ? employee.LocationEn : employee.Location,
+                "ru" => !string.IsNullOrEmpty(employee.LocationRu) ? employee.LocationRu : employee.Location,
+                _ => employee.Location
+            };
+        }
+
+        private string GetLocalizedFirstDesc(Employee employee, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(employee.FirstDescEn) ? employee.FirstDescEn : employee.FirstDesc,
+                "ru" => !string.IsNullOrEmpty(employee.FirstDescRu) ? employee.FirstDescRu : employee.FirstDesc,
+                _ => employee.FirstDesc
+            };
+        }
+
+        private string GetLocalizedSecondDesc(Employee employee, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(employee.SecondDescEn) ? employee.SecondDescEn : employee.SecondDesc,
+                "ru" => !string.IsNullOrEmpty(employee.SecondDescRu) ? employee.SecondDescRu : employee.SecondDesc,
+                _ => employee.SecondDesc
+            };
         }
     }
 }

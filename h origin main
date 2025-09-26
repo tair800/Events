@@ -1,0 +1,4 @@
+[33m8044a73[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m feat: Update UI components with new icons and styling
+[33mf1a039b[m[33m ([m[1;31morigin/main[m[33m)[m chore: Remove node_modules from git tracking and add comprehensive .gitignore
+[33mf614302[m feat: Implement mobile-responsive staggered menu and footer improvements
+[33m03bf13c[m[33m ([m[1;31morigin/feat/push-initial-commit[m[33m)[m chore: initial import from local workspace

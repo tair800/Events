@@ -16,6 +16,16 @@ namespace HospitalAPI.Models
         [Column("university_name")]
         public string UniversityName { get; set; } = string.Empty;
         
+        // English language field
+        [MaxLength(255)]
+        [Column("university_name_en")]
+        public string? UniversityNameEn { get; set; }
+        
+        // Russian language field
+        [MaxLength(255)]
+        [Column("university_name_ru")]
+        public string? UniversityNameRu { get; set; }
+        
         [Column("start_year")]
         public int StartYear { get; set; }
         

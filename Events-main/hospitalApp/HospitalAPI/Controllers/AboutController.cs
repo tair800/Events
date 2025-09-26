@@ -32,6 +32,23 @@ namespace HospitalAPI.Controllers
             return aboutItems;
         }
 
+        // GET: api/About/language/{lang}
+        [HttpGet("language/{lang}")]
+        public async Task<ActionResult<IEnumerable<object>>> GetAboutByLanguage(string lang)
+        {
+            var aboutItems = await _context.About.ToListAsync();
+            
+            var result = aboutItems.Select(item => new
+            {
+                Id = item.Id,
+                Title = GetLocalizedTitle(item, lang),
+                Description = GetLocalizedDescription(item, lang),
+                Img = ImagePathService.FormatContextualImagePath(item.Img, "admin")
+            }).ToList();
+            
+            return result;
+        }
+
         // GET: api/About/5
         [HttpGet("{id}")]
         public async Task<ActionResult<About>> GetAbout(int id)
@@ -105,6 +122,26 @@ namespace HospitalAPI.Controllers
         private bool AboutExists(int id)
         {
             return _context.About.Any(e => e.Id == id);
+        }
+
+        private string GetLocalizedTitle(About item, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(item.TitleEn) ? item.TitleEn : item.Title,
+                "ru" => !string.IsNullOrEmpty(item.TitleRu) ? item.TitleRu : item.Title,
+                _ => item.Title
+            };
+        }
+
+        private string GetLocalizedDescription(About item, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(item.DescriptionEn) ? item.DescriptionEn : item.Description,
+                "ru" => !string.IsNullOrEmpty(item.DescriptionRu) ? item.DescriptionRu : item.Description,
+                _ => item.Description
+            };
         }
     }
 }

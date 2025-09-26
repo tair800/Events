@@ -47,6 +47,22 @@ namespace HospitalAPI.Data
                 entity.Property(e => e.DetailImageMain).HasMaxLength(500);
                 entity.Property(e => e.DetailImageRight).HasMaxLength(500);
                 entity.Property(e => e.Price).HasColumnType("REAL");
+                // English language fields
+                entity.Property(e => e.TitleEn).HasMaxLength(200);
+                entity.Property(e => e.SubtitleEn).HasMaxLength(300);
+                entity.Property(e => e.DescriptionEn).HasMaxLength(1000);
+                entity.Property(e => e.LongDescriptionEn);
+                entity.Property(e => e.VenueEn).HasMaxLength(200);
+                entity.Property(e => e.TrainerEn).HasMaxLength(100);
+                entity.Property(e => e.RegionEn).HasMaxLength(100);
+                // Russian language fields
+                entity.Property(e => e.TitleRu).HasMaxLength(200);
+                entity.Property(e => e.SubtitleRu).HasMaxLength(300);
+                entity.Property(e => e.DescriptionRu).HasMaxLength(1000);
+                entity.Property(e => e.LongDescriptionRu);
+                entity.Property(e => e.VenueRu).HasMaxLength(200);
+                entity.Property(e => e.TrainerRu).HasMaxLength(100);
+                entity.Property(e => e.RegionRu).HasMaxLength(100);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
@@ -63,6 +79,20 @@ namespace HospitalAPI.Data
                 entity.Property(b => b.SecondDescBody).HasMaxLength(1000);
                 entity.Property(b => b.ThirdTextTitle).HasMaxLength(200);
                 entity.Property(b => b.ThirdTextBody).HasMaxLength(1000);
+                // English language fields
+                entity.Property(b => b.TitleEn).HasMaxLength(300);
+                entity.Property(b => b.DescriptionEn).HasMaxLength(500);
+                entity.Property(b => b.SecondDescTitleEn).HasMaxLength(200);
+                entity.Property(b => b.SecondDescBodyEn).HasMaxLength(1000);
+                entity.Property(b => b.ThirdTextTitleEn).HasMaxLength(200);
+                entity.Property(b => b.ThirdTextBodyEn).HasMaxLength(1000);
+                // Russian language fields
+                entity.Property(b => b.TitleRu).HasMaxLength(300);
+                entity.Property(b => b.DescriptionRu).HasMaxLength(500);
+                entity.Property(b => b.SecondDescTitleRu).HasMaxLength(200);
+                entity.Property(b => b.SecondDescBodyRu).HasMaxLength(1000);
+                entity.Property(b => b.ThirdTextTitleRu).HasMaxLength(200);
+                entity.Property(b => b.ThirdTextBodyRu).HasMaxLength(1000);
                 entity.Property(b => b.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(b => b.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
@@ -96,6 +126,10 @@ namespace HospitalAPI.Data
                 entity.Property(a => a.Title).IsRequired().HasMaxLength(500);
                 entity.Property(a => a.Description).IsRequired();
                 entity.Property(a => a.Img).IsRequired().HasMaxLength(500);
+                entity.Property(a => a.TitleEn).HasMaxLength(500);
+                entity.Property(a => a.DescriptionEn);
+                entity.Property(a => a.TitleRu).HasMaxLength(500);
+                entity.Property(a => a.DescriptionRu);
             });
 
             // Configure Contact table for SQLite
@@ -151,6 +185,20 @@ namespace HospitalAPI.Data
                 entity.Property(e => e.Location).HasMaxLength(255);
                 entity.Property(e => e.FirstDesc);
                 entity.Property(e => e.SecondDesc);
+                // English language fields
+                entity.Property(e => e.FullnameEn).HasMaxLength(255);
+                entity.Property(e => e.FieldEn).HasMaxLength(255);
+                entity.Property(e => e.ClinicEn).HasMaxLength(255);
+                entity.Property(e => e.LocationEn).HasMaxLength(255);
+                entity.Property(e => e.FirstDescEn).HasColumnName("first_desc_en");
+                entity.Property(e => e.SecondDescEn).HasColumnName("second_desc_en");
+                // Russian language fields
+                entity.Property(e => e.FullnameRu).HasMaxLength(255);
+                entity.Property(e => e.FieldRu).HasMaxLength(255);
+                entity.Property(e => e.ClinicRu).HasMaxLength(255);
+                entity.Property(e => e.LocationRu).HasMaxLength(255);
+                entity.Property(e => e.FirstDescRu).HasColumnName("first_desc_ru");
+                entity.Property(e => e.SecondDescRu).HasColumnName("second_desc_ru");
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 
@@ -172,6 +220,10 @@ namespace HospitalAPI.Data
                 entity.ToTable("Employee_degrees");
                 entity.HasKey(ed => ed.Id);
                 entity.Property(ed => ed.UniversityName).IsRequired().HasMaxLength(255);
+                // English language field
+                entity.Property(ed => ed.UniversityNameEn).HasMaxLength(255);
+                // Russian language field
+                entity.Property(ed => ed.UniversityNameRu).HasMaxLength(255);
             });
 
             // Configure EmployeeCertificate table for SQLite
@@ -181,6 +233,10 @@ namespace HospitalAPI.Data
                 entity.HasKey(ec => ec.Id);
                 entity.Property(ec => ec.CertificateImage).IsRequired().HasMaxLength(500);
                 entity.Property(ec => ec.CertificateName).IsRequired().HasMaxLength(255);
+                // English language field
+                entity.Property(ec => ec.CertificateNameEn).HasMaxLength(255);
+                // Russian language field
+                entity.Property(ec => ec.CertificateNameRu).HasMaxLength(255);
             });
 
             // Configure Request table for SQLite
@@ -242,6 +298,12 @@ namespace HospitalAPI.Data
                 entity.Property(es => es.Name).IsRequired().HasMaxLength(255);
                 entity.Property(es => es.Title).IsRequired().HasMaxLength(255);
                 entity.Property(es => es.Image).HasMaxLength(500);
+                // English language fields
+                entity.Property(es => es.NameEn).HasMaxLength(255);
+                entity.Property(es => es.TitleEn).HasMaxLength(255);
+                // Russian language fields
+                entity.Property(es => es.NameRu).HasMaxLength(255);
+                entity.Property(es => es.TitleRu).HasMaxLength(255);
                 entity.Property(es => es.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(es => es.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 
@@ -263,6 +325,14 @@ namespace HospitalAPI.Data
                 entity.Property(et => et.Description).HasMaxLength(1000);
                 entity.Property(et => et.Info).HasMaxLength(2000);
                 entity.Property(et => et.OrderIndex).IsRequired();
+                // English language fields
+                entity.Property(et => et.TitleEn).HasMaxLength(255);
+                entity.Property(et => et.DescriptionEn).HasMaxLength(1000);
+                entity.Property(et => et.InfoEn).HasMaxLength(2000);
+                // Russian language fields
+                entity.Property(et => et.TitleRu).HasMaxLength(255);
+                entity.Property(et => et.DescriptionRu).HasMaxLength(1000);
+                entity.Property(et => et.InfoRu).HasMaxLength(2000);
                 entity.Property(et => et.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(et => et.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 

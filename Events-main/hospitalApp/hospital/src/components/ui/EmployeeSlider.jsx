@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getContextualImagePath } from '../../utils/imageUtils';
 import employeeBg from '../../assets/employee-bg.png';
-import iconNext from '../../assets/icon-next.svg';
-import iconPrev from '../../assets/icon-prev.svg';
+const iconNext = '/assets/event-next.svg';
+const iconPrev = '/assets/event-prev.svg';
 // Removed speakerData import - now fetching from API
 import './EmployeeSlider.css';
 
@@ -155,26 +155,20 @@ const EmployeeSlider = ({ eventId = 1 }) => {
 
             {combinedData.length > 4 && (
                 <div className="employee-slider-bottom-controls">
-                    <img
-                        src={iconPrev}
-                        alt="Previous"
+                    <button
                         className="employee-slider-bottom-arrow employee-slider-bottom-arrow-left"
                         onClick={handlePreviousPage}
-                        style={{
-                            cursor: currentPage === 0 ? 'not-allowed' : 'pointer',
-                            opacity: currentPage === 0 ? 0.3 : 1
-                        }}
-                    />
-                    <img
-                        src={iconNext}
-                        alt="Next"
+                        disabled={currentPage === 0}
+                    >
+                        <img src={iconPrev} alt="Previous" />
+                    </button>
+                    <button
                         className="employee-slider-bottom-arrow employee-slider-bottom-arrow-right"
                         onClick={handleNextPage}
-                        style={{
-                            cursor: currentPage >= totalPages - 1 ? 'not-allowed' : 'pointer',
-                            opacity: currentPage >= totalPages - 1 ? 0.3 : 1
-                        }}
-                    />
+                        disabled={currentPage >= totalPages - 1}
+                    >
+                        <img src={iconNext} alt="Next" />
+                    </button>
                 </div>
             )}
         </div>

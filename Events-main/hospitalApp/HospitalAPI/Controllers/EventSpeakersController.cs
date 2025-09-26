@@ -35,6 +35,32 @@ namespace HospitalAPI.Controllers
             }
         }
 
+        // GET: api/eventspeakers/event/{eventId}/language/{lang}
+        [HttpGet("event/{eventId}/language/{lang}")]
+        public async Task<ActionResult<IEnumerable<EventSpeaker>>> GetSpeakersByEventLanguage(int eventId, string lang)
+        {
+            try
+            {
+                var speakers = await _context.EventSpeakers
+                    .Where(es => es.EventId == eventId)
+                    .OrderBy(es => es.Id)
+                    .ToListAsync();
+
+                // Apply language-specific content
+                foreach (var speaker in speakers)
+                {
+                    speaker.Name = GetLocalizedName(speaker, lang);
+                    speaker.Title = GetLocalizedTitle(speaker, lang);
+                }
+
+                return Ok(speakers);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         // GET: api/eventspeakers/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<EventSpeaker>> GetEventSpeaker(int id)
@@ -86,7 +112,23 @@ namespace HospitalAPI.Controllers
 
             try
             {
-                _context.Entry(eventSpeaker).State = EntityState.Modified;
+                var existingSpeaker = await _context.EventSpeakers.FindAsync(id);
+                if (existingSpeaker == null)
+                {
+                    return NotFound();
+                }
+
+                // Update all fields including language fields
+                existingSpeaker.EventId = eventSpeaker.EventId;
+                existingSpeaker.Name = eventSpeaker.Name;
+                existingSpeaker.Title = eventSpeaker.Title;
+                existingSpeaker.Image = eventSpeaker.Image;
+                existingSpeaker.NameEn = eventSpeaker.NameEn;
+                existingSpeaker.TitleEn = eventSpeaker.TitleEn;
+                existingSpeaker.NameRu = eventSpeaker.NameRu;
+                existingSpeaker.TitleRu = eventSpeaker.TitleRu;
+                existingSpeaker.UpdatedAt = DateTime.UtcNow.ToString();
+
                 await _context.SaveChangesAsync();
 
                 return NoContent();
@@ -134,6 +176,27 @@ namespace HospitalAPI.Controllers
         private bool EventSpeakerExists(int id)
         {
             return _context.EventSpeakers.Any(e => e.Id == id);
+        }
+
+        // Helper methods for localization
+        private string GetLocalizedName(EventSpeaker speaker, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(speaker.NameEn) ? speaker.NameEn : speaker.Name,
+                "ru" => !string.IsNullOrEmpty(speaker.NameRu) ? speaker.NameRu : speaker.Name,
+                _ => speaker.Name
+            };
+        }
+
+        private string GetLocalizedTitle(EventSpeaker speaker, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(speaker.TitleEn) ? speaker.TitleEn : speaker.Title,
+                "ru" => !string.IsNullOrEmpty(speaker.TitleRu) ? speaker.TitleRu : speaker.Title,
+                _ => speaker.Title
+            };
         }
     }
 }

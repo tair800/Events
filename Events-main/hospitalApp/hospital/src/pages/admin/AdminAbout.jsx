@@ -6,16 +6,41 @@ const adminBrowseIcon = '/assets/admin-browse.png';
 import './AdminAbout.css';
 
 function AdminAbout() {
-    const [aboutData, setAboutData] = useState({ title: '', description: '', img: '' });
+    const [aboutData, setAboutData] = useState({
+        title: '',
+        description: '',
+        img: '',
+        titleEn: '',
+        descriptionEn: '',
+        titleRu: '',
+        descriptionRu: ''
+    });
     const [carouselData, setCarouselData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [activeLanguage, setActiveLanguage] = useState('aze');
 
 
     // Configuration for form fields
     const formConfig = {
-        title: { label: 'Heading', type: 'text', placeholder: 'Enter heading' },
-        description: { label: 'Subtext', type: 'textarea', placeholder: 'Enter your description here. Use double line breaks to separate paragraphs for proper spacing.' }
+        aze: {
+            title: { label: 'Heading (Azerbaijani)', type: 'text', placeholder: 'Enter heading in Azerbaijani' },
+            description: { label: 'Subtext (Azerbaijani)', type: 'textarea', placeholder: 'Enter your description here in Azerbaijani. Use double line breaks to separate paragraphs for proper spacing.' }
+        },
+        en: {
+            title: { label: 'Heading (English)', type: 'text', placeholder: 'Enter heading in English' },
+            description: { label: 'Subtext (English)', type: 'textarea', placeholder: 'Enter your description here in English. Use double line breaks to separate paragraphs for proper spacing.' }
+        },
+        ru: {
+            title: { label: 'Heading (Russian)', type: 'text', placeholder: 'Enter heading in Russian' },
+            description: { label: 'Subtext (Russian)', type: 'textarea', placeholder: 'Enter your description here in Russian. Use double line breaks to separate paragraphs for proper spacing.' }
+        }
     };
+
+    const languageOptions = [
+        { code: 'aze', name: 'Azerbaijani', flag: '🇦🇿' },
+        { code: 'en', name: 'English', flag: '🇺🇸' },
+        { code: 'ru', name: 'Russian', flag: '🇷🇺' }
+    ];
 
     // SweetAlert configuration
     const swalConfig = {
@@ -63,6 +88,22 @@ function AdminAbout() {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setAboutData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const getCurrentFieldName = (field) => {
+        if (activeLanguage === 'aze') {
+            return field;
+        } else if (activeLanguage === 'en') {
+            return field + 'En';
+        } else if (activeLanguage === 'ru') {
+            return field + 'Ru';
+        }
+        return field;
+    };
+
+    const getCurrentFieldValue = (field) => {
+        const fieldName = getCurrentFieldName(field);
+        return aboutData[fieldName] || '';
     };
 
     const handleSubmit = async (e) => {
@@ -296,15 +337,18 @@ function AdminAbout() {
     };
 
     const renderFormField = (name) => {
-        const config = formConfig[name];
+        const config = formConfig[activeLanguage][name];
+        const fieldName = getCurrentFieldName(name);
+        const fieldValue = getCurrentFieldValue(name);
+
         if (config.type === 'textarea') {
             return (
-                <div className="form-group" key={name}>
-                    <label htmlFor={name}>{config.label}</label>
+                <div className="form-group" key={fieldName}>
+                    <label htmlFor={fieldName}>{config.label}</label>
                     <textarea
-                        id={name}
-                        name={name}
-                        value={aboutData[name]}
+                        id={fieldName}
+                        name={fieldName}
+                        value={fieldValue}
                         onChange={handleInputChange}
                         placeholder={config.placeholder}
                         className="form-textarea"
@@ -314,14 +358,14 @@ function AdminAbout() {
             );
         }
         return (
-            <div className="form-group" key={name}>
-                <label htmlFor={name}>{config.label}</label>
+            <div className="form-group" key={fieldName}>
+                <label htmlFor={fieldName}>{config.label}</label>
                 <div className="input-container">
                     <input
                         type={config.type}
-                        id={name}
-                        name={name}
-                        value={aboutData[name]}
+                        id={fieldName}
+                        name={fieldName}
+                        value={fieldValue}
                         onChange={handleInputChange}
                         placeholder={config.placeholder}
                         className="form-input"
@@ -387,9 +431,26 @@ function AdminAbout() {
                         <h2>About Us</h2>
                     </div>
 
+                    {/* Language Tabs - Outside the form */}
+                    <div className="language-tabs-container">
+                        <div className="language-tabs">
+                            {languageOptions.map((lang) => (
+                                <button
+                                    key={lang.code}
+                                    type="button"
+                                    className={`language-tab ${activeLanguage === lang.code ? 'active' : ''}`}
+                                    onClick={() => setActiveLanguage(lang.code)}
+                                >
+                                    <span className="language-flag">{lang.flag}</span>
+                                    <span className="language-name">{lang.name}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     <div className="admin-about-form">
                         <div className="form-fields-left">
-                            {Object.keys(formConfig).map(renderFormField)}
+                            {Object.keys(formConfig[activeLanguage]).map(renderFormField)}
                         </div>
 
                         <div className="image-section-right">

@@ -44,6 +44,44 @@ namespace HospitalAPI.Models
         [Column("second_desc")]
         public string? SecondDesc { get; set; }
         
+        // English language fields
+        [MaxLength(255)]
+        public string? FullnameEn { get; set; }
+        
+        [MaxLength(255)]
+        public string? FieldEn { get; set; }
+        
+        [MaxLength(255)]
+        public string? ClinicEn { get; set; }
+        
+        [MaxLength(255)]
+        public string? LocationEn { get; set; }
+        
+        [Column("first_desc_en")]
+        public string? FirstDescEn { get; set; }
+        
+        [Column("second_desc_en")]
+        public string? SecondDescEn { get; set; }
+        
+        // Russian language fields
+        [MaxLength(255)]
+        public string? FullnameRu { get; set; }
+        
+        [MaxLength(255)]
+        public string? FieldRu { get; set; }
+        
+        [MaxLength(255)]
+        public string? ClinicRu { get; set; }
+        
+        [MaxLength(255)]
+        public string? LocationRu { get; set; }
+        
+        [Column("first_desc_ru")]
+        public string? FirstDescRu { get; set; }
+        
+        [Column("second_desc_ru")]
+        public string? SecondDescRu { get; set; }
+        
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         

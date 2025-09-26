@@ -7,7 +7,7 @@ import './Home.css';
 import iconNext from '../../../assets/icon-next.svg';
 import eventNext from '/assets/event-next.svg';
 import eventPrev from '/assets/event-prev.svg';
-import homeLongButton from '../../../assets/home-long-button.svg';
+// Replaced long button image with event arrow svg used inside a styled button
 import InfoCard from '../../ui/InfoCard';
 import EmployeeSlider from '../employee/EmployeeSlider';
 import LogoCarousel from '../../ui/LogoCarousel';
@@ -530,13 +530,13 @@ const Home = () => {
                                         alt="Event Image"
                                         className="home-event-image"
                                     />
-                                    <img
-                                        src={homeLongButton}
-                                        alt="Go to Event Details"
-                                        className="home-arrow-image"
+                                    <button
+                                        className="home-arrow-button"
                                         onClick={() => navigate(`/event/${event.id}`)}
-                                        style={{ cursor: 'pointer' }}
-                                    />
+                                        aria-label="Go to Event Details"
+                                    >
+                                        <img src="/assets/event-arrow.svg" alt="Go" className="home-arrow-icon" />
+                                    </button>
                                 </div>
                             </div>
                         );

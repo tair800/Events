@@ -27,6 +27,12 @@ namespace HospitalAPI.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("DescriptionEn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DescriptionRu")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Img")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -34,6 +40,14 @@ namespace HospitalAPI.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TitleEn")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TitleRu")
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
@@ -93,6 +107,14 @@ namespace HospitalAPI.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("DescriptionEn")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DescriptionRu")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Image")
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
@@ -106,7 +128,23 @@ namespace HospitalAPI.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("SecondDescBodyEn")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SecondDescBodyRu")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("SecondDescTitle")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SecondDescTitleEn")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SecondDescTitleRu")
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
@@ -114,12 +152,36 @@ namespace HospitalAPI.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ThirdTextBodyEn")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ThirdTextBodyRu")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ThirdTextTitle")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ThirdTextTitleEn")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ThirdTextTitleRu")
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TitleEn")
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TitleRu")
                         .HasMaxLength(300)
                         .HasColumnType("TEXT");
 
@@ -183,6 +245,14 @@ namespace HospitalAPI.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ClinicEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClinicRu")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
@@ -203,12 +273,36 @@ namespace HospitalAPI.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("FieldEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FieldRu")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("FirstDesc")
                         .HasColumnType("TEXT")
                         .HasColumnName("first_desc");
 
+                    b.Property<string>("FirstDescEn")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("first_desc_en");
+
+                    b.Property<string>("FirstDescRu")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("first_desc_ru");
+
                     b.Property<string>("Fullname")
                         .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FullnameEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FullnameRu")
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
@@ -220,6 +314,14 @@ namespace HospitalAPI.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("LocationEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LocationRu")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Phone")
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
@@ -227,6 +329,14 @@ namespace HospitalAPI.Migrations
                     b.Property<string>("SecondDesc")
                         .HasColumnType("TEXT")
                         .HasColumnName("second_desc");
+
+                    b.Property<string>("SecondDescEn")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("second_desc_en");
+
+                    b.Property<string>("SecondDescRu")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("second_desc_ru");
 
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
@@ -260,6 +370,16 @@ namespace HospitalAPI.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT")
                         .HasColumnName("certificate_name");
+
+                    b.Property<string>("CertificateNameEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("certificate_name_en");
+
+                    b.Property<string>("CertificateNameRu")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("certificate_name_ru");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("INTEGER")
@@ -296,6 +416,16 @@ namespace HospitalAPI.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("university_name");
 
+                    b.Property<string>("UniversityNameEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("university_name_en");
+
+                    b.Property<string>("UniversityNameRu")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("university_name_ru");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeId");
@@ -323,6 +453,14 @@ namespace HospitalAPI.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("DescriptionEn")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DescriptionRu")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("DetailImageLeft")
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
@@ -347,6 +485,12 @@ namespace HospitalAPI.Migrations
                     b.Property<string>("LongDescription")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("LongDescriptionEn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LongDescriptionRu")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("MainImage")
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
@@ -358,7 +502,23 @@ namespace HospitalAPI.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("RegionEn")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RegionRu")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Subtitle")
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SubtitleEn")
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SubtitleRu")
                         .HasMaxLength(300)
                         .HasColumnType("TEXT");
 
@@ -371,7 +531,23 @@ namespace HospitalAPI.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("TitleEn")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TitleRu")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Trainer")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TrainerEn")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TrainerRu")
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
@@ -381,6 +557,14 @@ namespace HospitalAPI.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Venue")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("VenueEn")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("VenueRu")
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
@@ -459,8 +643,24 @@ namespace HospitalAPI.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("NameEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NameRu")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TitleEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TitleRu")
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
@@ -495,6 +695,14 @@ namespace HospitalAPI.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("DescriptionEn")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DescriptionRu")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("EndTime")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -510,6 +718,14 @@ namespace HospitalAPI.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("InfoEn")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("InfoRu")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("OrderIndex")
                         .HasColumnType("INTEGER");
 
@@ -520,6 +736,14 @@ namespace HospitalAPI.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TitleEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TitleRu")
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 

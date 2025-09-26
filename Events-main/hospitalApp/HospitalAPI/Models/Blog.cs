@@ -40,6 +40,44 @@ namespace HospitalAPI.Models
         [MaxLength(500)]
         public string? Image { get; set; }
         
+        // English language fields
+        [MaxLength(300)]
+        public string? TitleEn { get; set; }
+        
+        [MaxLength(500)]
+        public string? DescriptionEn { get; set; }
+        
+        [MaxLength(200)]
+        public string? SecondDescTitleEn { get; set; }
+        
+        [MaxLength(1000)]
+        public string? SecondDescBodyEn { get; set; }
+        
+        [MaxLength(200)]
+        public string? ThirdTextTitleEn { get; set; }
+        
+        [MaxLength(1000)]
+        public string? ThirdTextBodyEn { get; set; }
+        
+        // Russian language fields
+        [MaxLength(300)]
+        public string? TitleRu { get; set; }
+        
+        [MaxLength(500)]
+        public string? DescriptionRu { get; set; }
+        
+        [MaxLength(200)]
+        public string? SecondDescTitleRu { get; set; }
+        
+        [MaxLength(1000)]
+        public string? SecondDescBodyRu { get; set; }
+        
+        [MaxLength(200)]
+        public string? ThirdTextTitleRu { get; set; }
+        
+        [MaxLength(1000)]
+        public string? ThirdTextBodyRu { get; set; }
+        
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

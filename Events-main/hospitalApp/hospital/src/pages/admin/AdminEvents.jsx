@@ -26,7 +26,23 @@ function AdminEvents() {
         detailImageLeft: '',
         detailImageMain: '',
         detailImageRight: '',
-        isMain: false
+        isMain: false,
+        // English language fields
+        titleEn: '',
+        subtitleEn: '',
+        descriptionEn: '',
+        longDescriptionEn: '',
+        venueEn: '',
+        trainerEn: '',
+        regionEn: '',
+        // Russian language fields
+        titleRu: '',
+        subtitleRu: '',
+        descriptionRu: '',
+        longDescriptionRu: '',
+        venueRu: '',
+        trainerRu: '',
+        regionRu: ''
     });
     const [loading, setLoading] = useState(false);
     const [editingEvents, setEditingEvents] = useState({});
@@ -45,17 +61,43 @@ function AdminEvents() {
     const [showEditTimelineModal, setShowEditTimelineModal] = useState(false);
     const [showEditSpeakerModal, setShowEditSpeakerModal] = useState(false);
     const [selectedEventId, setSelectedEventId] = useState(null);
-    const [newSpeaker, setNewSpeaker] = useState({ name: '', title: '', image: '' });
+    const [newSpeaker, setNewSpeaker] = useState({
+        name: '',
+        title: '',
+        image: '',
+        // English language fields
+        nameEn: '',
+        titleEn: '',
+        // Russian language fields
+        nameRu: '',
+        titleRu: ''
+    });
     const [newTimelineSlot, setNewTimelineSlot] = useState({
         startTime: '',
         endTime: '',
         title: '',
         description: '',
-        info: ''
+        info: '',
+        // English language fields
+        titleEn: '',
+        descriptionEn: '',
+        infoEn: '',
+        // Russian language fields
+        titleRu: '',
+        descriptionRu: '',
+        infoRu: ''
     });
     const [editingTimelineSlot, setEditingTimelineSlot] = useState(null);
     const [editingSpeaker, setEditingSpeaker] = useState(null);
     const [employeeSearchTerm, setEmployeeSearchTerm] = useState('');
+
+    // Language support
+    const [activeLanguage, setActiveLanguage] = useState('aze');
+    const languageOptions = [
+        { code: 'aze', name: 'Azərbaycan', flag: '/assets/azerbaijan.svg' },
+        { code: 'en', name: 'English', flag: '/assets/english.svg' },
+        { code: 'ru', name: 'Русский', flag: '/assets/russian.svg' }
+    ];
 
     // Pagination hook
     const {
@@ -75,6 +117,14 @@ function AdminEvents() {
         fetchEvents();
         fetchAllEmployees();
     }, []);
+
+    // Refetch speakers and timeline when language changes
+    useEffect(() => {
+        if (selectedEventId) {
+            fetchEventSpeakers(selectedEventId);
+            fetchEventTimeline(selectedEventId);
+        }
+    }, [activeLanguage, selectedEventId]);
 
 
     // Filter events based on search term
@@ -213,7 +263,7 @@ function AdminEvents() {
     // Fetch event speakers
     const fetchEventSpeakers = async (eventId) => {
         try {
-            const response = await fetch(`https://localhost:5000/api/eventspeakers/event/${eventId}`);
+            const response = await fetch(`https://localhost:5000/api/eventspeakers/event/${eventId}/language/${activeLanguage}`);
             if (response.ok) {
                 const data = await response.json();
                 setEventSpeakers(prev => ({ ...prev, [eventId]: data }));
@@ -226,7 +276,7 @@ function AdminEvents() {
     // Fetch event timeline
     const fetchEventTimeline = async (eventId) => {
         try {
-            const response = await fetch(`https://localhost:5000/api/eventtimeline/event/${eventId}`);
+            const response = await fetch(`https://localhost:5000/api/eventtimeline/event/${eventId}/language/${activeLanguage}`);
             if (response.ok) {
                 const data = await response.json();
                 setEventTimeline(prev => ({ ...prev, [eventId]: data }));
@@ -288,7 +338,15 @@ function AdminEvents() {
             if (response.ok) {
                 showAlert('success', 'Success!', 'Speaker added successfully!');
                 fetchEventSpeakers(eventId);
-                setNewSpeaker({ name: '', title: '', image: '' });
+                setNewSpeaker({
+                    name: '',
+                    title: '',
+                    image: '',
+                    nameEn: '',
+                    titleEn: '',
+                    nameRu: '',
+                    titleRu: ''
+                });
             } else {
                 showAlert('error', 'Error!', 'Failed to add speaker.');
             }
@@ -334,7 +392,13 @@ function AdminEvents() {
                     endTime: '',
                     title: '',
                     description: '',
-                    info: ''
+                    info: '',
+                    titleEn: '',
+                    descriptionEn: '',
+                    infoEn: '',
+                    titleRu: '',
+                    descriptionRu: '',
+                    infoRu: ''
                 });
             } else {
                 showAlert('error', 'Xəta!', 'Timeline slot əlavə edilə bilmədi.');
@@ -591,6 +655,36 @@ function AdminEvents() {
         }
     };
 
+    // Helper functions for language support
+    const getCurrentFieldName = (field) => {
+        return activeLanguage === 'aze' ? field : `${field}${activeLanguage.charAt(0).toUpperCase() + activeLanguage.slice(1)}`;
+    };
+
+    const getCurrentFieldValue = (event, field) => {
+        const fieldName = getCurrentFieldName(field);
+        return event[fieldName] || '';
+    };
+
+    const getLocalizedPlaceholder = (field) => {
+        const placeholders = {
+            title: { aze: 'Başlıq', en: 'Title', ru: 'Заголовок' },
+            subtitle: { aze: 'Alt başlıq', en: 'Subtitle', ru: 'Подзаголовок' },
+            description: { aze: 'Təsvir', en: 'Description', ru: 'Описание' },
+            longDescription: { aze: 'Uzun təsvir', en: 'Long Description', ru: 'Длинное описание' },
+            venue: { aze: 'Məkan', en: 'Venue', ru: 'Место проведения' },
+            trainer: { aze: 'Təlimçi', en: 'Trainer', ru: 'Тренер' },
+            region: { aze: 'Region', en: 'Region', ru: 'Регион' },
+            // Speaker placeholders
+            speakerName: { aze: 'Speaker adı', en: 'Speaker Name', ru: 'Имя спикера' },
+            speakerTitle: { aze: 'Speaker vəzifəsi', en: 'Speaker Title', ru: 'Должность спикера' },
+            // Timeline placeholders
+            timelineTitle: { aze: 'Timeline başlığı', en: 'Timeline Title', ru: 'Заголовок временной шкалы' },
+            timelineDescription: { aze: 'Timeline təsviri', en: 'Timeline Description', ru: 'Описание временной шкалы' },
+            timelineInfo: { aze: 'Əlavə məlumat', en: 'Additional Info', ru: 'Дополнительная информация' }
+        };
+        return placeholders[field]?.[activeLanguage] || field;
+    };
+
     // Reset form to initial state
     const resetForm = () => {
         setEventData({
@@ -602,13 +696,30 @@ function AdminEvents() {
             time: '',
             venue: '',
             trainer: '',
+            region: '',
             price: 0,
             currency: 'AZN',
             mainImage: '',
             detailImageLeft: '',
             detailImageMain: '',
             detailImageRight: '',
-            isMain: false
+            isMain: false,
+            // English language fields
+            titleEn: '',
+            subtitleEn: '',
+            descriptionEn: '',
+            longDescriptionEn: '',
+            venueEn: '',
+            trainerEn: '',
+            regionEn: '',
+            // Russian language fields
+            titleRu: '',
+            subtitleRu: '',
+            descriptionRu: '',
+            longDescriptionRu: '',
+            venueRu: '',
+            trainerRu: '',
+            regionRu: ''
         });
     };
 
@@ -886,7 +997,16 @@ function AdminEvents() {
 
     // Start editing timeline slot
     const startEditingTimelineSlot = (slot) => {
-        setEditingTimelineSlot({ ...slot });
+        setEditingTimelineSlot({
+            ...slot,
+            // Initialize language fields if they don't exist
+            titleEn: slot.titleEn || '',
+            descriptionEn: slot.descriptionEn || '',
+            infoEn: slot.infoEn || '',
+            titleRu: slot.titleRu || '',
+            descriptionRu: slot.descriptionRu || '',
+            infoRu: slot.infoRu || ''
+        });
         setShowEditTimelineModal(true);
     };
 
@@ -898,7 +1018,14 @@ function AdminEvents() {
 
     // Start editing speaker
     const startEditingSpeaker = (speaker) => {
-        setEditingSpeaker({ ...speaker });
+        setEditingSpeaker({
+            ...speaker,
+            // Initialize language fields if they don't exist
+            nameEn: speaker.nameEn || '',
+            titleEn: speaker.titleEn || '',
+            nameRu: speaker.nameRu || '',
+            titleRu: speaker.titleRu || ''
+        });
         setShowEditSpeakerModal(true);
     };
 
@@ -1036,16 +1163,36 @@ function AdminEvents() {
                                     </div>
 
                                     <div className="admin-events-form">
+                                        {/* Language Tabs for Inline Editing */}
+                                        <div className="language-tabs-container">
+                                            <div className="language-tabs">
+                                                {languageOptions.map((lang) => (
+                                                    <button
+                                                        key={lang.code}
+                                                        type="button"
+                                                        className={`language-tab ${activeLanguage === lang.code ? 'active' : ''}`}
+                                                        onClick={() => setActiveLanguage(lang.code)}
+                                                    >
+                                                        <img src={lang.flag} alt={lang.name} className="language-flag" />
+                                                        <span className="language-name">{lang.name}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
                                         <div className="form-fields-left">
                                             <div className="form-group">
                                                 <label>Tədbirin Başlığı</label>
                                                 <input
                                                     type="text"
                                                     className="form-input"
-                                                    value={currentData.title || ''}
-                                                    onChange={(e) => handleInlineInputChange(event.id, 'title', e.target.value)}
+                                                    value={getCurrentFieldValue(currentData, 'title')}
+                                                    onChange={(e) => {
+                                                        const fieldName = getCurrentFieldName('title');
+                                                        handleInlineInputChange(event.id, fieldName, e.target.value);
+                                                    }}
                                                     maxLength={200}
-                                                    placeholder="Tədbirin başlığı"
+                                                    placeholder={getLocalizedPlaceholder('title')}
                                                 />
                                             </div>
 
@@ -1054,10 +1201,13 @@ function AdminEvents() {
                                                 <input
                                                     type="text"
                                                     className="form-input"
-                                                    value={currentData.subtitle || ''}
-                                                    onChange={(e) => handleInlineInputChange(event.id, 'subtitle', e.target.value)}
+                                                    value={getCurrentFieldValue(currentData, 'subtitle')}
+                                                    onChange={(e) => {
+                                                        const fieldName = getCurrentFieldName('subtitle');
+                                                        handleInlineInputChange(event.id, fieldName, e.target.value);
+                                                    }}
                                                     maxLength={300}
-                                                    placeholder="Tədbirin alt başlığı"
+                                                    placeholder={getLocalizedPlaceholder('subtitle')}
                                                 />
                                             </div>
 
@@ -1103,10 +1253,13 @@ function AdminEvents() {
                                                 <input
                                                     type="text"
                                                     className="form-input"
-                                                    value={currentData.venue || ''}
-                                                    onChange={(e) => handleInlineInputChange(event.id, 'venue', e.target.value)}
+                                                    value={getCurrentFieldValue(currentData, 'venue')}
+                                                    onChange={(e) => {
+                                                        const fieldName = getCurrentFieldName('venue');
+                                                        handleInlineInputChange(event.id, fieldName, e.target.value);
+                                                    }}
                                                     maxLength={200}
-                                                    placeholder="Tədbir məkanı"
+                                                    placeholder={getLocalizedPlaceholder('venue')}
                                                 />
                                             </div>
 
@@ -1115,10 +1268,13 @@ function AdminEvents() {
                                                 <input
                                                     type="text"
                                                     className="form-input"
-                                                    value={currentData.trainer || ''}
-                                                    onChange={(e) => handleInlineInputChange(event.id, 'trainer', e.target.value)}
+                                                    value={getCurrentFieldValue(currentData, 'trainer')}
+                                                    onChange={(e) => {
+                                                        const fieldName = getCurrentFieldName('trainer');
+                                                        handleInlineInputChange(event.id, fieldName, e.target.value);
+                                                    }}
                                                     maxLength={100}
-                                                    placeholder="Tədbir təlimçisi"
+                                                    placeholder={getLocalizedPlaceholder('trainer')}
                                                 />
                                             </div>
 
@@ -1127,10 +1283,13 @@ function AdminEvents() {
                                                 <input
                                                     type="text"
                                                     className="form-input"
-                                                    value={currentData.region || ''}
-                                                    onChange={(e) => handleInlineInputChange(event.id, 'region', e.target.value)}
+                                                    value={getCurrentFieldValue(currentData, 'region')}
+                                                    onChange={(e) => {
+                                                        const fieldName = getCurrentFieldName('region');
+                                                        handleInlineInputChange(event.id, fieldName, e.target.value);
+                                                    }}
                                                     maxLength={100}
-                                                    placeholder="Tədbir regionu"
+                                                    placeholder={getLocalizedPlaceholder('region')}
                                                 />
                                             </div>
 
@@ -1162,10 +1321,13 @@ function AdminEvents() {
                                                 <label>Təsvir</label>
                                                 <textarea
                                                     className="form-textarea"
-                                                    value={currentData.description || ''}
-                                                    onChange={(e) => handleInlineInputChange(event.id, 'description', e.target.value)}
+                                                    value={getCurrentFieldValue(currentData, 'description')}
+                                                    onChange={(e) => {
+                                                        const fieldName = getCurrentFieldName('description');
+                                                        handleInlineInputChange(event.id, fieldName, e.target.value);
+                                                    }}
                                                     maxLength={1000}
-                                                    placeholder="Tədbirin təsviri"
+                                                    placeholder={getLocalizedPlaceholder('description')}
                                                     rows={4}
                                                 />
                                             </div>
@@ -1174,9 +1336,12 @@ function AdminEvents() {
                                                 <label>Ətraflı Təsvir</label>
                                                 <textarea
                                                     className="form-textarea"
-                                                    value={currentData.longDescription || ''}
-                                                    onChange={(e) => handleInlineInputChange(event.id, 'longDescription', e.target.value)}
-                                                    placeholder="Tədbirin ətraflı təsviri"
+                                                    value={getCurrentFieldValue(currentData, 'longDescription')}
+                                                    onChange={(e) => {
+                                                        const fieldName = getCurrentFieldName('longDescription');
+                                                        handleInlineInputChange(event.id, fieldName, e.target.value);
+                                                    }}
+                                                    placeholder={getLocalizedPlaceholder('longDescription')}
                                                     rows={4}
                                                 />
                                             </div>
@@ -1385,6 +1550,23 @@ function AdminEvents() {
                             </button>
                         </div>
 
+                        {/* Language Tabs */}
+                        <div className="language-tabs-container">
+                            <div className="language-tabs">
+                                {languageOptions.map((lang) => (
+                                    <button
+                                        key={lang.code}
+                                        type="button"
+                                        className={`language-tab ${activeLanguage === lang.code ? 'active' : ''}`}
+                                        onClick={() => setActiveLanguage(lang.code)}
+                                    >
+                                        <img src={lang.flag} alt={lang.name} className="language-flag" />
+                                        <span className="language-name">{lang.name}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                         <form className="admin-events-modal-form" onSubmit={handleSubmit}>
                             <div className="admin-events-modal-fields">
                                 <div className="admin-events-modal-left">
@@ -1395,11 +1577,14 @@ function AdminEvents() {
                                             id="title"
                                             name="title"
                                             className="admin-events-form-input"
-                                            value={eventData.title}
-                                            onChange={(e) => setEventData(prev => ({ ...prev, title: e.target.value }))}
+                                            value={eventData[getCurrentFieldName('title')]}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('title');
+                                                setEventData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={200}
-                                            required
-                                            placeholder="Enter event title"
+                                            required={activeLanguage === 'aze'}
+                                            placeholder={getLocalizedPlaceholder('title')}
                                         />
                                     </div>
 
@@ -1410,10 +1595,13 @@ function AdminEvents() {
                                             id="subtitle"
                                             name="subtitle"
                                             className="admin-events-form-input"
-                                            value={eventData.subtitle}
-                                            onChange={(e) => setEventData(prev => ({ ...prev, subtitle: e.target.value }))}
+                                            value={eventData[getCurrentFieldName('subtitle')]}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('subtitle');
+                                                setEventData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={300}
-                                            placeholder="Enter event subtitle"
+                                            placeholder={getLocalizedPlaceholder('subtitle')}
                                         />
                                     </div>
 
@@ -1454,10 +1642,13 @@ function AdminEvents() {
                                             id="venue"
                                             name="venue"
                                             className="admin-events-form-input"
-                                            value={eventData.venue}
-                                            onChange={(e) => setEventData(prev => ({ ...prev, venue: e.target.value }))}
+                                            value={eventData[getCurrentFieldName('venue')]}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('venue');
+                                                setEventData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={200}
-                                            placeholder="Enter event venue"
+                                            placeholder={getLocalizedPlaceholder('venue')}
                                         />
                                     </div>
 
@@ -1468,10 +1659,13 @@ function AdminEvents() {
                                             id="trainer"
                                             name="trainer"
                                             className="admin-events-form-input"
-                                            value={eventData.trainer}
-                                            onChange={(e) => setEventData(prev => ({ ...prev, trainer: e.target.value }))}
+                                            value={eventData[getCurrentFieldName('trainer')]}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('trainer');
+                                                setEventData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={100}
-                                            placeholder="Enter event trainer"
+                                            placeholder={getLocalizedPlaceholder('trainer')}
                                         />
                                     </div>
 
@@ -1482,10 +1676,13 @@ function AdminEvents() {
                                             id="region"
                                             name="region"
                                             className="admin-events-form-input"
-                                            value={eventData.region}
-                                            onChange={(e) => setEventData(prev => ({ ...prev, region: e.target.value }))}
+                                            value={eventData[getCurrentFieldName('region')]}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('region');
+                                                setEventData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={100}
-                                            placeholder="Enter event region"
+                                            placeholder={getLocalizedPlaceholder('region')}
                                         />
                                     </div>
 
@@ -1539,11 +1736,14 @@ function AdminEvents() {
                                             id="description"
                                             name="description"
                                             className="admin-events-form-textarea"
-                                            value={eventData.description}
-                                            onChange={(e) => setEventData(prev => ({ ...prev, description: e.target.value }))}
+                                            value={eventData[getCurrentFieldName('description')]}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('description');
+                                                setEventData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={1000}
                                             rows={4}
-                                            placeholder="Enter event description"
+                                            placeholder={getLocalizedPlaceholder('description')}
                                         />
                                     </div>
 
@@ -1553,10 +1753,13 @@ function AdminEvents() {
                                             id="longDescription"
                                             name="longDescription"
                                             className="admin-events-form-textarea"
-                                            value={eventData.longDescription}
-                                            onChange={(e) => setEventData(prev => ({ ...prev, longDescription: e.target.value }))}
+                                            value={eventData[getCurrentFieldName('longDescription')]}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('longDescription');
+                                                setEventData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             rows={4}
-                                            placeholder="Enter detailed event description"
+                                            placeholder={getLocalizedPlaceholder('longDescription')}
                                         />
                                     </div>
 
@@ -1752,6 +1955,23 @@ function AdminEvents() {
                                     <p className="speaker-form-subtitle">Speaker məlumatlarını doldurun</p>
                                 </div>
 
+                                {/* Language Tabs */}
+                                <div className="language-tabs-container">
+                                    <div className="language-tabs">
+                                        {languageOptions.map((lang) => (
+                                            <button
+                                                key={lang.code}
+                                                type="button"
+                                                className={`language-tab ${activeLanguage === lang.code ? 'active' : ''}`}
+                                                onClick={() => setActiveLanguage(lang.code)}
+                                            >
+                                                <img src={lang.flag} alt={lang.name} className="language-flag" />
+                                                <span className="language-name">{lang.name}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 <div className="speaker-form-body">
                                     <div className="speaker-basic-section">
                                         <h4 className="section-title">Əsas Məlumatlar</h4>
@@ -1759,22 +1979,28 @@ function AdminEvents() {
                                             <label>Speaker Adı</label>
                                             <input
                                                 type="text"
-                                                placeholder="Speaker adını daxil edin"
-                                                value={newSpeaker.name}
-                                                onChange={(e) => setNewSpeaker(prev => ({ ...prev, name: e.target.value }))}
+                                                placeholder={getLocalizedPlaceholder('speakerName')}
+                                                value={getCurrentFieldValue(newSpeaker, 'name')}
+                                                onChange={(e) => {
+                                                    const fieldName = getCurrentFieldName('name');
+                                                    setNewSpeaker(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                                }}
                                                 className="admin-events-form-input"
-                                                required
+                                                required={activeLanguage === 'aze'}
                                             />
                                         </div>
                                         <div className="admin-events-form-group">
                                             <label>Speaker Vəzifəsi</label>
                                             <input
                                                 type="text"
-                                                placeholder="Speaker vəzifəsini daxil edin"
-                                                value={newSpeaker.title}
-                                                onChange={(e) => setNewSpeaker(prev => ({ ...prev, title: e.target.value }))}
+                                                placeholder={getLocalizedPlaceholder('speakerTitle')}
+                                                value={getCurrentFieldValue(newSpeaker, 'title')}
+                                                onChange={(e) => {
+                                                    const fieldName = getCurrentFieldName('title');
+                                                    setNewSpeaker(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                                }}
                                                 className="admin-events-form-input"
-                                                required
+                                                required={activeLanguage === 'aze'}
                                             />
                                         </div>
                                     </div>
@@ -1899,6 +2125,23 @@ function AdminEvents() {
                                     <p className="timeline-form-subtitle">Timeline slot məlumatlarını doldurun</p>
                                 </div>
 
+                                {/* Language Tabs */}
+                                <div className="language-tabs-container">
+                                    <div className="language-tabs">
+                                        {languageOptions.map((lang) => (
+                                            <button
+                                                key={lang.code}
+                                                type="button"
+                                                className={`language-tab ${activeLanguage === lang.code ? 'active' : ''}`}
+                                                onClick={() => setActiveLanguage(lang.code)}
+                                            >
+                                                <img src={lang.flag} alt={lang.name} className="language-flag" />
+                                                <span className="language-name">{lang.name}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 <div className="timeline-form-body">
                                     <div className="timeline-time-section">
                                         <h4 className="section-title">Vaxt Aralığı</h4>
@@ -1972,33 +2215,42 @@ function AdminEvents() {
                                             <label>Başlıq</label>
                                             <input
                                                 type="text"
-                                                placeholder="Timeline slot başlığı"
-                                                value={newTimelineSlot.title}
-                                                onChange={(e) => setNewTimelineSlot(prev => ({ ...prev, title: e.target.value }))}
+                                                placeholder={getLocalizedPlaceholder('timelineTitle')}
+                                                value={getCurrentFieldValue(newTimelineSlot, 'title')}
+                                                onChange={(e) => {
+                                                    const fieldName = getCurrentFieldName('title');
+                                                    setNewTimelineSlot(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                                }}
                                                 className="admin-events-form-input"
-                                                required
+                                                required={activeLanguage === 'aze'}
                                             />
                                         </div>
                                         <div className="admin-events-form-group">
                                             <label>Təsvir</label>
                                             <textarea
-                                                placeholder="Timeline slot haqqında ətraflı məlumat"
-                                                value={newTimelineSlot.description}
-                                                onChange={(e) => setNewTimelineSlot(prev => ({ ...prev, description: e.target.value }))}
+                                                placeholder={getLocalizedPlaceholder('timelineDescription')}
+                                                value={getCurrentFieldValue(newTimelineSlot, 'description')}
+                                                onChange={(e) => {
+                                                    const fieldName = getCurrentFieldName('description');
+                                                    setNewTimelineSlot(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                                }}
                                                 className="admin-events-form-textarea"
                                                 rows={3}
-                                                required
+                                                required={activeLanguage === 'aze'}
                                             />
                                         </div>
                                         <div className="admin-events-form-group">
                                             <label>Əlavə Məlumat</label>
                                             <textarea
-                                                placeholder="Əlavə qeydlər və məlumatlar"
-                                                value={newTimelineSlot.info}
-                                                onChange={(e) => setNewTimelineSlot(prev => ({ ...prev, info: e.target.value }))}
+                                                placeholder={getLocalizedPlaceholder('timelineInfo')}
+                                                value={getCurrentFieldValue(newTimelineSlot, 'info')}
+                                                onChange={(e) => {
+                                                    const fieldName = getCurrentFieldName('info');
+                                                    setNewTimelineSlot(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                                }}
                                                 className="admin-events-form-textarea"
                                                 rows={3}
-                                                required
+                                                required={activeLanguage === 'aze'}
                                             />
                                         </div>
                                     </div>
@@ -2148,6 +2400,23 @@ function AdminEvents() {
                                 <p className="timeline-form-subtitle">Timeline slot məlumatlarını düzəldin</p>
                             </div>
 
+                            {/* Language Tabs */}
+                            <div className="language-tabs-container">
+                                <div className="language-tabs">
+                                    {languageOptions.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            className={`language-tab ${activeLanguage === lang.code ? 'active' : ''}`}
+                                            onClick={() => setActiveLanguage(lang.code)}
+                                        >
+                                            <img src={lang.flag} alt={lang.name} className="language-flag" />
+                                            <span className="language-name">{lang.name}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
                             <div className="timeline-form-body">
                                 <div className="timeline-time-section">
                                     <h4 className="section-title">Vaxt Aralığı</h4>
@@ -2207,33 +2476,42 @@ function AdminEvents() {
                                         <label>Başlıq</label>
                                         <input
                                             type="text"
-                                            placeholder="Timeline slot başlığı"
-                                            value={editingTimelineSlot.title}
-                                            onChange={(e) => setEditingTimelineSlot(prev => ({ ...prev, title: e.target.value }))}
+                                            placeholder={getLocalizedPlaceholder('timelineTitle')}
+                                            value={getCurrentFieldValue(editingTimelineSlot, 'title')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('title');
+                                                setEditingTimelineSlot(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             className="admin-events-form-input"
-                                            required
+                                            required={activeLanguage === 'aze'}
                                         />
                                     </div>
                                     <div className="admin-events-form-group">
                                         <label>Təsvir</label>
                                         <textarea
-                                            placeholder="Timeline slot haqqında ətraflı məlumat"
-                                            value={editingTimelineSlot.description}
-                                            onChange={(e) => setEditingTimelineSlot(prev => ({ ...prev, description: e.target.value }))}
+                                            placeholder={getLocalizedPlaceholder('timelineDescription')}
+                                            value={getCurrentFieldValue(editingTimelineSlot, 'description')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('description');
+                                                setEditingTimelineSlot(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             className="admin-events-form-textarea"
                                             rows={3}
-                                            required
+                                            required={activeLanguage === 'aze'}
                                         />
                                     </div>
                                     <div className="admin-events-form-group">
                                         <label>Əlavə Məlumat</label>
                                         <textarea
-                                            placeholder="Əlavə qeydlər və məlumatlar"
-                                            value={editingTimelineSlot.info}
-                                            onChange={(e) => setEditingTimelineSlot(prev => ({ ...prev, info: e.target.value }))}
+                                            placeholder={getLocalizedPlaceholder('timelineInfo')}
+                                            value={getCurrentFieldValue(editingTimelineSlot, 'info')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('info');
+                                                setEditingTimelineSlot(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             className="admin-events-form-textarea"
                                             rows={3}
-                                            required
+                                            required={activeLanguage === 'aze'}
                                         />
                                     </div>
                                 </div>
@@ -2273,6 +2551,23 @@ function AdminEvents() {
                                 <p className="speaker-form-subtitle">Speaker məlumatlarını düzəldin</p>
                             </div>
 
+                            {/* Language Tabs */}
+                            <div className="language-tabs-container">
+                                <div className="language-tabs">
+                                    {languageOptions.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            className={`language-tab ${activeLanguage === lang.code ? 'active' : ''}`}
+                                            onClick={() => setActiveLanguage(lang.code)}
+                                        >
+                                            <img src={lang.flag} alt={lang.name} className="language-flag" />
+                                            <span className="language-name">{lang.name}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
                             <div className="speaker-form-body">
                                 <div className="speaker-basic-section">
                                     <h4 className="section-title">Əsas Məlumatlar</h4>
@@ -2280,22 +2575,28 @@ function AdminEvents() {
                                         <label>Speaker Adı</label>
                                         <input
                                             type="text"
-                                            placeholder="Speaker adını daxil edin"
-                                            value={editingSpeaker.name}
-                                            onChange={(e) => setEditingSpeaker(prev => ({ ...prev, name: e.target.value }))}
+                                            placeholder={getLocalizedPlaceholder('speakerName')}
+                                            value={getCurrentFieldValue(editingSpeaker, 'name')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('name');
+                                                setEditingSpeaker(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             className="admin-events-form-input"
-                                            required
+                                            required={activeLanguage === 'aze'}
                                         />
                                     </div>
                                     <div className="admin-events-form-group">
                                         <label>Speaker Vəzifəsi</label>
                                         <input
                                             type="text"
-                                            placeholder="Speaker vəzifəsini daxil edin"
-                                            value={editingSpeaker.title}
-                                            onChange={(e) => setEditingSpeaker(prev => ({ ...prev, title: e.target.value }))}
+                                            placeholder={getLocalizedPlaceholder('speakerTitle')}
+                                            value={getCurrentFieldValue(editingSpeaker, 'title')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('title');
+                                                setEditingSpeaker(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             className="admin-events-form-input"
-                                            required
+                                            required={activeLanguage === 'aze'}
                                         />
                                     </div>
                                 </div>

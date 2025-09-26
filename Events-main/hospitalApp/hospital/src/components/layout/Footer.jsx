@@ -22,10 +22,10 @@ function Footer() {
                         <Link to="/" className="footer-link">Ana səhifə</Link>
                         <Link to="/about" className="footer-link">Haqqımızda</Link>
                         <Link to="/events" className="footer-link">Tədbirlər</Link>
-                        <Link to="/employee" className="footer-link">Üzv</Link>
+                        <Link to="/employee" className="footer-link">Üzvlər</Link>
                         <Link to="/gallery" className="footer-link">Qalereya</Link>
-                        <Link to="/blog" className="footer-link">Blog</Link>
-                        <Link to="/contact" className="footer-link">Contact</Link>
+                        <Link to="/blog" className="footer-link">Blog - Bloq</Link>
+                        <Link to="/contact" className="footer-link">Contact - Əlaqə</Link>
                     </div>
                     <div className="social-media-icons">
                         <a className="social-icon" href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">

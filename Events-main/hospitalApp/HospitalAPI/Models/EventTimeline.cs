@@ -30,6 +30,26 @@ namespace HospitalAPI.Models
         [Required]
         public int OrderIndex { get; set; }
         
+        // English language fields
+        [MaxLength(255)]
+        public string? TitleEn { get; set; }
+        
+        [MaxLength(1000)]
+        public string? DescriptionEn { get; set; }
+        
+        [MaxLength(2000)]
+        public string? InfoEn { get; set; }
+        
+        // Russian language fields
+        [MaxLength(255)]
+        public string? TitleRu { get; set; }
+        
+        [MaxLength(1000)]
+        public string? DescriptionRu { get; set; }
+        
+        [MaxLength(2000)]
+        public string? InfoRu { get; set; }
+        
         public string CreatedAt { get; set; } = string.Empty;
         public string UpdatedAt { get; set; } = string.Empty;
         

@@ -7,16 +7,25 @@ import RequestModal from '../ui/RequestModal'
 import './Header.css'
 import StaggeredMenu from './StaggeredMenu'
 import SpotlightNav from './SpotlightNav'
+import { useLanguage } from '../../context'
+import { useTranslation } from '../../hooks/useTranslation'
 
 function Header({ showTopImage = false, customTopImage = null, hidePageName = false }) {
     const [activePage, setActivePage] = useState('home');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
-    const [selectedLanguage, setSelectedLanguage] = useState('aze');
-    const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+    const {
+        selectedLanguage,
+        isLanguageDropdownOpen,
+        languageOptions,
+        handleLanguageSelect,
+        toggleLanguageDropdown,
+        getCurrentLanguage
+    } = useLanguage();
+    const { t } = useTranslation();
 
     // Check if we're on the home page
     const isHomePage = location.pathname === '/';
@@ -30,20 +39,15 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
     // Check if we're on the gallery page
     const isGalleryPage = location.pathname === '/gallery';
 
-    const languageOptions = [
-        { code: 'aze', name: 'Aze', flag: 'https://flagcdn.com/w20/az.png' },
-        { code: 'eng', name: 'Eng', flag: 'https://flagcdn.com/w20/us.png' },
-        { code: 'rus', name: 'Rus', flag: 'https://flagcdn.com/w20/ru.png' }
-    ];
 
     const navigationItems = [
-        { label: 'Ana səhifə', href: '/', id: 'home' },
-        { label: 'Haqqımızda', href: '/about', id: 'about' },
-        { label: 'Tedbirlər', href: '/events', id: 'events' },
-        { label: 'Üzv', href: '/employee', id: 'employee' },
-        { label: 'Qalereya', href: '/gallery', id: 'gallery' },
-        { label: 'Bloq', href: '/blog', id: 'blog' },
-        { label: 'Əlaqə', href: '/contact', id: 'contact' },
+        { label: t('home'), href: '/', id: 'home' },
+        { label: t('about'), href: '/about', id: 'about' },
+        { label: t('events'), href: '/events', id: 'events' },
+        { label: t('members'), href: '/employee', id: 'employee' },
+        { label: t('gallery'), href: '/gallery', id: 'gallery' },
+        { label: t('blog'), href: '/blog', id: 'blog' },
+        { label: t('contact'), href: '/contact', id: 'contact' },
     ];
 
     const handleItemClick = (item) => {
@@ -64,18 +68,6 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
         setIsRequestModalOpen(false);
     };
 
-    const handleLanguageSelect = (languageCode) => {
-        setSelectedLanguage(languageCode);
-        setIsLanguageDropdownOpen(false);
-    };
-
-    const toggleLanguageDropdown = () => {
-        setIsLanguageDropdownOpen(!isLanguageDropdownOpen);
-    };
-
-    const getCurrentLanguage = () => {
-        return languageOptions.find(lang => lang.code === selectedLanguage) || languageOptions[0];
-    };
 
     // Set initial active page based on current path
     useEffect(() => {
@@ -191,7 +183,7 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
                             </div>
                         )}
                     </div>
-                    <button className="uzv-btn" onClick={handleRequestModalOpen}>Üzv ol</button>
+                    <button className="uzv-btn" onClick={handleRequestModalOpen}>{t('joinMember')}</button>
                 </div>
             </div>
 
@@ -199,12 +191,12 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
                 <div className="page-name-display">
                     {activePage !== 'home' && activePage !== 'none' && (
                         <>
-                            {activePage === 'about' && 'Haqqımızda'}
-                            {activePage === 'contact' && 'Əlaqə'}
-                            {activePage === 'events' && 'Tədbirlər'}
-                            {activePage === 'employee' && 'Üzv'}
-                            {activePage === 'gallery' && 'Qalereya'}
-                            {activePage === 'blog' && 'Bloq'}
+                            {activePage === 'about' && t('about')}
+                            {activePage === 'contact' && t('contact')}
+                            {activePage === 'events' && t('events')}
+                            {activePage === 'employee' && t('members')}
+                            {activePage === 'gallery' && t('gallery')}
+                            {activePage === 'blog' && t('blog')}
                         </>
                     )}
                 </div>

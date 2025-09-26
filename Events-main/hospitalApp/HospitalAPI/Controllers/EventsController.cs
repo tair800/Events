@@ -44,6 +44,42 @@ namespace HospitalAPI.Controllers
             }
         }
 
+        // GET: api/events/language/{lang} - Get all events in specific language
+        [HttpGet("language/{lang}")]
+        public async Task<ActionResult<IEnumerable<Event>>> GetEventsByLanguage(string lang)
+        {
+            try
+            {
+                var events = await _context.Events
+                    .OrderByDescending(e => e.EventDate)
+                    .ToListAsync();
+                
+                // Apply language-specific content
+                foreach (var eventItem in events)
+                {
+                    eventItem.Title = GetLocalizedTitle(eventItem, lang);
+                    eventItem.Subtitle = GetLocalizedSubtitle(eventItem, lang);
+                    eventItem.Description = GetLocalizedDescription(eventItem, lang);
+                    eventItem.LongDescription = GetLocalizedLongDescription(eventItem, lang);
+                    eventItem.Venue = GetLocalizedVenue(eventItem, lang);
+                    eventItem.Trainer = GetLocalizedTrainer(eventItem, lang);
+                    eventItem.Region = GetLocalizedRegion(eventItem, lang);
+                    
+                    // Format image paths for frontend
+                    eventItem.MainImage = ImagePathService.FormatContextualImagePath(eventItem.MainImage, "admin");
+                    eventItem.DetailImageLeft = ImagePathService.FormatContextualImagePath(eventItem.DetailImageLeft, "admin");
+                    eventItem.DetailImageMain = ImagePathService.FormatContextualImagePath(eventItem.DetailImageMain, "admin");
+                    eventItem.DetailImageRight = ImagePathService.FormatContextualImagePath(eventItem.DetailImageRight, "admin");
+                }
+                
+                return Ok(events);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         // GET: api/events/{id} - Get specific event
         [HttpGet("{id}")]
         public async Task<ActionResult<Event>> GetEvent(int id)
@@ -56,6 +92,36 @@ namespace HospitalAPI.Controllers
                 {
                     return NotFound($"Event with ID {id} not found");
                 }
+
+                return Ok(eventItem);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        // GET: api/events/{id}/language/{lang} - Get specific event in specific language
+        [HttpGet("{id}/language/{lang}")]
+        public async Task<ActionResult<Event>> GetEventByLanguage(int id, string lang)
+        {
+            try
+            {
+                var eventItem = await _context.Events.FindAsync(id);
+
+                if (eventItem == null)
+                {
+                    return NotFound($"Event with ID {id} not found");
+                }
+
+                // Apply language-specific content
+                eventItem.Title = GetLocalizedTitle(eventItem, lang);
+                eventItem.Subtitle = GetLocalizedSubtitle(eventItem, lang);
+                eventItem.Description = GetLocalizedDescription(eventItem, lang);
+                eventItem.LongDescription = GetLocalizedLongDescription(eventItem, lang);
+                eventItem.Venue = GetLocalizedVenue(eventItem, lang);
+                eventItem.Trainer = GetLocalizedTrainer(eventItem, lang);
+                eventItem.Region = GetLocalizedRegion(eventItem, lang);
 
                 return Ok(eventItem);
             }
@@ -230,6 +296,24 @@ namespace HospitalAPI.Controllers
                 existingEvent.DetailImageRight = eventItem.DetailImageRight;
                 existingEvent.IsMain = eventItem.IsMain;
                 
+                // Update English language fields
+                existingEvent.TitleEn = eventItem.TitleEn;
+                existingEvent.SubtitleEn = eventItem.SubtitleEn;
+                existingEvent.DescriptionEn = eventItem.DescriptionEn;
+                existingEvent.LongDescriptionEn = eventItem.LongDescriptionEn;
+                existingEvent.VenueEn = eventItem.VenueEn;
+                existingEvent.TrainerEn = eventItem.TrainerEn;
+                existingEvent.RegionEn = eventItem.RegionEn;
+                
+                // Update Russian language fields
+                existingEvent.TitleRu = eventItem.TitleRu;
+                existingEvent.SubtitleRu = eventItem.SubtitleRu;
+                existingEvent.DescriptionRu = eventItem.DescriptionRu;
+                existingEvent.LongDescriptionRu = eventItem.LongDescriptionRu;
+                existingEvent.VenueRu = eventItem.VenueRu;
+                existingEvent.TrainerRu = eventItem.TrainerRu;
+                existingEvent.RegionRu = eventItem.RegionRu;
+                
                 // Automatically set IsFree based on Price
                 bool newIsFreeValue = eventItem.Price == 0 || eventItem.Price == null;
                 existingEvent.IsFree = newIsFreeValue;
@@ -376,6 +460,76 @@ namespace HospitalAPI.Controllers
             }
         }
 
+        // Helper methods for localization
+        private string GetLocalizedTitle(Event eventItem, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(eventItem.TitleEn) ? eventItem.TitleEn : eventItem.Title,
+                "ru" => !string.IsNullOrEmpty(eventItem.TitleRu) ? eventItem.TitleRu : eventItem.Title,
+                _ => eventItem.Title
+            };
+        }
+
+        private string GetLocalizedSubtitle(Event eventItem, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(eventItem.SubtitleEn) ? eventItem.SubtitleEn : eventItem.Subtitle,
+                "ru" => !string.IsNullOrEmpty(eventItem.SubtitleRu) ? eventItem.SubtitleRu : eventItem.Subtitle,
+                _ => eventItem.Subtitle
+            };
+        }
+
+        private string GetLocalizedDescription(Event eventItem, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(eventItem.DescriptionEn) ? eventItem.DescriptionEn : eventItem.Description,
+                "ru" => !string.IsNullOrEmpty(eventItem.DescriptionRu) ? eventItem.DescriptionRu : eventItem.Description,
+                _ => eventItem.Description
+            };
+        }
+
+        private string GetLocalizedLongDescription(Event eventItem, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(eventItem.LongDescriptionEn) ? eventItem.LongDescriptionEn : eventItem.LongDescription,
+                "ru" => !string.IsNullOrEmpty(eventItem.LongDescriptionRu) ? eventItem.LongDescriptionRu : eventItem.LongDescription,
+                _ => eventItem.LongDescription
+            };
+        }
+
+        private string GetLocalizedVenue(Event eventItem, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(eventItem.VenueEn) ? eventItem.VenueEn : eventItem.Venue,
+                "ru" => !string.IsNullOrEmpty(eventItem.VenueRu) ? eventItem.VenueRu : eventItem.Venue,
+                _ => eventItem.Venue
+            };
+        }
+
+        private string GetLocalizedTrainer(Event eventItem, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(eventItem.TrainerEn) ? eventItem.TrainerEn : eventItem.Trainer,
+                "ru" => !string.IsNullOrEmpty(eventItem.TrainerRu) ? eventItem.TrainerRu : eventItem.Trainer,
+                _ => eventItem.Trainer
+            };
+        }
+
+        private string GetLocalizedRegion(Event eventItem, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(eventItem.RegionEn) ? eventItem.RegionEn : eventItem.Region,
+                "ru" => !string.IsNullOrEmpty(eventItem.RegionRu) ? eventItem.RegionRu : eventItem.Region,
+                _ => eventItem.Region
+            };
+        }
 
     }
 }

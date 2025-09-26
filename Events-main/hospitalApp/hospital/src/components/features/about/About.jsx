@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import './About.css'
 import { getContextualImagePath } from '../../../utils/imageUtils'
+import { useLanguage } from '../../../context'
+import { useTranslation } from '../../../hooks/useTranslation'
 const aboutMainImage = '/assets/about-main.png'
 const aboutTop1Image = '/assets/about-dot1.png'
 const aboutTop2Image = '/assets/about-dot2.png'
@@ -16,27 +18,59 @@ function About() {
     const [aboutData, setAboutData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const [cachedData, setCachedData] = useState({});
+    const { selectedLanguage } = useLanguage();
+    const { t } = useTranslation();
 
-    // Fetch About data from API
+    // Fetch About data from API with caching
     useEffect(() => {
         const fetchAboutData = async () => {
             try {
+                // Check if we have cached data for this language
+                if (cachedData[selectedLanguage]) {
+                    setAboutData(cachedData[selectedLanguage]);
+                    setLoading(false);
+                    return;
+                }
+
+                setIsTransitioning(true);
                 setLoading(true);
-                const response = await fetch('https://localhost:5000/api/about');
+
+                let apiUrl = 'https://localhost:5000/api/about';
+
+                // Use language-specific endpoint if not Azerbaijani
+                if (selectedLanguage !== 'aze') {
+                    apiUrl = `https://localhost:5000/api/about/language/${selectedLanguage}`;
+                }
+
+                const response = await fetch(apiUrl);
                 if (!response.ok) {
                     throw new Error('Failed to fetch about data');
                 }
                 const data = await response.json();
-                setAboutData(data[0]); // Get the first about entry
+                const aboutItem = data[0]; // Get the first about entry
+
+                // Cache the data for this language
+                setCachedData(prev => ({
+                    ...prev,
+                    [selectedLanguage]: aboutItem
+                }));
+
+                setAboutData(aboutItem);
             } catch (err) {
                 setError(err.message);
             } finally {
                 setLoading(false);
+                // Add a small delay for smooth transition
+                setTimeout(() => {
+                    setIsTransitioning(false);
+                }, 150);
             }
         };
 
         fetchAboutData();
-    }, []);
+    }, [selectedLanguage]);
 
 
 
@@ -78,11 +112,17 @@ function About() {
 
 
 
-    // Show loading state
-    if (loading) {
+    // Show loading state only for initial load, not for language changes
+    if (loading && !cachedData[selectedLanguage]) {
         return (
             <div className="about-page">
-                <div style={{ textAlign: 'center', padding: '50px' }}>
+                <div style={{
+                    textAlign: 'center',
+                    padding: '50px',
+                    color: 'white',
+                    opacity: 0.7,
+                    transition: 'opacity 0.3s ease'
+                }}>
                     <p>Loading...</p>
                 </div>
             </div>
@@ -102,7 +142,7 @@ function About() {
 
 
     return (
-        <div className="about-page">
+        <div className={`about-page ${isTransitioning ? 'transitioning' : ''}`} data-language={selectedLanguage}>
             <img
                 src={circleImage}
                 alt="Circle"
@@ -125,14 +165,14 @@ function About() {
                         <img src={aboutTop3Image} alt="About Dot 3 Image" />
                         <div className="dot3-text-overlay">
                             <span className="dot3-number">+{counter2}</span>
-                            <span className="dot3-label">doctors</span>
+                            <span className="dot3-label">{t('doctors')}</span>
                         </div>
                     </div>
                     <div className="dot4-image-container">
                         <img src={aboutTop4Image} alt="About Dot 4 Image" />
                         <div className="dot4-text-overlay">
                             <span className="dot4-number">+{counter}</span>
-                            <span className="dot4-label">Events</span>
+                            <span className="dot4-label">{t('events')}</span>
                         </div>
                     </div>
                     <div className="main-image-container">
@@ -145,7 +185,7 @@ function About() {
 
                 <div className="right-text-section" style={{ color: 'black' }}>
                     <h1 className="main-title">
-                        {aboutData?.title || 'Azərbaycan Hepato-Pankreato-Biliar Cərrahlar İctimai Birliyi'}
+                        {aboutData?.title || t('aboutTitle')}
                     </h1>
 
                     <div className="text-content" style={{ marginTop: '2rem' }}>
@@ -156,17 +196,11 @@ function About() {
                                 </p>
                             ))
                         ) : (
-                            <>
-                                <p>
-                                    Azərbaycan Hepato-Pankreato-Biliar Cərrahlar İctimai Birliyi, qaraciyər, öd yolları və mədəaltı vəzi xəstəliklərinin diaqnostika və cərrahiyyəsi sahəsində fəaliyyət göstərən mütəxəssisləri bir araya gətirən elmi-ictimai təşkilatdır.
+                            t('aboutDescription').split('\n\n').map((paragraph, index) => (
+                                <p key={index}>
+                                    {paragraph.trim()}
                                 </p>
-                                <p>
-                                    Birliyin əsas məqsədi HPB sahəsində bilik və təcrübə mübadiləsini təşviq etmək, peşəkar inkişafı dəstəkləmək və ölkədə bu sahənin inkişafına töhfə verməkdir. Birlik həm yerli, həm də beynəlxalq əməkdaşlıqlar quraraq seminarlar, elmi konfranslar və təlimlər təşkil edir. Gənc cərrahların və mütəxəssislərin dəstəklənməsi, müasir cərrahiyyə metodlarının tətbiqi və elmi tədqiqatların təşviqi də fəaliyyətimizin əsas istiqamətlərindəndir.
-                                </p>
-                                <p>
-                                    Azərbaycan HPB Cərrahları İctimai Birliyi olaraq, səhiyyə sisteminə dəyər qatmaq və xəstələrin həyat keyfiyyətini artırmaq üçün peşəkar bir cəmiyyət olaraq çalışırıq.
-                                </p>
-                            </>
+                            ))
                         )}
                     </div>
                 </div>

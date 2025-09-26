@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getContextualImagePath } from '../../../utils/imageUtils';
-const searchIcon = '/assets/search-icon.png';
-const cardIcon = '/assets/card-icon.png';
+const searchIcon = '/assets/search.svg';
+const cardIcon = '/assets/event-arrow.svg';
 const eventImg = '/assets/event-img.png';
 import iconNext from '../../../assets/icon-next.svg';
 import iconPrev from '../../../assets/icon-prev.svg';
@@ -303,7 +303,7 @@ const Events = () => {
         // Region filter
         const regionMatch = selectedRegion === 'All' || event.region === selectedRegion;
 
-        // Date filter - show events on or after selected date
+        // Date filter - show events exactly on selected date
         let dateMatch = true;
         if (selectedDate) {
             const eventDate = new Date(event.eventDate);
@@ -311,7 +311,7 @@ const Events = () => {
             // Set time to start of day for comparison
             filterDate.setHours(0, 0, 0, 0);
             eventDate.setHours(0, 0, 0, 0);
-            dateMatch = eventDate >= filterDate;
+            dateMatch = eventDate.getTime() === filterDate.getTime();
         }
 
         // Search filter - search by first letters of title, subtitle, and venue
@@ -402,7 +402,7 @@ const Events = () => {
                                 <div className="featured-event-details">
                                     <div className="featured-event-date-venue-row">
                                         <div className="featured-event-date">
-                                            <img src="/assets/calendar.png" alt="Calendar" className="featured-icon" />
+                                            <img src="/assets/calendar.svg" alt="Calendar" className="featured-icon" />
                                             <span>{eventDate.toLocaleDateString('en-US', {
                                                 month: 'long',
                                                 day: 'numeric',
@@ -410,7 +410,7 @@ const Events = () => {
                                             })}</span>
                                         </div>
                                         <div className="featured-event-venue">
-                                            <img src="/assets/location.png" alt="Venue" className="featured-icon" />
+                                            <img src="/assets/map.svg" alt="Venue" className="featured-icon" />
                                             <span>{currentEvent.venue}</span>
                                         </div>
 
@@ -609,7 +609,7 @@ const Events = () => {
                         {(selectedDate || selectedRegion !== 'All' || searchTerm) && (
                             <div className="calendar-refresh-section">
                                 <button className="calendar-refresh-text" onClick={handleCalendarRefresh}>
-                                    Refresh Calendar
+                                    Kalendarı yenilə
                                 </button>
                             </div>
                         )}

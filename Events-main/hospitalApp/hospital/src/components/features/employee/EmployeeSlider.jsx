@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../../../hooks/useTranslation';
 import iconNext from '../../../assets/icon-next.svg';
 import iconPrev from '../../../assets/icon-prev.svg';
 import eventNext from '/assets/event-next.svg';
@@ -10,6 +11,7 @@ const EmployeeSlider = ({ employees }) => {
     const [currentPage, setCurrentPage] = useState(0);
     const [cardsPerPage, setCardsPerPage] = useState(window.innerWidth <= 768 ? 2 : 4);
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     useEffect(() => {
         const handleResize = () => {
@@ -22,7 +24,7 @@ const EmployeeSlider = ({ employees }) => {
     }, []);
 
     if (!employees || employees.length === 0) {
-        return <div className="no-employees-message">Həkim tapılmadı</div>;
+        return <div className="no-employees-message">{t('noEmployeesFound')}</div>;
     }
 
     const totalPages = Math.ceil(employees.length / cardsPerPage);

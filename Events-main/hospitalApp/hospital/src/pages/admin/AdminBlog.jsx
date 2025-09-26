@@ -18,13 +18,47 @@ function AdminBlog() {
         secondDescBody: '',
         thirdTextTitle: '',
         thirdTextBody: '',
-        image: ''
+        image: '',
+        // English language fields
+        titleEn: '',
+        descriptionEn: '',
+        secondDescTitleEn: '',
+        secondDescBodyEn: '',
+        thirdTextTitleEn: '',
+        thirdTextBodyEn: '',
+        // Russian language fields
+        titleRu: '',
+        descriptionRu: '',
+        secondDescTitleRu: '',
+        secondDescBodyRu: '',
+        thirdTextTitleRu: '',
+        thirdTextBodyRu: ''
     });
+    const [activeLanguage, setActiveLanguage] = useState('aze');
     const [loading, setLoading] = useState(false);
     const [editingBlogs, setEditingBlogs] = useState({});
     const [showModal, setShowModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredBlogs, setFilteredBlogs] = useState([]);
+
+    const languageOptions = [
+        { code: 'aze', name: 'Azerbaijani', flag: '🇦🇿' },
+        { code: 'en', name: 'English', flag: '🇺🇸' },
+        { code: 'ru', name: 'Russian', flag: '🇷🇺' }
+    ];
+
+    // Helper functions for language-specific fields
+    const getCurrentFieldName = (field) => {
+        if (activeLanguage === 'aze') return field;
+        if (activeLanguage === 'en') return field + 'En';
+        if (activeLanguage === 'ru') return field + 'Ru';
+        return field;
+    };
+
+    const getCurrentFieldValue = (field, data = blogData) => {
+        const fieldName = getCurrentFieldName(field);
+        return data[fieldName] || '';
+    };
 
     // Pagination hook
     const {
@@ -202,7 +236,21 @@ function AdminBlog() {
             secondDescBody: '',
             thirdTextTitle: '',
             thirdTextBody: '',
-            image: ''
+            image: '',
+            // English language fields
+            titleEn: '',
+            descriptionEn: '',
+            secondDescTitleEn: '',
+            secondDescBodyEn: '',
+            thirdTextTitleEn: '',
+            thirdTextBodyEn: '',
+            // Russian language fields
+            titleRu: '',
+            descriptionRu: '',
+            secondDescTitleRu: '',
+            secondDescBodyRu: '',
+            thirdTextTitleRu: '',
+            thirdTextBodyRu: ''
         });
     };
 
@@ -480,11 +528,31 @@ function AdminBlog() {
                                         <input
                                             type="text"
                                             className="admin-blog-inline-input"
-                                            value={currentData.title || ''}
-                                            onChange={(e) => handleInlineInputChange(blog.id, 'title', e.target.value)}
+                                            value={getCurrentFieldValue('title', currentData)}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('title');
+                                                handleInlineInputChange(blog.id, fieldName, e.target.value);
+                                            }}
                                             maxLength={300}
                                             placeholder="Blog title"
                                         />
+                                    </div>
+
+                                    {/* Language Tabs for Inline Editing */}
+                                    <div className="language-tabs-container">
+                                        <div className="language-tabs">
+                                            {languageOptions.map((lang) => (
+                                                <button
+                                                    key={lang.code}
+                                                    type="button"
+                                                    className={`language-tab ${activeLanguage === lang.code ? 'active' : ''}`}
+                                                    onClick={() => setActiveLanguage(lang.code)}
+                                                >
+                                                    <span className="language-flag">{lang.flag}</span>
+                                                    <span className="language-name">{lang.name}</span>
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
 
                                     <div className="admin-blog-form">
@@ -495,8 +563,11 @@ function AdminBlog() {
                                                     <input
                                                         type="text"
                                                         className="form-input"
-                                                        value={currentData.title || ''}
-                                                        onChange={(e) => handleInlineInputChange(blog.id, 'title', e.target.value)}
+                                                        value={getCurrentFieldValue('title', currentData)}
+                                                        onChange={(e) => {
+                                                            const fieldName = getCurrentFieldName('title');
+                                                            handleInlineInputChange(blog.id, fieldName, e.target.value);
+                                                        }}
                                                         maxLength={300}
                                                         placeholder="Blog title"
                                                     />
@@ -534,8 +605,11 @@ function AdminBlog() {
                                                 <label>Blog Description</label>
                                                 <textarea
                                                     className="form-textarea"
-                                                    value={currentData.description || ''}
-                                                    onChange={(e) => handleInlineInputChange(blog.id, 'description', e.target.value)}
+                                                    value={getCurrentFieldValue('description', currentData)}
+                                                    onChange={(e) => {
+                                                        const fieldName = getCurrentFieldName('description');
+                                                        handleInlineInputChange(blog.id, fieldName, e.target.value);
+                                                    }}
                                                     maxLength={500}
                                                     placeholder="Blog description"
                                                     rows={4}
@@ -548,8 +622,11 @@ function AdminBlog() {
                                                     <input
                                                         type="text"
                                                         className="form-input"
-                                                        value={currentData.secondDescTitle || ''}
-                                                        onChange={(e) => handleInlineInputChange(blog.id, 'secondDescTitle', e.target.value)}
+                                                        value={getCurrentFieldValue('secondDescTitle', currentData)}
+                                                        onChange={(e) => {
+                                                            const fieldName = getCurrentFieldName('secondDescTitle');
+                                                            handleInlineInputChange(blog.id, fieldName, e.target.value);
+                                                        }}
                                                         maxLength={200}
                                                         placeholder="Second description title"
                                                     />
@@ -560,8 +637,11 @@ function AdminBlog() {
                                                 <label>Second Description Body</label>
                                                 <textarea
                                                     className="form-textarea"
-                                                    value={currentData.secondDescBody || ''}
-                                                    onChange={(e) => handleInlineInputChange(blog.id, 'secondDescBody', e.target.value)}
+                                                    value={getCurrentFieldValue('secondDescBody', currentData)}
+                                                    onChange={(e) => {
+                                                        const fieldName = getCurrentFieldName('secondDescBody');
+                                                        handleInlineInputChange(blog.id, fieldName, e.target.value);
+                                                    }}
                                                     maxLength={1000}
                                                     placeholder="Second description body"
                                                     rows={4}
@@ -574,8 +654,11 @@ function AdminBlog() {
                                                     <input
                                                         type="text"
                                                         className="form-input"
-                                                        value={currentData.thirdTextTitle || ''}
-                                                        onChange={(e) => handleInlineInputChange(blog.id, 'thirdTextTitle', e.target.value)}
+                                                        value={getCurrentFieldValue('thirdTextTitle', currentData)}
+                                                        onChange={(e) => {
+                                                            const fieldName = getCurrentFieldName('thirdTextTitle');
+                                                            handleInlineInputChange(blog.id, fieldName, e.target.value);
+                                                        }}
                                                         maxLength={200}
                                                         placeholder="Third text title"
                                                     />
@@ -586,8 +669,11 @@ function AdminBlog() {
                                                 <label>Third Text Body</label>
                                                 <textarea
                                                     className="form-textarea"
-                                                    value={currentData.thirdTextBody || ''}
-                                                    onChange={(e) => handleInlineInputChange(blog.id, 'thirdTextBody', e.target.value)}
+                                                    value={getCurrentFieldValue('thirdTextBody', currentData)}
+                                                    onChange={(e) => {
+                                                        const fieldName = getCurrentFieldName('thirdTextBody');
+                                                        handleInlineInputChange(blog.id, fieldName, e.target.value);
+                                                    }}
                                                     maxLength={1000}
                                                     placeholder="Third text body"
                                                     rows={4}
@@ -696,6 +782,23 @@ function AdminBlog() {
                             </button>
                         </div>
 
+                        {/* Language Tabs */}
+                        <div className="language-tabs-container">
+                            <div className="language-tabs">
+                                {languageOptions.map((lang) => (
+                                    <button
+                                        key={lang.code}
+                                        type="button"
+                                        className={`language-tab ${activeLanguage === lang.code ? 'active' : ''}`}
+                                        onClick={() => setActiveLanguage(lang.code)}
+                                    >
+                                        <span className="language-flag">{lang.flag}</span>
+                                        <span className="language-name">{lang.name}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                         <form className="admin-blog-modal-form" onSubmit={handleSubmit}>
                             <div className="admin-blog-modal-fields">
                                 <div className="admin-blog-modal-left">
@@ -707,8 +810,11 @@ function AdminBlog() {
                                             id="title"
                                             name="title"
                                             className="admin-blog-form-input"
-                                            value={blogData.title}
-                                            onChange={(e) => setBlogData(prev => ({ ...prev, title: e.target.value }))}
+                                            value={getCurrentFieldValue('title')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('title');
+                                                setBlogData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={300}
                                             required
                                             placeholder="Enter blog title"
@@ -748,8 +854,11 @@ function AdminBlog() {
                                             id="description"
                                             name="description"
                                             className="admin-blog-form-textarea"
-                                            value={blogData.description}
-                                            onChange={(e) => setBlogData(prev => ({ ...prev, description: e.target.value }))}
+                                            value={getCurrentFieldValue('description')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('description');
+                                                setBlogData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={500}
                                             rows={4}
                                             placeholder="Enter blog description"
@@ -766,8 +875,11 @@ function AdminBlog() {
                                             id="secondDescTitle"
                                             name="secondDescTitle"
                                             className="admin-blog-form-input"
-                                            value={blogData.secondDescTitle}
-                                            onChange={(e) => setBlogData(prev => ({ ...prev, secondDescTitle: e.target.value }))}
+                                            value={getCurrentFieldValue('secondDescTitle')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('secondDescTitle');
+                                                setBlogData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={200}
                                             placeholder="Enter second description title"
                                         />
@@ -779,8 +891,11 @@ function AdminBlog() {
                                             id="secondDescBody"
                                             name="secondDescBody"
                                             className="admin-blog-form-textarea"
-                                            value={blogData.secondDescBody}
-                                            onChange={(e) => setBlogData(prev => ({ ...prev, secondDescBody: e.target.value }))}
+                                            value={getCurrentFieldValue('secondDescBody')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('secondDescBody');
+                                                setBlogData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={1000}
                                             rows={4}
                                             placeholder="Enter second description body"
@@ -795,8 +910,11 @@ function AdminBlog() {
                                             id="thirdTextTitle"
                                             name="thirdTextTitle"
                                             className="admin-blog-form-input"
-                                            value={blogData.thirdTextTitle}
-                                            onChange={(e) => setBlogData(prev => ({ ...prev, thirdTextTitle: e.target.value }))}
+                                            value={getCurrentFieldValue('thirdTextTitle')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('thirdTextTitle');
+                                                setBlogData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={200}
                                             placeholder="Enter third text title"
                                         />
@@ -808,8 +926,11 @@ function AdminBlog() {
                                             id="thirdTextBody"
                                             name="thirdTextBody"
                                             className="admin-blog-form-textarea"
-                                            value={blogData.thirdTextBody}
-                                            onChange={(e) => setBlogData(prev => ({ ...prev, thirdTextBody: e.target.value }))}
+                                            value={getCurrentFieldValue('thirdTextBody')}
+                                            onChange={(e) => {
+                                                const fieldName = getCurrentFieldName('thirdTextBody');
+                                                setBlogData(prev => ({ ...prev, [fieldName]: e.target.value }));
+                                            }}
                                             maxLength={1000}
                                             rows={4}
                                             placeholder="Enter third text body"

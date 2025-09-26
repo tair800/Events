@@ -477,6 +477,8 @@
     justify-content: center;
     z-index: 1000;
     padding: 2rem;
+    transition: none !important;
+    animation: none !important;
 }
 
 .admin-employee-modal {
@@ -487,6 +489,8 @@
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transition: none !important;
+    animation: none !important;
 }
 
 .admin-employee-modal-header {
@@ -509,8 +513,8 @@
 }
 
 .admin-employee-modal-close {
-    background: none;
-    border: none;
+    background: none !important;
+    border: none !important;
     font-size: 2rem;
     color: #666;
     cursor: pointer;
@@ -520,13 +524,25 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    transition: all 0.3s ease;
+    border-radius: 0 !important;
+    transition: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    transform: none !important;
 }
 
-.admin-employee-modal-close:hover {
-    background: rgba(0, 0, 0, 0.1);
-    color: #333;
+.admin-employee-modal-close:hover,
+.admin-employee-modal-close:focus,
+.admin-employee-modal-close:active {
+    background: none !important;
+    color: #666 !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
 }
 
 .admin-employee-modal-form {
@@ -1722,4 +1738,61 @@
     .admin-employee-modal-form {
         padding: 1rem;
     }
+}
+
+/* Language Tabs */
+.language-tabs-container {
+    padding: 1rem 2rem 0;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.language-tabs {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+.language-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d9e0;
+    border-radius: 6px;
+    background: white;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.language-tab.active {
+    background: #1976d2;
+    border-color: #1976d2;
+    color: white;
+    font-weight: 600;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(25, 118, 210, 0.3);
+}
+
+.language-tab:hover:not(.active) {
+    background: #f8f9fa;
+    border-color: #adb5bd;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.language-flag {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.language-name {
+    font-size: 0.8rem;
+    font-weight: inherit;
+    line-height: 1;
 }

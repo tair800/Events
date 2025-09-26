@@ -20,6 +20,20 @@ namespace HospitalAPI.Models
         [MaxLength(500)]
         public string? Image { get; set; }
         
+        // English language fields
+        [MaxLength(255)]
+        public string? NameEn { get; set; }
+        
+        [MaxLength(255)]
+        public string? TitleEn { get; set; }
+        
+        // Russian language fields
+        [MaxLength(255)]
+        public string? NameRu { get; set; }
+        
+        [MaxLength(255)]
+        public string? TitleRu { get; set; }
+        
         public string CreatedAt { get; set; } = string.Empty;
         public string UpdatedAt { get; set; } = string.Empty;
         

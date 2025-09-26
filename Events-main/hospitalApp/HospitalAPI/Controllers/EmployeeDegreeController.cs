@@ -38,14 +38,89 @@ namespace HospitalAPI.Controllers
             return employeeDegree;
         }
 
+        // GET: api/employee-degrees/language/{lang}
+        [HttpGet("language/{lang}")]
+        public async Task<ActionResult<IEnumerable<object>>> GetEmployeeDegreesByLanguage(string lang)
+        {
+            try
+            {
+                var degrees = await _context.EmployeeDegrees.ToListAsync();
+                
+                var result = degrees.Select(degree => new
+                {
+                    Id = degree.Id,
+                    EmployeeId = degree.EmployeeId,
+                    UniversityName = GetLocalizedUniversityName(degree, lang),
+                    StartYear = degree.StartYear,
+                    EndYear = degree.EndYear
+                }).ToList();
+                
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ERROR in GetEmployeeDegreesByLanguage: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        // GET: api/employee-degrees/{id}/language/{lang}
+        [HttpGet("{id}/language/{lang}")]
+        public async Task<ActionResult<object>> GetEmployeeDegreeByLanguage(int id, string lang)
+        {
+            try
+            {
+                var degree = await _context.EmployeeDegrees.FindAsync(id);
+                
+                if (degree == null)
+                {
+                    return NotFound($"Degree with ID {id} not found");
+                }
+                
+                var result = new
+                {
+                    Id = degree.Id,
+                    EmployeeId = degree.EmployeeId,
+                    UniversityName = GetLocalizedUniversityName(degree, lang),
+                    StartYear = degree.StartYear,
+                    EndYear = degree.EndYear
+                };
+                
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ERROR in GetEmployeeDegreeByLanguage: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         // POST: api/employee-degrees
         [HttpPost]
-        public async Task<ActionResult<EmployeeDegree>> PostEmployeeDegree(EmployeeDegree employeeDegree)
+        public async Task<ActionResult<EmployeeDegree>> PostEmployeeDegree([FromBody] JsonElement jsonData)
         {
-            _context.EmployeeDegrees.Add(employeeDegree);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var employeeDegree = new EmployeeDegree
+                {
+                    EmployeeId = jsonData.GetProperty("employeeId").GetInt32(),
+                    UniversityName = jsonData.GetProperty("universityName").GetString() ?? string.Empty,
+                    StartYear = jsonData.GetProperty("startYear").GetInt32(),
+                    EndYear = jsonData.GetProperty("endYear").GetInt32(),
+                    UniversityNameEn = jsonData.TryGetProperty("universityNameEn", out var nameEn) ? nameEn.GetString() : null,
+                    UniversityNameRu = jsonData.TryGetProperty("universityNameRu", out var nameRu) ? nameRu.GetString() : null
+                };
 
-            return CreatedAtAction("GetEmployeeDegree", new { id = employeeDegree.Id }, employeeDegree);
+                _context.EmployeeDegrees.Add(employeeDegree);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction("GetEmployeeDegree", new { id = employeeDegree.Id }, employeeDegree);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ERROR in PostEmployeeDegree: {ex.Message}");
+                return BadRequest($"Invalid data: {ex.Message}");
+            }
         }
 
         // PUT: api/employee-degrees/5
@@ -88,6 +163,17 @@ namespace HospitalAPI.Controllers
                 }
             }
 
+            // Update language fields
+            if (updateData.TryGetProperty("universityNameEn", out JsonElement uniEnEl))
+            {
+                existingDegree.UniversityNameEn = uniEnEl.GetString();
+            }
+            
+            if (updateData.TryGetProperty("universityNameRu", out JsonElement uniRuEl))
+            {
+                existingDegree.UniversityNameRu = uniRuEl.GetString();
+            }
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -125,6 +211,16 @@ namespace HospitalAPI.Controllers
         private bool EmployeeDegreeExists(int id)
         {
             return _context.EmployeeDegrees.Any(e => e.Id == id);
+        }
+
+        private string GetLocalizedUniversityName(EmployeeDegree degree, string lang)
+        {
+            return lang.ToLower() switch
+            {
+                "en" => !string.IsNullOrEmpty(degree.UniversityNameEn) ? degree.UniversityNameEn : degree.UniversityName,
+                "ru" => !string.IsNullOrEmpty(degree.UniversityNameRu) ? degree.UniversityNameRu : degree.UniversityName,
+                _ => degree.UniversityName
+            };
         }
     }
 }

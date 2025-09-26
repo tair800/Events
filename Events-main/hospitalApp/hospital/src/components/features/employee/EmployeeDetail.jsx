@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { getContextualImagePath } from '../../../utils/imageUtils';
+import { useLanguage } from '../../../context/LanguageContext';
+import { useTranslation } from '../../../hooks/useTranslation';
 import './EmployeeDetail.css';
 import iconNext from '../../../assets/icon-next.svg';
 import iconPrev from '../../../assets/icon-prev.svg';
@@ -10,11 +12,15 @@ const EmployeeDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const employeeId = parseInt(id);
+    const { selectedLanguage } = useLanguage();
+    const { t } = useTranslation();
 
     // Employee data state
     const [employee, setEmployee] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [cachedData, setCachedData] = useState({});
+    const [isTransitioning, setIsTransitioning] = useState(false);
 
 
     // Carousel state
@@ -33,25 +39,51 @@ const EmployeeDetail = () => {
     useEffect(() => {
         const fetchEmployee = async () => {
             try {
-                setLoading(true);
-                const response = await fetch(`https://localhost:5000/api/employees/${employeeId}`);
+                // Check cache first
+                const cacheKey = `${employeeId}-${selectedLanguage}`;
+                if (cachedData[cacheKey]) {
+                    setEmployee(cachedData[cacheKey]);
+                    return;
+                }
+
+                // Only show loading for initial load, not language changes
+                if (!employee) {
+                    setLoading(true);
+                } else {
+                    setIsTransitioning(true);
+                }
+
+                // Use language-specific endpoint if not Azerbaijani
+                const apiUrl = selectedLanguage === 'aze'
+                    ? `https://localhost:5000/api/employees/${employeeId}`
+                    : `https://localhost:5000/api/employees/${employeeId}/language/${selectedLanguage}`;
+
+                const response = await fetch(apiUrl);
                 if (!response.ok) {
                     throw new Error('Employee not found');
                 }
                 const employeeData = await response.json();
+
+                // Cache the data
+                setCachedData(prev => ({
+                    ...prev,
+                    [cacheKey]: employeeData
+                }));
+
                 setEmployee(employeeData);
             } catch (err) {
                 console.error('Error fetching employee:', err);
                 setError(err.message);
             } finally {
                 setLoading(false);
+                setIsTransitioning(false);
             }
         };
 
         if (employeeId) {
             fetchEmployee();
         }
-    }, [employeeId]);
+    }, [employeeId, selectedLanguage]);
 
     // Get certificate cards from employee data only
     const allCards = employee?.certificates ? employee.certificates.map(cert => ({
@@ -183,7 +215,7 @@ const EmployeeDetail = () => {
         return (
             <div className="employee-detail-page">
                 <div className="loading-container">
-                    <p>Loading employee details...</p>
+                    <p>{t('loadingEmployeeDetails')}</p>
                 </div>
             </div>
         );
@@ -193,8 +225,8 @@ const EmployeeDetail = () => {
         return (
             <div className="employee-detail-page">
                 <div className="error-container">
-                    <p>Error loading employee: {error}</p>
-                    <button onClick={() => navigate('/employee')}>Back to Employees</button>
+                    <p>{t('errorLoadingEmployee')}: {error}</p>
+                    <button onClick={() => navigate('/employee')}>{t('backToEmployees')}</button>
                 </div>
             </div>
         );
@@ -204,15 +236,15 @@ const EmployeeDetail = () => {
         return (
             <div className="employee-detail-page">
                 <div className="error-container">
-                    <p>Employee not found</p>
-                    <button onClick={() => navigate('/employee')}>Back to Employees</button>
+                    <p>{t('employeeNotFound')}</p>
+                    <button onClick={() => navigate('/employee')}>{t('backToEmployees')}</button>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="employee-detail-page">
+        <div className={`employee-detail-page ${isTransitioning ? 'transitioning' : ''}`}>
             {/* Background Image Section */}
             <div className="employee-detail-bg-section">
                 <img
@@ -227,7 +259,7 @@ const EmployeeDetail = () => {
                     <div className="employee-detail-left">
                         {/* Breadcrumb Navigation */}
                         <div className="breadcrumb">
-                            <span>Üzvlərimiz</span>
+                            <span>{t('members')}</span>
                             <span className="separator">&gt;</span>
                             <span>{employee.fullname}</span>
                         </div>
@@ -286,7 +318,7 @@ const EmployeeDetail = () => {
                 <div className="employee-about-content">
                     <div className="about-title-container">
                         <h2 className="about-title">
-                            <span>Mən Kiməm?</span>
+                            <span>{t('whoAmI')}</span>
                         </h2>
                     </div>
                     <p className="about-paragraph">
@@ -309,7 +341,7 @@ const EmployeeDetail = () => {
                     <div className="certificate-timeline-container">
                         <div className="certificate-title-container">
                             <h3 className="certificate-title">
-                                <span>Tibbə Aparan Yol</span>
+                                <span>{t('pathToMedicine')}</span>
                             </h3>
                         </div>
                         <p className="certificate-description">
@@ -358,14 +390,14 @@ const EmployeeDetail = () => {
                                                 )}
                                             </h4>
                                             <p className="certificate-years">
-                                                {degree.startYear}-{degree.endYear === 0 ? 'indi' : degree.endYear}
+                                                {degree.startYear}-{degree.endYear === 0 ? t('now') : degree.endYear}
                                             </p>
                                             {shouldTruncate && (
                                                 <button
                                                     className="certificate-read-more-btn"
                                                     onClick={() => toggleCertificateExpansion(degree.id)}
                                                 >
-                                                    {isExpanded ? 'Daha az' : 'Daha çox'}
+                                                    {isExpanded ? t('less') : t('more')}
                                                 </button>
                                             )}
                                         </div>

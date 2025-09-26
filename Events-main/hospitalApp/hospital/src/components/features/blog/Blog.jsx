@@ -7,6 +7,7 @@ import iconPrev from '../../../assets/icon-prev.svg';
 import eventNext from '/assets/event-next.svg';
 import './Blog.css';
 import LogoCarousel from '../../ui/LogoCarousel';
+import { useLanguage } from '../../../context';
 
 const Blog = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -14,14 +15,33 @@ const Blog = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isLargeScreen, setIsLargeScreen] = useState(false);
+    const [cachedData, setCachedData] = useState({});
+    const [isTransitioning, setIsTransitioning] = useState(false);
     const navigate = useNavigate();
+    const { selectedLanguage } = useLanguage();
 
-    // Fetch blog data from API
+    // Fetch blog data from API with language support
     useEffect(() => {
         const fetchBlogData = async () => {
             try {
+                // Check if we have cached data for this language
+                if (cachedData[selectedLanguage]) {
+                    setBlogData(cachedData[selectedLanguage]);
+                    setLoading(false);
+                    return;
+                }
+
+                setIsTransitioning(true);
                 setLoading(true);
-                const response = await fetch('https://localhost:5000/api/blogs');
+
+                let apiUrl = 'https://localhost:5000/api/blogs';
+
+                // Use language-specific endpoint if not Azerbaijani
+                if (selectedLanguage !== 'aze') {
+                    apiUrl = `https://localhost:5000/api/blogs/language/${selectedLanguage}`;
+                }
+
+                const response = await fetch(apiUrl);
                 if (!response.ok) {
                     throw new Error('Failed to fetch blog data');
                 }
@@ -34,17 +54,27 @@ const Blog = () => {
                     return numA - numB;
                 });
 
+                // Cache the data for this language
+                setCachedData(prev => ({
+                    ...prev,
+                    [selectedLanguage]: sortedData
+                }));
+
                 setBlogData(sortedData);
             } catch (err) {
                 console.error('Error fetching blog data:', err);
                 setError(err.message);
             } finally {
                 setLoading(false);
+                // Add a small delay for smooth transition
+                setTimeout(() => {
+                    setIsTransitioning(false);
+                }, 150);
             }
         };
 
         fetchBlogData();
-    }, []);
+    }, [selectedLanguage, cachedData]);
 
     // Screen size detection for card display
     useEffect(() => {
@@ -105,8 +135,8 @@ const Blog = () => {
         );
     };
 
-    // Show loading state
-    if (loading) {
+    // Show loading state only for initial load, not for language changes
+    if (loading && !cachedData[selectedLanguage]) {
         return (
             <div className="blog-page">
                 <div style={{ textAlign: 'center', padding: '50px' }}>
@@ -139,7 +169,7 @@ const Blog = () => {
     }
 
     return (
-        <div className="blog-page">
+        <div className={`blog-page ${isTransitioning ? 'transitioning' : ''}`} data-language={selectedLanguage}>
             <div className="blog-slider-container">
                 <div className="blog-cards-container">
                     {getVisibleBlogs().map((blog) => (

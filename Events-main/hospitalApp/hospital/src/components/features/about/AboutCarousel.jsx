@@ -113,10 +113,10 @@ function AboutCarousel() {
 
                 {/* Navigation arrows */}
                 <button className="about-carousel-arrow about-carousel-arrow-left" onClick={goToPrevious}>
-                    &#8249;
+                    <span>‹</span>
                 </button>
                 <button className="about-carousel-arrow about-carousel-arrow-right" onClick={goToNext}>
-                    &#8250;
+                    <span>›</span>
                 </button>
 
                 {/* Dots indicator - one per group */}
