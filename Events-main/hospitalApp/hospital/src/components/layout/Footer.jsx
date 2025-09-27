@@ -3,11 +3,14 @@ import { Link } from 'react-router-dom'
 import './Footer.css'
 import footerLeft from '../../assets/footer-left.png'
 import footerRight from '../../assets/footer-right.png'
+import { useTranslation } from '../../hooks/useTranslation'
 // Footer logo now sourced from public assets as SVG
 // Use SVG from public assets
 // Social icons now sourced from public/assets as SVGs
 
 function Footer() {
+    const { t } = useTranslation();
+
     return (
         <footer>
             <div className="footer-content">
@@ -19,13 +22,13 @@ function Footer() {
                         <img src="/assets/footer.svg" alt="Footer Logo" />
                     </div>
                     <div className="footer-navigation">
-                        <Link to="/" className="footer-link">Ana səhifə</Link>
-                        <Link to="/about" className="footer-link">Haqqımızda</Link>
-                        <Link to="/events" className="footer-link">Tədbirlər</Link>
-                        <Link to="/employee" className="footer-link">Üzvlər</Link>
-                        <Link to="/gallery" className="footer-link">Qalereya</Link>
-                        <Link to="/blog" className="footer-link">Blog - Bloq</Link>
-                        <Link to="/contact" className="footer-link">Contact - Əlaqə</Link>
+                        <Link to="/" className="footer-link">{t('home')}</Link>
+                        <Link to="/about" className="footer-link">{t('about')}</Link>
+                        <Link to="/events" className="footer-link">{t('events')}</Link>
+                        <Link to="/employee" className="footer-link">{t('employees')}</Link>
+                        <Link to="/gallery" className="footer-link">{t('gallery')}</Link>
+                        <Link to="/blog" className="footer-link">{t('blog')}</Link>
+                        <Link to="/contact" className="footer-link">{t('contact')}</Link>
                     </div>
                     <div className="social-media-icons">
                         <a className="social-icon" href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
@@ -48,10 +51,10 @@ function Footer() {
                         <div className="footer-copyright-line"></div>
                         <div className="footer-copyright-content">
                             <div className="footer-copyright-left">
-                                Veb-sayt Webonly tərəfindən hazırlanıb.
+                                {t('websiteByPrefix')} <a href="https://webonly.io/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Webonly</a>{t('websiteBySuffix')}
                             </div>
                             <div className="footer-copyright-right">
-                                Copywrite @2025. Bütün hüquqlar qorunur. AHBPCA
+                                {t('copyright')}
                             </div>
                         </div>
                     </div>

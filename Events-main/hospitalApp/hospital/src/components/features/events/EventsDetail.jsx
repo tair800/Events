@@ -310,7 +310,63 @@ const EventsDetail = () => {
                 <img src={getContextualImagePath(event.detailImageMain, 'admin')} alt="Event Detail Main" className="main-event-image" />
                 <img src={getContextualImagePath(event.detailImageRight, 'admin')} alt="Event Detail Right" className="right-event-image" />
                 <button className="muraciet-btn" onClick={() => setShowRequestModal(true)}>Müraciət et</button>
-                <button className="pdf-download-btn" onClick={() => {/* PDF download logic */ }}>Pdf yüklə</button>
+                {event.pdfUrl && (
+                    <button
+                        className="pdf-download-btn"
+                        onClick={async () => {
+                            if (event.pdfUrl) {
+                                try {
+                                    console.log('PDF URL:', event.pdfUrl);
+
+                                    // Ensure we have a full URL
+                                    let pdfUrl = event.pdfUrl;
+
+                                    // Add leading slash if missing
+                                    if (!pdfUrl.startsWith('/') && !pdfUrl.startsWith('http')) {
+                                        pdfUrl = `/${pdfUrl}`;
+                                    }
+
+                                    // Add domain if it's a relative path
+                                    if (pdfUrl.startsWith('/')) {
+                                        pdfUrl = `https://localhost:5000${pdfUrl}`;
+                                    }
+
+                                    console.log('Full PDF URL:', pdfUrl);
+
+                                    // Fetch the PDF as a blob to force download
+                                    const response = await fetch(pdfUrl);
+                                    if (!response.ok) {
+                                        throw new Error(`Failed to fetch PDF: ${response.status}`);
+                                    }
+
+                                    const blob = await response.blob();
+                                    console.log('PDF blob size:', blob.size);
+
+                                    // Create blob URL and download
+                                    const blobUrl = window.URL.createObjectURL(blob);
+                                    const link = document.createElement('a');
+                                    link.href = blobUrl;
+                                    link.download = `event-${event.id}-document.pdf`;
+                                    link.style.display = 'none';
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+
+                                    // Clean up blob URL
+                                    setTimeout(() => {
+                                        window.URL.revokeObjectURL(blobUrl);
+                                    }, 100);
+
+                                } catch (error) {
+                                    console.error('PDF download error:', error);
+                                    alert('Failed to download PDF. Please try again.');
+                                }
+                            }
+                        }}
+                    >
+                        Pdf yüklə
+                    </button>
+                )}
             </div>
 
             <div className="employee-slider-section">

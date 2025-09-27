@@ -13,9 +13,13 @@ import EmployeeSlider from '../employee/EmployeeSlider';
 import LogoCarousel from '../../ui/LogoCarousel';
 import { RequestModal } from '../../ui';
 import { getContextualImagePath } from '../../../utils/imageUtils';
+import { useLanguage } from '../../../context/LanguageContext';
+import { useTranslation } from '../../../hooks/useTranslation';
 
 const Home = () => {
     const navigate = useNavigate();
+    const { selectedLanguage } = useLanguage();
+    const { t } = useTranslation();
     const [latestEvents, setLatestEvents] = useState([]);
     const [pastEvents, setPastEvents] = useState([]);
     const [employees, setEmployees] = useState([]);
@@ -40,7 +44,12 @@ const Home = () => {
     useEffect(() => {
         const fetchHomeData = async () => {
             try {
-                const response = await fetch('https://localhost:5000/api/HomeSection/first');
+                // Use language-specific endpoint for English and Russian, fallback to default for Azerbaijani
+                const endpoint = selectedLanguage === 'az'
+                    ? 'https://localhost:5000/api/HomeSection/first'
+                    : `https://localhost:5000/api/HomeSection/first/language/${selectedLanguage}`;
+
+                const response = await fetch(endpoint);
                 if (response.ok) {
                     const data = await response.json();
                     setHomeData({
@@ -59,14 +68,19 @@ const Home = () => {
         };
 
         fetchHomeData();
-    }, []);
+    }, [selectedLanguage]);
 
     // Fetch latest events from API
     useEffect(() => {
         const fetchEvents = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('https://localhost:5000/api/events');
+                // Use language-specific endpoint for English and Russian, fallback to default for Azerbaijani
+                const endpoint = selectedLanguage === 'az'
+                    ? 'https://localhost:5000/api/events'
+                    : `https://localhost:5000/api/events/language/${selectedLanguage}`;
+
+                const response = await fetch(endpoint);
                 if (!response.ok) {
                     throw new Error('Failed to fetch events');
                 }
@@ -102,13 +116,18 @@ const Home = () => {
         };
 
         fetchEvents();
-    }, []);
+    }, [selectedLanguage]);
 
     // Fetch employees from API
     useEffect(() => {
         const fetchEmployees = async () => {
             try {
-                const response = await fetch('https://localhost:5000/api/employees');
+                // Use language-specific endpoint for English and Russian, fallback to default for Azerbaijani
+                const endpoint = selectedLanguage === 'az'
+                    ? 'https://localhost:5000/api/employees'
+                    : `https://localhost:5000/api/employees/language/${selectedLanguage}`;
+
+                const response = await fetch(endpoint);
                 if (!response.ok) {
                     throw new Error('Failed to fetch employees');
                 }
@@ -121,7 +140,7 @@ const Home = () => {
         };
 
         fetchEmployees();
-    }, []);
+    }, [selectedLanguage]);
 
     // Countdown timer effect for current hero event
     useEffect(() => {
@@ -182,19 +201,19 @@ const Home = () => {
         const date = new Date(dateString);
         const day = date.getDate();
 
-        // Custom month mapping for Azerbaijani
-        const months = [
-            'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun',
-            'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr'
+        // Language-aware month mapping
+        const monthKeys = [
+            'january', 'february', 'march', 'april', 'may', 'june',
+            'july', 'august', 'september', 'october', 'november', 'december'
         ];
-        const month = months[date.getMonth()];
+        const month = t(monthKeys[date.getMonth()]);
 
         return { day, month };
     };
 
     // Helper function to format price
     const formatPrice = (price, currency) => {
-        if (price === 0 || price === '0' || price === null || price === undefined) return 'Pulsuz';
+        if (price === 0 || price === '0' || price === null || price === undefined) return t('free');
         return `${price} ${currency}`;
     };
 
@@ -248,17 +267,23 @@ const Home = () => {
                 <div className="home-hero-slider">
                     <div className="home-hero-slider-container">
                         {loading ? (
-                            <div className="home-hero-loading">Yüklənir...</div>
+                            <div className="home-hero-loading">{t('loading')}</div>
                         ) : error ? (
-                            <div className="home-hero-error">Xəta: {error}</div>
+                            <div className="home-hero-error">{t('error')}: {error}</div>
                         ) : heroEvents.length === 0 ? (
-                            <div className="home-hero-no-events">Heç bir tədbir tapılmadı</div>
+                            <div className="home-hero-no-events">{t('noEventsFound')}</div>
                         ) : (
                             heroEvents.map((event, index) => {
                                 const { day, month } = formatEventDate(event.eventDate);
                                 const formattedPrice = formatPrice(event.price, event.currency);
                                 const eventDate = new Date(event.eventDate);
-                                const timeString = eventDate.toLocaleTimeString('az-AZ', {
+                                // Language-aware time formatting
+                                const localeMap = {
+                                    'az': 'az-AZ',
+                                    'en': 'en-US',
+                                    'ru': 'ru-RU'
+                                };
+                                const timeString = eventDate.toLocaleTimeString(localeMap[selectedLanguage] || 'az-AZ', {
                                     hour: '2-digit',
                                     minute: '2-digit',
                                     hour12: false
@@ -291,7 +316,7 @@ const Home = () => {
                                                     </div>
                                                     {event.price !== 0 && event.price !== '0' && event.price !== null && event.price !== undefined && (
                                                         <div className="home-hero-event-price">
-                                                            Qiymət: {formattedPrice}
+                                                            {t('price')}: {formattedPrice}
                                                         </div>
                                                     )}
                                                     <div className="home-hero-event-buttons">
@@ -299,13 +324,13 @@ const Home = () => {
                                                             className="home-hero-btn-primary"
                                                             onClick={() => setShowRequestModal(true)}
                                                         >
-                                                            Bilet al
+                                                            {t('buyTicket')}
                                                         </button>
                                                         <button
                                                             className="home-hero-btn-secondary"
                                                             onClick={() => navigate(`/event/${event.id}`)}
                                                         >
-                                                            Detaillı bax
+                                                            {t('viewDetailsHome')}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -462,25 +487,25 @@ const Home = () => {
             {/* Home Header Text */}
             <div className="home-header-text">
                 <div className="home-header-left">
-                    <span className="home-header-first">Gözlənilən</span>
+                    <span className="home-header-first">{t('upcomingEvents')}</span>
                     <span className="home-header-second">
-                        <span>Tədbirlər</span>
+                        <span>{t('allEventsHome')}</span>
                     </span>
                 </div>
                 <button className="home-header-btn" onClick={() => {
                     navigate('/events');
                     window.scrollTo(0, 0);
-                }}>Hamısına bax</button>
+                }}>{t('viewAll')}</button>
             </div>
 
             {/* Event Cards */}
             <div className="home-events-container">
                 {loading ? (
-                    <div className="loading-message">Yüklənir...</div>
+                    <div className="loading-message">{t('loading')}</div>
                 ) : error ? (
-                    <div className="error-message">Xəta: {error}</div>
+                    <div className="error-message">{t('error')}: {error}</div>
                 ) : latestEvents.length === 0 ? (
-                    <div className="no-events-message">Heç bir tədbir tapılmadı</div>
+                    <div className="no-events-message">{t('noEventsFound')}</div>
                 ) : (
                     latestEvents.map((event, index) => {
                         const { day, month } = formatEventDate(event.eventDate);
@@ -547,25 +572,25 @@ const Home = () => {
             {/* Home Header Text 2 */}
             <div className="home-header-text-2">
                 <div className="home-header-left-2">
-                    <span className="home-header-first-2">Ən son</span>
+                    <span className="home-header-first-2">{t('recentEvents')}</span>
                     <span className="home-header-second-2">
-                        <span>Tədbirlər</span>
+                        <span>{t('allEventsHome')}</span>
                     </span>
                 </div>
                 <button className="home-header-btn-2" onClick={() => {
                     navigate('/events');
                     window.scrollTo(0, 0);
-                }}>Hamsına bax</button>
+                }}>{t('viewAll')}</button>
             </div>
 
             {/* Additional Info Cards in one row */}
             <div className="info-card-row">
                 {loading ? (
-                    <div className="loading-message">Yüklənir...</div>
+                    <div className="loading-message">{t('loading')}</div>
                 ) : error ? (
-                    <div className="error-message">Xəta: {error}</div>
+                    <div className="error-message">{t('error')}: {error}</div>
                 ) : pastEvents.length === 0 ? (
-                    <div className="no-events-message">Keçmiş tədbir tapılmadı</div>
+                    <div className="no-events-message">{t('noPastEventsFound')}</div>
                 ) : (
                     <>
                         {pastEvents.slice(0, isLargeScreen ? 5 : 3).map((event, index) => {
@@ -626,15 +651,15 @@ const Home = () => {
             {/* Home Header Text 3 */}
             <div className="home-header-text-3">
                 <div className="home-header-left-3">
-                    <span className="home-header-first-3">Bizim</span>
+                    <span className="home-header-first-3">{t('ourMembers')}</span>
                     <span className="home-header-second-3">
-                        <span>Üzvlərimiz</span>
+                        <span>{t('members')}</span>
                     </span>
                 </div>
                 <button className="home-header-btn-3" onClick={() => {
                     navigate('/employee');
                     window.scrollTo(0, 0);
-                }}>Hamsına bax</button>
+                }}>{t('viewAll')}</button>
             </div>
 
             {/* Employee Cards Slider */}

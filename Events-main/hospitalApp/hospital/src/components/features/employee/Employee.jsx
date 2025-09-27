@@ -22,12 +22,14 @@ const Employee = () => {
     // Update items per page based on screen size
     useEffect(() => {
         const updateItemsPerPage = () => {
-            if (window.innerWidth <= 375) {
-                setItemsPerPage(6); // 1x1 grid, 6 cards per page
+            if (window.innerWidth <= 393) {
+                setItemsPerPage(5); // 5 cards per page for 393x852
             } else if (window.innerWidth <= 425) {
                 setItemsPerPage(4); // 2x2 grid, 4 cards per page
             } else if (window.innerWidth <= 768) {
                 setItemsPerPage(6); // 2x3 grid, 6 cards per page
+            } else if (window.innerWidth >= 1920) {
+                setItemsPerPage(12); // 4x3 grid, 12 cards per page for 1920x1080
             } else {
                 setItemsPerPage(9); // 3x3 grid, 9 cards per page
             }

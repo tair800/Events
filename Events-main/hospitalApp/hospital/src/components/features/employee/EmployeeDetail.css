@@ -106,7 +106,6 @@
     height: 400px;
     object-fit: cover;
     border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
 }
 
 /* Breadcrumb Navigation */
@@ -1564,6 +1563,122 @@
     right: 0;
     width: 100% !important;
     box-sizing: border-box;
+}
+
+/* 393px breakpoint */
+@media (max-width: 393px) {
+    .employee-detail-bg-section {
+        height: 27rem !important;
+    }
+
+    .employee-detail-right {
+        margin-top: 160px !important;
+    }
+
+    .cards-container {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1rem !important;
+        display: grid !important;
+    }
+
+    .card-image {
+        left: 33px !important;
+        height: 100px !important;
+        width: 107px !important;
+    }
+
+    .carousel-buttons-container {
+        gap: 15rem !important;
+    }
+}
+
+/* 1920x1080 Resolution */
+@media (min-width: 1920px) {
+    .employee-detail-bg-section {
+        height: 41rem !important;
+    }
+
+    .employee-detail-right {
+        margin-right: -274px !important;
+        margin-top: 85px !important;
+    }
+
+    .employee-name {
+        font-size: 5rem !important;
+    }
+
+    .employee-title p {
+        font-size: 1.8rem !important;
+    }
+
+    .contact-item {
+        font-size: 1.4rem !important;
+    }
+
+    .about-title {
+        font-size: 3rem !important;
+    }
+
+    .about-paragraph {
+        font-size: 1.4rem !important;
+    }
+
+    .breadcrumb {
+        font-size: 1.1rem !important;
+    }
+
+    .contact-icon {
+        width: 24px !important;
+        height: 24px !important;
+    }
+
+    .divided-right {
+        flex: 0 0 75% !important;
+        padding: 0 3rem !important;
+        padding-right: 6rem !important;
+    }
+
+    .divided-left {
+        flex: 0 0 35% !important;
+        margin-left: 8rem !important;
+    }
+
+    .divided-left-image {
+        height: 500px !important;
+        width: 100% !important;
+    }
+
+    .certificate-title {
+        font-size: 2.5rem !important;
+    }
+
+    .certificate-description {
+        font-size: 1.2rem !important;
+    }
+
+    .certificate-number {
+        font-size: 3rem !important;
+    }
+
+    .certificate-university {
+        font-size: 1.1rem !important;
+    }
+
+    .certificate-years {
+        font-size: 1rem !important;
+    }
+}
+
+/* Responsive Design */
+@media (min-width: 1920px) {
+    .card {
+        width: 110%;
+    }
+
+    .card-image {
+        width: 242px;
+        right: 9px;
+    }
 }
 
 /* Mobile Responsive Design */

@@ -119,16 +119,7 @@ function AboutCarousel() {
                     <span>›</span>
                 </button>
 
-                {/* Dots indicator - one per group */}
-                <div className="about-carousel-dots">
-                    {Array.from({ length: totalGroups }, (_, index) => (
-                        <button
-                            key={index}
-                            className={`about-carousel-dot ${index === currentGroup ? 'active' : ''}`}
-                            onClick={() => goToSlide(index * imagesPerScreen)}
-                        />
-                    ))}
-                </div>
+
             </div>
         </div>
     );

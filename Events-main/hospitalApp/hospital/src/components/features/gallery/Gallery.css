@@ -515,10 +515,20 @@
     }
 }
 
+@media (max-width: 393px) {
+    .gallery-anim-page {
+        min-height: 52vh ;
+    }
+
+    .gallery-anim-container {
+        height: 48vh ;
+    }
+}
+
 /* 1920px and above - Gallery specific overrides */
 @media (min-width: 1920px) {
     .gallery-anim-page {
-        min-height: 100vh;
+        min-height: 100vh ;
         width: 100%;
         position: relative;
         overflow: hidden;
@@ -528,7 +538,7 @@
     .gallery-anim-container {
         position: relative;
         width: 100vw;
-        height: 73vh;
+        height: 73vh ;
         display: flex;
         align-items: center;
         justify-content: center;

@@ -378,6 +378,21 @@
     }
 }
 
+/* 393px breakpoint */
+@media (max-width: 393px) {
+    .blog-card-title {
+        font-size: 1rem !important;
+    }
+
+    .blog-card-text {
+        font-size: 0.8rem !important;
+    }
+
+    .blog-card-number {
+        font-size: 6rem !important;
+    }
+}
+
 /* 1920x1080 Resolution */
 @media (min-width: 1920px) {
     .blog-cards-container {

@@ -38,6 +38,58 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
+    align-items: start;
+}
+
+/* Language Tabs Styles */
+.language-tabs-container {
+    grid-column: 1 / -1;
+    margin-bottom: 1rem;
+}
+
+.language-tabs {
+    display: flex;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    padding: 0.5rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.language-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #666;
+}
+
+.language-tab:hover {
+    background: rgba(25, 118, 210, 0.1);
+    color: #1976d2;
+}
+
+.language-tab.active {
+    background: #1976d2;
+    color: white;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+}
+
+.language-flag {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+}
+
+.language-name {
+    white-space: nowrap;
 }
 
 .form-fields-left {

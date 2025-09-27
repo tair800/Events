@@ -402,9 +402,6 @@
 }
 
 /* Events Detail Content */
-.events-detail-content {
-    /* Removed custom CSS */
-}
 
 /* Events Detail Left Section */
 .events-detail-left {
@@ -697,32 +694,52 @@
     position: absolute;
     right: 17.4%;
     bottom: 23%;
-    background: #4B84FF;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
     color: white;
     border: none;
-    padding: 12px 24px;
-    border-radius: 25px;
-    font-size: 14px;
-    font-weight: 600;
+    padding: 14px 28px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(75, 132, 255, 0.3);
-    font-family: 'Arial', sans-serif;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 140px;
+    justify-content: center;
+}
+
+.pdf-download-btn::before {
+    content: "📄";
+    font-size: 16px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
 }
 
 .pdf-download-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(75, 132, 255, 0.4);
-    background: #3a6bcc;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.5);
+    background: linear-gradient(135deg, #c0392b, #a93226);
 }
 
 .pdf-download-btn:active {
-    transform: translateY(0);
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
 }
 
 .pdf-download-btn:focus {
     outline: none;
-    box-shadow: 0 4px 15px rgba(75, 132, 255, 0.3);
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.3);
+}
+
+.pdf-download-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
 }
 
 /* Modal Styles */
@@ -860,6 +877,15 @@
     .events-detail-right {
         flex: 1;
     }
+
+    /* PDF Download Button - Tablet */
+    .pdf-download-btn {
+        right: 15%;
+        bottom: 20%;
+        padding: 13px 24px;
+        font-size: 12px;
+        min-width: 130px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -886,6 +912,21 @@
         align-items: center;
         gap: 1.5rem;
         margin-bottom: 2rem;
+    }
+
+    /* PDF Download Button - Mobile */
+    .pdf-download-btn {
+        right: 50%;
+        bottom: 15%;
+        transform: translateX(50%);
+        padding: 12px 20px;
+        font-size: 12px;
+        min-width: 120px;
+        border-radius: 25px;
+    }
+
+    .pdf-download-btn::before {
+        font-size: 14px;
     }
 
     .event-detail-card {

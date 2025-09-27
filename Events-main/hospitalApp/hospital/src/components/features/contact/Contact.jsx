@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Application } from '@splinetool/runtime';
 import Swal from 'sweetalert2';
 import { mailService } from '../../../services/mailService';
+import { useTranslation } from '../../../hooks/useTranslation';
 import './Contact.css';
 import phoneIcon from '../../../assets/phone-icon.png';
 import whatsappIcon from '../../../assets/whatsapp-icon.png';
@@ -18,6 +19,7 @@ import LogoCarousel from '../../ui/LogoCarousel';
 const API_BASE_URL = 'https://localhost:5000';
 
 const Contact = () => {
+    const { t } = useTranslation();
     const canvasRef = useRef(null);
     const [contactData, setContactData] = useState({
         contactInfo: [],
@@ -303,25 +305,25 @@ const Contact = () => {
         const newErrors = {};
 
         if (!formData.name.trim()) {
-            newErrors.name = 'Ad tələb olunur';
+            newErrors.name = t('firstNameRequired');
         }
 
         if (!formData.surname.trim()) {
-            newErrors.surname = 'Soyad tələb olunur';
+            newErrors.surname = t('lastNameRequired');
         }
 
         if (!formData.email.trim()) {
-            newErrors.email = 'E-poçt tələb olunur';
+            newErrors.email = t('emailRequired');
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Düzgün e-poçt ünvanı daxil edin';
+            newErrors.email = t('invalidEmail');
         }
 
         if (!formData.phone.trim()) {
-            newErrors.phone = 'Telefon nömrəsi tələb olunur';
+            newErrors.phone = t('phoneRequired');
         }
 
         if (!formData.message.trim()) {
-            newErrors.message = 'Mesaj tələb olunur';
+            newErrors.message = t('messageRequired');
         }
 
         setFormErrors(newErrors);
@@ -363,20 +365,20 @@ const Contact = () => {
             // Show success message
             Swal.fire({
                 icon: 'success',
-                title: 'Mesajınız uğurla göndərildi!',
-                text: 'Mesajınız qeydə alındı. Tezliklə sizinlə əlaqə saxlayacağıq.',
+                title: t('messageSentSuccess'),
+                text: t('messageRecorded'),
                 confirmButtonColor: '#1B1B3F',
-                confirmButtonText: 'Tamam'
+                confirmButtonText: t('ok')
             });
 
         } catch (error) {
             console.error('Error submitting contact form:', error);
             Swal.fire({
                 icon: 'error',
-                title: 'Xəta!',
-                text: 'Mesaj göndərilmədi. Zəhmət olmasa yenidən cəhd edin.',
+                title: t('messageError'),
+                text: t('messageNotSent'),
                 confirmButtonColor: '#ef4444',
-                confirmButtonText: 'Tamam'
+                confirmButtonText: t('ok')
             });
         } finally {
             setIsSubmitting(false);
@@ -388,7 +390,7 @@ const Contact = () => {
         return (
             <div className="contact-page">
                 <div style={{ textAlign: 'center', padding: '50px' }}>
-                    <p>Loading contact information...</p>
+                    <p>{t('loadingContactInfo')}</p>
                 </div>
             </div>
         );
@@ -399,9 +401,9 @@ const Contact = () => {
         return (
             <div className="contact-page">
                 <div style={{ textAlign: 'center', padding: '50px', color: 'red' }}>
-                    <p>Error loading contact information: {error}</p>
+                    <p>{t('errorLoadingContactInfo')}: {error}</p>
                     <p style={{ fontSize: '0.9rem', marginTop: '10px' }}>
-                        Please check if the API server is running at {API_BASE_URL}
+                        {t('checkApiServer')} {API_BASE_URL}
                     </p>
                 </div>
             </div>
@@ -443,13 +445,13 @@ const Contact = () => {
                                             animation: 'spin 1s linear infinite',
                                             marginBottom: '20px'
                                         }}></div>
-                                        <div>Loading 3D Scene...</div>
+                                        <div>{t('loadingScene')}</div>
                                     </>
                                 )}
                                 {splineError && (
                                     <>
                                         <div style={{ fontSize: '2rem', marginBottom: '10px' }}>⚠️</div>
-                                        <div>Failed to load 3D scene</div>
+                                        <div>{t('failedToLoadScene')}</div>
                                         <button
                                             onClick={() => window.location.reload()}
                                             style={{
@@ -462,7 +464,7 @@ const Contact = () => {
                                                 cursor: 'pointer'
                                             }}
                                         >
-                                            Retry
+                                            {t('retry')}
                                         </button>
                                     </>
                                 )}
@@ -471,14 +473,16 @@ const Contact = () => {
                         {/* Contact Information Overlay */}
                         <div className="contact-info-overlay">
                             <div className="contact-heading">
-                                <h2>Nə sualın varsa,</h2>
-                                <h2>buradayıq!</h2>
+                                <h2>{t('contactTitle')}</h2>
+                                <h2>{t('contactSubtitle')}</h2>
                             </div>
                             <div className="contact-details">
                                 {contactData.contactInfo && contactData.contactInfo.length > 0 ? (
                                     contactData.contactInfo.map((item, index) => {
-                                        // Check if the item is an email type
+                                        // Check the item type for different link handling
                                         const isEmail = item.type === 'email';
+                                        const isPhone = item.type === 'phone';
+                                        const isLocation = item.type === 'location';
 
                                         return (
                                             <div key={`${item.type}-${item.value}-${index}`} className="contact-item">
@@ -495,6 +499,24 @@ const Contact = () => {
                                                     >
                                                         {item.value}
                                                     </a>
+                                                ) : isPhone ? (
+                                                    <a
+                                                        href={`tel:${item.value}`}
+                                                        className="contact-link"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        {item.value}
+                                                    </a>
+                                                ) : isLocation ? (
+                                                    <a
+                                                        href="https://www.google.com/maps/place/Ahmad+Rajabli,+Baku,+Azerbaijan"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="contact-link"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        {item.value}
+                                                    </a>
                                                 ) : (
                                                     <span>{item.value}</span>
                                                 )}
@@ -503,7 +525,7 @@ const Contact = () => {
                                     })
                                 ) : (
                                     <div className="contact-item">
-                                        <span>No contact information available</span>
+                                        <span>{t('noContactInfo')}</span>
                                     </div>
                                 )}
                             </div>
@@ -529,7 +551,7 @@ const Contact = () => {
                                         );
                                     })
                                 ) : (
-                                    <div>No social media links available</div>
+                                    <div>{t('noSocialMedia')}</div>
                                 )}
                             </div>
                         </div>
@@ -539,12 +561,12 @@ const Contact = () => {
                     <div className="contact-form-container">
                         <form className="contact-form" onSubmit={handleSubmit}>
                             <div className="form-group">
-                                <label htmlFor="name">Ad *</label>
+                                <label htmlFor="name">{t('firstName')} *</label>
                                 <input
                                     type="text"
                                     id="name"
                                     name="name"
-                                    placeholder="Adınızı daxil edin"
+                                    placeholder={t('enterFirstName')}
                                     className={`form-input ${formErrors.name ? 'error' : ''}`}
                                     value={formData.name}
                                     onChange={handleInputChange}
@@ -556,12 +578,12 @@ const Contact = () => {
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="surname">Soyad *</label>
+                                <label htmlFor="surname">{t('lastName')} *</label>
                                 <input
                                     type="text"
                                     id="surname"
                                     name="surname"
-                                    placeholder="Soyadınızı daxil edin"
+                                    placeholder={t('enterLastName')}
                                     className={`form-input ${formErrors.surname ? 'error' : ''}`}
                                     value={formData.surname}
                                     onChange={handleInputChange}
@@ -573,12 +595,12 @@ const Contact = () => {
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="email">E-poçt *</label>
+                                <label htmlFor="email">{t('email')} *</label>
                                 <input
                                     type="email"
                                     id="email"
                                     name="email"
-                                    placeholder="Elektron poçtunuzu daxil edin"
+                                    placeholder={t('enterEmail')}
                                     className={`form-input ${formErrors.email ? 'error' : ''}`}
                                     value={formData.email}
                                     onChange={handleInputChange}
@@ -590,12 +612,12 @@ const Contact = () => {
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="phone">Telefon *</label>
+                                <label htmlFor="phone">{t('phone')} *</label>
                                 <input
                                     type="tel"
                                     id="phone"
                                     name="phone"
-                                    placeholder="Telefon nömrənizi daxil edin"
+                                    placeholder={t('enterPhone')}
                                     className={`form-input ${formErrors.phone ? 'error' : ''}`}
                                     value={formData.phone}
                                     onChange={handleInputChange}
@@ -607,11 +629,11 @@ const Contact = () => {
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="message">Mesajınız *</label>
+                                <label htmlFor="message">{t('message')} *</label>
                                 <textarea
                                     id="message"
                                     name="message"
-                                    placeholder="Mesajınızı daxil edin"
+                                    placeholder={t('enterMessage')}
                                     className={`form-textarea ${formErrors.message ? 'error' : ''}`}
                                     rows="4"
                                     value={formData.message}
@@ -629,7 +651,7 @@ const Contact = () => {
                                     className="contact-submit-btn"
                                     disabled={isSubmitting}
                                 >
-                                    {isSubmitting ? 'Göndərilir...' : 'Mesaj Göndər'}
+                                    {isSubmitting ? t('sending') : t('sendMessage')}
                                 </button>
                             </div>
                         </form>
@@ -640,7 +662,7 @@ const Contact = () => {
             {/* Maps Section */}
             <div className="maps-section">
                 <div className="maps-container">
-                    <h3 className="maps-title">Xəritədə Bizi Tapın</h3>
+                    <h3 className="maps-title">{t('findUsOnMap')}</h3>
                     <div className="map-wrapper">
                         <iframe
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d24310.547386!2d49.851066!3d40.3772!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40307d6bd6211cf9%3A0x343f6a9e9e6b3b3a!2sAhmad%20Rajabli%2C%20Baku%2C%20Azerbaijan!5e0!3m2!1sen!2s!4v1234567890"

@@ -330,6 +330,23 @@
 }
 
 /* Responsive Design */
+@media (min-width: 1920px) {
+    .employee-slider-photo {
+        height: 39vh !important;
+    }
+
+    .employee-slider-field-section {
+        margin-left: -1px;
+        width: 101%;
+    }
+
+    .employee-slider-cards {
+        margin-top: 52px;
+    }
+
+}
+
+
 @media (max-width: 1200px) {
     .employee-slider-cards {
         grid-template-columns: repeat(3, 1fr);

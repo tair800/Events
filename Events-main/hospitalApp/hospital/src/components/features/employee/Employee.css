@@ -15,7 +15,7 @@
     max-width: 1400px;
     margin: 0 auto;
     min-height: 1000px;
-    margin-top: 15rem;
+    margin-top: 6%;
 }
 
 /* Employee Unified Card */
@@ -769,12 +769,62 @@
     }
 }
 
+@media (max-width: 393px) {
+    .employee-cards-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+        gap: 8rem !important;
+        padding: 1rem;
+        max-width: 100%;
+        margin: 2rem auto 0;
+        min-height: auto;
+    }
+
+    .employee-photo {
+        height: 45.7vh !important;
+    }
+
+    .employee-fullname {
+        top: 14rem !important;
+    }
+
+    .employee-field-section {
+        left: -1px !important;
+        width: 101% !important;
+    }
+
+    .pagination-wrapper.employee-pagination {
+        margin-left: 21px !important;
+    }
+}
+
+/* 1280x832 Resolution */
+@media (min-width: 1280px) and (max-width: 1919px) {
+    .employee-unified-card {
+        height: 354px !important;
+    }
+
+    .employee-field-section {
+        left: -1px !important;
+        width: 101% !important;
+    }
+}
+
 /* 1920x1080 Resolution */
 @media (min-width: 1920px) {
+    .employee-page {
+        margin-top: -24rem
+    }
+
     .employee-cards-container {
         grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(3, 1fr);
         gap: 2rem 1rem;
         max-width: 1600px;
+        height: auto;
+        min-height: 900px;
+        margin-top: 13rem;
     }
 
     .employee-photo {

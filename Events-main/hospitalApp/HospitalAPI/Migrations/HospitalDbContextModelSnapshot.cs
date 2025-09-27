@@ -495,6 +495,10 @@ namespace HospitalAPI.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PdfUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal?>("Price")
                         .HasColumnType("REAL");
 
@@ -819,6 +823,16 @@ namespace HospitalAPI.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("section_1_description");
 
+                    b.Property<string>("Section1DescriptionEn")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("section_1_description_en");
+
+                    b.Property<string>("Section1DescriptionRu")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("section_1_description_ru");
+
                     b.Property<string>("Section2Image")
                         .HasMaxLength(500)
                         .HasColumnType("TEXT")
@@ -834,20 +848,60 @@ namespace HospitalAPI.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("section_4_description");
 
+                    b.Property<string>("Section4DescriptionEn")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("section_4_description_en");
+
+                    b.Property<string>("Section4DescriptionRu")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("section_4_description_ru");
+
                     b.Property<string>("Section4PurposeDescription")
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT")
                         .HasColumnName("section_4_purpose_description");
+
+                    b.Property<string>("Section4PurposeDescriptionEn")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("section_4_purpose_description_en");
+
+                    b.Property<string>("Section4PurposeDescriptionRu")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("section_4_purpose_description_ru");
 
                     b.Property<string>("Section4PurposeTitle")
                         .HasMaxLength(500)
                         .HasColumnType("TEXT")
                         .HasColumnName("section_4_purpose_title");
 
+                    b.Property<string>("Section4PurposeTitleEn")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("section_4_purpose_title_en");
+
+                    b.Property<string>("Section4PurposeTitleRu")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("section_4_purpose_title_ru");
+
                     b.Property<string>("Section4Title")
                         .HasMaxLength(500)
                         .HasColumnType("TEXT")
                         .HasColumnName("section_4_title");
+
+                    b.Property<string>("Section4TitleEn")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("section_4_title_en");
+
+                    b.Property<string>("Section4TitleRu")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("section_4_title_ru");
 
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()

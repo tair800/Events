@@ -148,12 +148,22 @@ namespace HospitalAPI.Data
             {
                 entity.HasKey(h => h.Id);
                 entity.Property(h => h.Section1Description).HasColumnName("section_1_description").HasMaxLength(2000);
+                entity.Property(h => h.Section1DescriptionEn).HasColumnName("section_1_description_en").HasMaxLength(2000);
+                entity.Property(h => h.Section1DescriptionRu).HasColumnName("section_1_description_ru").HasMaxLength(2000);
                 entity.Property(h => h.Section2Image).HasColumnName("section_2_image").HasMaxLength(500);
                 entity.Property(h => h.Section3Image).HasColumnName("section_3_image").HasMaxLength(500);
                 entity.Property(h => h.Section4Title).HasColumnName("section_4_title").HasMaxLength(500);
+                entity.Property(h => h.Section4TitleEn).HasColumnName("section_4_title_en").HasMaxLength(500);
+                entity.Property(h => h.Section4TitleRu).HasColumnName("section_4_title_ru").HasMaxLength(500);
                 entity.Property(h => h.Section4Description).HasColumnName("section_4_description").HasMaxLength(2000);
+                entity.Property(h => h.Section4DescriptionEn).HasColumnName("section_4_description_en").HasMaxLength(2000);
+                entity.Property(h => h.Section4DescriptionRu).HasColumnName("section_4_description_ru").HasMaxLength(2000);
                 entity.Property(h => h.Section4PurposeTitle).HasColumnName("section_4_purpose_title").HasMaxLength(500);
+                entity.Property(h => h.Section4PurposeTitleEn).HasColumnName("section_4_purpose_title_en").HasMaxLength(500);
+                entity.Property(h => h.Section4PurposeTitleRu).HasColumnName("section_4_purpose_title_ru").HasMaxLength(500);
                 entity.Property(h => h.Section4PurposeDescription).HasColumnName("section_4_purpose_description").HasMaxLength(2000);
+                entity.Property(h => h.Section4PurposeDescriptionEn).HasColumnName("section_4_purpose_description_en").HasMaxLength(2000);
+                entity.Property(h => h.Section4PurposeDescriptionRu).HasColumnName("section_4_purpose_description_ru").HasMaxLength(2000);
                 entity.Property(h => h.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(h => h.UpdatedAt).HasColumnName("updated_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
             });

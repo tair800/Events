@@ -160,3 +160,34 @@
         height: 40px;
     }
 }
+
+@media (max-width: 393px) {
+    .pagination-controls {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center;
+        justify-content: center !important;
+        width: 100%;
+        padding: 0 1rem;
+        flex-wrap: nowrap !important;
+    }
+
+    .pagination-pages {
+        flex-wrap: nowrap !important;
+        gap: 0.2rem;
+    }
+
+    .pagination-page {
+        width: 30px;
+        height: 30px;
+        padding: 0.4rem;
+        font-size: 0.8rem;
+    }
+
+    .pagination-arrow {
+        min-width: 35px;
+        height: 35px;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+}

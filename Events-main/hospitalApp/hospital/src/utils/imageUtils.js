@@ -104,6 +104,7 @@ export const isUploadedFile = (imageName) => {
         'employee_',
         'home_',
         'event_',
+        'event_pdf_',
         'about_carousel_',
         'gallery_',
         'blog_'

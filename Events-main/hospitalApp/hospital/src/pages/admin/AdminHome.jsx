@@ -8,14 +8,47 @@ import './AdminHome.css'
 function AdminHome() {
     const [homeData, setHomeData] = useState({
         section1Description: '',
+        section1DescriptionEn: '',
+        section1DescriptionRu: '',
         section2Image: '',
         section3Image: '',
         section4Title: '',
+        section4TitleEn: '',
+        section4TitleRu: '',
         section4Description: '',
+        section4DescriptionEn: '',
+        section4DescriptionRu: '',
         section4PurposeTitle: '',
-        section4PurposeDescription: ''
+        section4PurposeTitleEn: '',
+        section4PurposeTitleRu: '',
+        section4PurposeDescription: '',
+        section4PurposeDescriptionEn: '',
+        section4PurposeDescriptionRu: ''
     });
     const [loading, setLoading] = useState(false);
+    const [activeLanguage, setActiveLanguage] = useState('az');
+
+    const languageOptions = [
+        { code: 'az', name: 'Azərbaycan', flag: '/assets/azerbaijan.svg' },
+        { code: 'en', name: 'English', flag: '/assets/english.svg' },
+        { code: 'ru', name: 'Русский', flag: '/assets/russian.svg' }
+    ];
+
+    // Helper functions for language-aware field handling
+    const getCurrentFieldName = (baseField) => {
+        if (activeLanguage === 'az') return baseField;
+        return `${baseField}${activeLanguage === 'en' ? 'En' : 'Ru'}`;
+    };
+
+    const getCurrentFieldValue = (baseField) => {
+        const fieldName = getCurrentFieldName(baseField);
+        return homeData[fieldName] || '';
+    };
+
+    const getLocalizedPlaceholder = (baseField, defaultText) => {
+        const languageSuffix = activeLanguage === 'az' ? '' : (activeLanguage === 'en' ? ' (English)' : ' (Russian)');
+        return `${defaultText}${languageSuffix}`;
+    };
 
     useEffect(() => {
         fetchHomeData();
@@ -28,12 +61,22 @@ function AdminHome() {
                 const data = await response.json();
                 setHomeData({
                     section1Description: data.section1Description || '',
+                    section1DescriptionEn: data.section1DescriptionEn || '',
+                    section1DescriptionRu: data.section1DescriptionRu || '',
                     section2Image: data.section2Image || '',
                     section3Image: data.section3Image || '',
                     section4Title: data.section4Title || '',
+                    section4TitleEn: data.section4TitleEn || '',
+                    section4TitleRu: data.section4TitleRu || '',
                     section4Description: data.section4Description || '',
+                    section4DescriptionEn: data.section4DescriptionEn || '',
+                    section4DescriptionRu: data.section4DescriptionRu || '',
                     section4PurposeTitle: data.section4PurposeTitle || '',
-                    section4PurposeDescription: data.section4PurposeDescription || ''
+                    section4PurposeTitleEn: data.section4PurposeTitleEn || '',
+                    section4PurposeTitleRu: data.section4PurposeTitleRu || '',
+                    section4PurposeDescription: data.section4PurposeDescription || '',
+                    section4PurposeDescriptionEn: data.section4PurposeDescriptionEn || '',
+                    section4PurposeDescriptionRu: data.section4PurposeDescriptionRu || ''
                 });
             }
         } catch (error) {
@@ -48,6 +91,11 @@ function AdminHome() {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setHomeData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleLanguageFieldChange = (baseField, value) => {
+        const fieldName = getCurrentFieldName(baseField);
+        setHomeData(prev => ({ ...prev, [fieldName]: value }));
     };
 
     const handleImageBrowse = async (sectionName) => {
@@ -192,6 +240,23 @@ function AdminHome() {
                     </div>
 
                     <form onSubmit={handleSubmit} className="admin-home-form">
+                        {/* Language Tabs */}
+                        <div className="language-tabs-container">
+                            <div className="language-tabs">
+                                {languageOptions.map((lang) => (
+                                    <button
+                                        key={lang.code}
+                                        type="button"
+                                        className={`language-tab ${activeLanguage === lang.code ? 'active' : ''}`}
+                                        onClick={() => setActiveLanguage(lang.code)}
+                                    >
+                                        <img src={lang.flag} alt={lang.name} className="language-flag" />
+                                        <span className="language-name">{lang.name}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                         <div className="form-fields-left">
                             {/* Section 1 - Description */}
                             <div className="section-form-group">
@@ -200,10 +265,10 @@ function AdminHome() {
                                     <label htmlFor="section1Description">Main Title & Description</label>
                                     <textarea
                                         id="section1Description"
-                                        name="section1Description"
-                                        value={homeData.section1Description}
-                                        onChange={handleInputChange}
-                                        placeholder="Enter the main title and description for section 1"
+                                        name={getCurrentFieldName('section1Description')}
+                                        value={getCurrentFieldValue('section1Description')}
+                                        onChange={(e) => handleLanguageFieldChange('section1Description', e.target.value)}
+                                        placeholder={getLocalizedPlaceholder('section1Description', 'Enter the main title and description for section 1')}
                                         className="form-textarea"
                                         rows="3"
                                     />
@@ -221,10 +286,10 @@ function AdminHome() {
                                         {field.includes('Description') ? (
                                             <textarea
                                                 id={field}
-                                                name={field}
-                                                value={homeData[field]}
-                                                onChange={handleInputChange}
-                                                placeholder={`Enter ${field.replace('section4', '').replace(/([A-Z])/g, ' $1').trim().toLowerCase()}`}
+                                                name={getCurrentFieldName(field)}
+                                                value={getCurrentFieldValue(field)}
+                                                onChange={(e) => handleLanguageFieldChange(field, e.target.value)}
+                                                placeholder={getLocalizedPlaceholder(field, `Enter ${field.replace('section4', '').replace(/([A-Z])/g, ' $1').trim().toLowerCase()}`)}
                                                 className="form-textarea"
                                                 rows="3"
                                             />
@@ -232,10 +297,10 @@ function AdminHome() {
                                             <input
                                                 type="text"
                                                 id={field}
-                                                name={field}
-                                                value={homeData[field]}
-                                                onChange={handleInputChange}
-                                                placeholder={`Enter ${field.replace('section4', '').replace(/([A-Z])/g, ' $1').trim().toLowerCase()}`}
+                                                name={getCurrentFieldName(field)}
+                                                value={getCurrentFieldValue(field)}
+                                                onChange={(e) => handleLanguageFieldChange(field, e.target.value)}
+                                                placeholder={getLocalizedPlaceholder(field, `Enter ${field.replace('section4', '').replace(/([A-Z])/g, ' $1').trim().toLowerCase()}`)}
                                                 className="form-input"
                                             />
                                         )}

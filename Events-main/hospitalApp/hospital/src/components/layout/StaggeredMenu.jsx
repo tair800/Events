@@ -15,6 +15,7 @@ export const StaggeredMenu = ({
     openMenuButtonColor = '#fff',
     accentColor = '#5227FF',
     changeMenuColorOnOpen = true,
+    socialTitle = 'Languages',
     onMenuOpen,
     onMenuClose
 }) => {
@@ -387,11 +388,20 @@ export const StaggeredMenu = ({
                     </ul>
                     {displaySocials && socialItems && socialItems.length > 0 && (
                         <div className="sm-socials" aria-label="Language options">
-                            <h3 className="sm-socials-title">Languages</h3>
+                            <h3 className="sm-socials-title">{socialTitle}</h3>
                             <ul className="sm-socials-list" role="list">
                                 {socialItems.map((s, i) => (
                                     <li key={s.label + i} className="sm-socials-item">
-                                        <a href={s.link} className="sm-socials-link">
+                                        <a
+                                            href={s.link}
+                                            className="sm-socials-link"
+                                            onClick={(e) => {
+                                                if (s.onClick) {
+                                                    e.preventDefault();
+                                                    s.onClick();
+                                                }
+                                            }}
+                                        >
                                             {s.label}
                                         </a>
                                     </li>

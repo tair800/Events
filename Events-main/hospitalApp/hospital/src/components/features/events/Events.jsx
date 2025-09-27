@@ -6,8 +6,8 @@ import { useTranslation } from '../../../hooks/useTranslation';
 const searchIcon = '/assets/search.svg';
 const cardIcon = '/assets/event-arrow.svg';
 const eventImg = '/assets/event-img.png';
-import iconNext from '../../../assets/icon-next.svg';
-import iconPrev from '../../../assets/icon-prev.svg';
+import iconNext from '/assets/event-next.svg';
+import iconPrev from '/assets/event-prev.svg';
 import LogoCarousel from '../../ui/LogoCarousel';
 import { RequestModal } from '../../ui';
 import './Events.css';
@@ -426,7 +426,7 @@ const Events = () => {
                                         className="featured-event-btn qeydiyyat-btn"
                                         onClick={() => setShowRequestModal(true)}
                                     >
-                                        Qeydiyyatdan keç
+                                        {t('register')}
                                     </button>
                                     <button
                                         className="featured-event-btn detalli-btn"
@@ -437,7 +437,7 @@ const Events = () => {
                                             }
                                         }}
                                     >
-                                        Detallı bax
+                                        {t('viewDetails')}
                                     </button>
                                 </div>
                             </div>
@@ -474,9 +474,9 @@ const Events = () => {
             {/* Header */}
             <div className="events-header-section">
                 <div className="events-header-text">
-                    <span className="events-header-first">Bütün</span>
+                    <span className="events-header-first">{t('allEvents')}</span>
                     <span className="events-header-second">
-                        <span>Tədbirlər</span>
+                        <span>{t('events')}</span>
                     </span>
                 </div>
 
@@ -493,7 +493,7 @@ const Events = () => {
                                 <div className="filter-line short"></div>
                                 <div className="filter-line"></div>
                             </div>
-                            <span className="region-filter-text">{selectedRegion}</span>
+                            <span className="region-filter-text">{selectedRegion === 'All' ? t('all') : selectedRegion}</span>
                             <div className="dropdown-arrow">▼</div>
                         </div>
 
@@ -507,7 +507,7 @@ const Events = () => {
                                         setCurrentPage(1);
                                     }}
                                 >
-                                    All
+                                    {t('all')}
                                 </div>
                                 {uniqueRegions.map(region => (
                                     <div
@@ -536,7 +536,7 @@ const Events = () => {
                     <div className="search-container">
                         <input
                             type="text"
-                            placeholder="Tədbir axtar..."
+                            placeholder={t('searchEvents')}
                             className="search-input"
                             value={inputValue}
                             onChange={handleSearchChange}
@@ -613,7 +613,7 @@ const Events = () => {
                         {(selectedDate || selectedRegion !== 'All' || searchTerm) && (
                             <div className="calendar-refresh-section">
                                 <button className="calendar-refresh-text" onClick={handleCalendarRefresh}>
-                                    Kalendarı yenilə
+                                    {t('refreshCalendar')}
                                 </button>
                             </div>
                         )}
@@ -624,9 +624,9 @@ const Events = () => {
                     <div className="events-main-content">
 
                         {loading ? (
-                            <div className="loading-message">Yüklənir...</div>
+                            <div className="loading-message">{t('loading')}</div>
                         ) : error ? (
-                            <div className="error-message">Xəta: {error}</div>
+                            <div className="error-message">{t('error')}: {error}</div>
                         ) : (
                             <>
                                 <div className="events-grid">

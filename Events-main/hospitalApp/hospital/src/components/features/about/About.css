@@ -148,14 +148,14 @@
 
 .dot4-image-container img {
     max-width: 50%;
-    height: 220px;
+    height: 216px;
     display: block;
     object-fit: contain;
 }
 
 .dot4-text-overlay {
     position: absolute;
-    top: 50%;
+    top: 45%;
     left: 7%;
     transform: translate(-50%, -50%);
     text-align: center;
@@ -313,10 +313,14 @@ h1[style*="color: black"] {
         font-size: 1.8rem;
         text-align: center;
         margin-bottom: 1.5rem;
+        max-width: 100% !important;
+        white-space: normal !important;
     }
 
     .text-content {
         width: 100%;
+        max-width: 100% !important;
+        white-space: normal !important;
     }
 
     .text-content p {
@@ -324,6 +328,7 @@ h1[style*="color: black"] {
         line-height: 1.8;
         text-align: center;
         margin-bottom: 1.2rem;
+        white-space: normal !important;
     }
 
     /* Adjust dot images for mobile */
@@ -460,12 +465,22 @@ h1[style*="color: black"] {
         font-size: 0.8rem;
     }
 
+    /* Dot3 positioning for 480px */
+    .dot3-image-container {
+        left: 200px;
+    }
+
     .dot3-number {
         font-size: 1.8rem;
     }
 
     .dot3-label {
         font-size: 0.9rem;
+    }
+
+    /* Dot4 positioning for 480px */
+    .dot4-image-container {
+        left: 180px;
     }
 
     .dot4-number {
@@ -475,6 +490,103 @@ h1[style*="color: black"] {
     .dot4-label {
         font-size: 1.3rem;
     }
+}
+
+/* 425px breakpoint styles */
+@media (max-width: 425px) {
+
+    /* About Main Image */
+    .main-image-container img {
+        width: 93%;
+    }
+
+    /* Main image container positioning */
+    .main-image-container {
+        top: -4px;
+        left: -63px;
+    }
+
+    /* Dot3 image container positioning */
+    .dot3-image-container {
+        left: 190px;
+    }
+
+    /* Dot3 text overlay positioning */
+    .dot3-text-overlay {
+        top: 44%;
+        left: 11%;
+    }
+
+    /* Dot4 image container positioning */
+    .dot4-image-container {
+        left: 141px;
+    }
+
+    /* Dot4 text overlay positioning */
+    .dot4-text-overlay {
+        top: 40%;
+    }
+
+    /* Dot4 number font size */
+    .dot4-number {
+        font-size: 3.2rem;
+    }
+}
+
+/* 360px breakpoint for very small screens */
+@media (max-width: 360px) {
+
+    /* Dot3 positioning for 360px */
+    .dot3-image-container {
+        left: 190px;
+    }
+
+    /* Dot4 positioning for 360px */
+    .dot4-image-container {
+        left: 170px;
+    }
+
+    /* Adjust font sizes for very small screens */
+    .dot3-number {
+        font-size: 1.5rem;
+    }
+
+    .dot3-label {
+        font-size: 0.8rem;
+    }
+
+    .dot4-number {
+        font-size: 2.8rem;
+    }
+
+    .dot4-label {
+        font-size: 1.1rem;
+    }
+}
+
+/* 320px breakpoint for very small screens */
+@media (max-width: 320px) {
+
+    /* Dot3 positioning for 320px */
+    .dot3-image-container {
+        left: 130px;
+    }
+
+    .dot3-image-container img {
+        height: 81px;
+    }
+
+    /* Dot4 positioning for 320px */
+    .dot4-image-container {
+        left: 100px;
+    }
+
+    /* Dot4 number font size for 320px */
+    .dot4-image-container .dot4-number {
+        font-size: 2rem !important;
+        margin-bottom: -12px;
+    }
+
 }
 
 /* 1920x1080 Resolution */
@@ -503,6 +615,19 @@ h1[style*="color: black"] {
 /* Russian language specific styles - general rule */
 [data-language="ru"] .dot4-image-container .dot4-label {
     font-size: 1.7rem !important;
+}
+
+/* Russian language specific styles for mobile - must come after desktop rule */
+@media (max-width: 425px) {
+    [data-language="ru"] .dot4-image-container .dot4-label {
+        font-size: 1rem !important;
+    }
+}
+
+@media (max-width: 320px) {
+    [data-language="ru"] .dot4-image-container .dot4-label {
+        font-size: 0.9rem !important;
+    }
 }
 
 /* Smooth language transition effects */

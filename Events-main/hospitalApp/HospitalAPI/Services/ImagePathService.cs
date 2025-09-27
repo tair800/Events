@@ -36,7 +36,11 @@ namespace HospitalAPI.Services
             if (imagePath.StartsWith("http") || imagePath.StartsWith("/"))
                 return imagePath;
 
-            // For uploads, prefix with /uploads/
+            // If it already starts with uploads/, just add leading slash
+            if (imagePath.StartsWith("uploads/"))
+                return $"/{imagePath}";
+
+            // For other paths, prefix with /uploads/
             return $"/uploads/{imagePath}";
         }
 

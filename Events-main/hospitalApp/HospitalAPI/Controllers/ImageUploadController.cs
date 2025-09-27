@@ -616,6 +616,73 @@ namespace HospitalAPI.Controllers
             }
         }
 
+        [HttpPost("event/pdf")]
+        public async Task<IActionResult> UploadEventPdf(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return BadRequest("No file uploaded.");
+                }
+
+                // Validate file type - only PDF
+                var allowedExtensions = new[] { ".pdf" };
+                var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    return BadRequest("Invalid file type. Only PDF files are allowed.");
+                }
+
+                // Validate file size (max 20MB for PDFs)
+                if (file.Length > 20 * 1024 * 1024)
+                {
+                    return BadRequest("File size too large. Maximum size is 20MB.");
+                }
+
+                // Generate unique filename
+                var fileName = $"event_pdf_{Guid.NewGuid()}{fileExtension}";
+                var filePath = Path.Combine(_uploadPath, fileName);
+
+                // Save file
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                // Verify file was saved correctly
+                if (!System.IO.File.Exists(filePath))
+                {
+                    return StatusCode(500, new { 
+                        success = false, 
+                        message = "PDF file was not saved correctly." 
+                    });
+                }
+
+                var fileInfo = new FileInfo(filePath);
+                Console.WriteLine($"PDF uploaded: {fileName}, Size: {fileInfo.Length} bytes");
+
+                // Return the file path for database storage
+                var relativePath = $"uploads/{fileName}";
+                return Ok(new { 
+                    success = true, 
+                    message = "PDF uploaded successfully.",
+                    filePath = relativePath,
+                    fileName = fileName,
+                    fileSize = fileInfo.Length
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { 
+                    success = false, 
+                    message = "An error occurred while uploading the PDF.",
+                    error = ex.Message 
+                });
+            }
+        }
+
         [HttpDelete("{fileName}")]
         public IActionResult DeleteImage(string fileName)
         {
@@ -671,6 +738,70 @@ namespace HospitalAPI.Controllers
                 return StatusCode(500, new { 
                     success = false, 
                     message = "An error occurred while listing files.",
+                    error = ex.Message 
+                });
+            }
+        }
+
+        [HttpGet("pdf/{fileName}")]
+        public IActionResult GetPdf(string fileName)
+        {
+            try
+            {
+                var filePath = Path.Combine(_uploadPath, fileName);
+                
+                Console.WriteLine($"Requesting PDF: {fileName}");
+                Console.WriteLine($"Full path: {filePath}");
+                Console.WriteLine($"File exists: {System.IO.File.Exists(filePath)}");
+                
+                if (!System.IO.File.Exists(filePath))
+                {
+                    return NotFound($"PDF file not found: {fileName}");
+                }
+
+                var fileInfo = new FileInfo(filePath);
+                Console.WriteLine($"PDF file size: {fileInfo.Length} bytes");
+
+                var fileBytes = System.IO.File.ReadAllBytes(filePath);
+                return File(fileBytes, "application/pdf", fileName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"PDF retrieval error: {ex.Message}");
+                return StatusCode(500, new { 
+                    success = false, 
+                    message = "An error occurred while retrieving the PDF.",
+                    error = ex.Message 
+                });
+            }
+        }
+
+        [HttpGet("test-pdf")]
+        public IActionResult TestPdf()
+        {
+            try
+            {
+                var pdfFiles = Directory.GetFiles(_uploadPath, "event_pdf_*.pdf");
+                var fileList = pdfFiles.Select(f => new
+                {
+                    fileName = Path.GetFileName(f),
+                    filePath = f,
+                    size = new FileInfo(f).Length,
+                    exists = System.IO.File.Exists(f)
+                }).ToList();
+
+                return Ok(new { 
+                    success = true, 
+                    message = "PDF files found",
+                    files = fileList,
+                    uploadPath = _uploadPath
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { 
+                    success = false, 
+                    message = "Error listing PDF files",
                     error = ex.Message 
                 });
             }

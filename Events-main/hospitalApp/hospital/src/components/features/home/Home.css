@@ -1395,11 +1395,12 @@
 
     /* Header Text Sections Mobile */
     .home-header-text {
-        margin: 1.5rem 0.5rem;
-        flex-direction: column;
-        align-items: center;
-        gap: 3rem;
-        text-align: center;
+        margin: 1.5rem 0.5rem !important;
+        flex-direction: row !important;
+        gap: 0rem !important;
+        text-align: left !important;
+        justify-content: space-between !important;
+        align-items: center !important;
     }
 
     .home-header-text-3 {
@@ -1423,7 +1424,16 @@
 
     .home-header-left {
         margin-bottom: 0;
-        justify-content: center;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .home-header-btn {
+        margin-top: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
 
     .home-header-left-3 {
@@ -3148,6 +3158,15 @@
         height: 20px;
     }
 
+    .home-header-text {
+        margin: 1rem 0.5rem;
+        flex-direction: row;
+        gap: 0.5rem;
+        text-align: left;
+        justify-content: space-between;
+        align-items: center;
+    }
+
     .home-header-text-2 {
         margin: 1rem 0.5rem;
         flex-direction: row;
@@ -3157,12 +3176,34 @@
         align-items: center;
     }
 
+    .home-header-left {
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0;
+    }
+
     .home-header-left-2 {
         flex-direction: row;
         justify-content: flex-start;
         align-items: center;
         gap: 0.5rem;
         margin-bottom: 0;
+    }
+
+    .home-header-first {
+        font-size: 1.4rem;
+    }
+
+    .home-header-second {
+        font-size: 1.2rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .home-header-btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.8rem;
     }
 
     .home-header-first-2 {
@@ -3297,6 +3338,15 @@
         height: 18px;
     }
 
+    .home-header-text {
+        margin: 0.8rem 0.4rem;
+        flex-direction: row;
+        gap: 0.4rem;
+        text-align: left;
+        justify-content: space-between;
+        align-items: center;
+    }
+
     .home-header-text-2 {
         margin: 0.8rem 0.4rem;
         flex-direction: row;
@@ -3306,12 +3356,34 @@
         align-items: center;
     }
 
+    .home-header-left {
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 0.4rem;
+        margin-bottom: 0;
+    }
+
     .home-header-left-2 {
         flex-direction: row;
         justify-content: flex-start;
         align-items: center;
         gap: 0.4rem;
         margin-bottom: 0;
+    }
+
+    .home-header-first {
+        font-size: 1.2rem;
+    }
+
+    .home-header-second {
+        font-size: 1rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .home-header-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.7rem;
     }
 
     .home-header-first-2 {
@@ -3446,6 +3518,15 @@
         height: 16px;
     }
 
+    .home-header-text {
+        margin: 0.6rem 0.3rem;
+        flex-direction: row;
+        gap: 0.3rem;
+        text-align: left;
+        justify-content: space-between;
+        align-items: center;
+    }
+
     .home-header-text-2 {
         margin: 0.6rem 0.3rem;
         flex-direction: row;
@@ -3455,12 +3536,34 @@
         align-items: center;
     }
 
+    .home-header-left {
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 0.3rem;
+        margin-bottom: 0;
+    }
+
     .home-header-left-2 {
         flex-direction: row;
         justify-content: flex-start;
         align-items: center;
         gap: 0.3rem;
         margin-bottom: 0;
+    }
+
+    .home-header-first {
+        font-size: 1rem;
+    }
+
+    .home-header-second {
+        font-size: 0.9rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .home-header-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.65rem;
     }
 
     .home-header-first-2 {
@@ -3843,13 +3946,15 @@
     }
 
     .home-event-month {
-        position: static;
-        background: none;
-        padding: 0;
-        margin: 0;
+        position: absolute;
+        left: 100px;
+        top: 48%;
+        background-color: #1B1B3F;
+        padding: 5px 0px 0px 0px;
         text-transform: uppercase;
-        font-size: 0.7rem;
+        font-size: 1rem;
         color: #FFFFFF;
+        font-family: 'Questrial:Regular', sans-serif;
     }
 
     /* Desktop Info Card Row - Override Mobile Slider */

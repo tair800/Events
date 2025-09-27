@@ -512,3 +512,18 @@
         height: 250px;
     }
 }
+
+@media (max-width: 393px) {
+    .right-content-section {
+        margin-top: -177px !important;
+    }
+}
+
+/* Responsive Design */
+@media (min-width: 1920px) {
+    .contact-page {
+        margin-top: -79px;
+    }
+}
+
+/* 1280x832 Resolution */

@@ -57,6 +57,9 @@ namespace HospitalAPI.Models
         [MaxLength(500)]
         public string? DetailImageRight { get; set; }
         
+        [MaxLength(500)]
+        public string? PdfUrl { get; set; }
+        
         // English language fields
         [MaxLength(200)]
         public string? TitleEn { get; set; }

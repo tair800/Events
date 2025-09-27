@@ -137,7 +137,8 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
                         }))}
                         socialItems={languageOptions.map(lang => ({
                             label: lang.name,
-                            link: '#'
+                            link: '#',
+                            onClick: () => handleLanguageSelect(lang.code)
                         }))}
                         displaySocials={true}
                         displayItemNumbering={false}
@@ -147,6 +148,7 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
                         colors={['#B19EEF', '#5227FF']}
                         logoUrl="/assets/footer.svg"
                         accentColor="#ff6b6b"
+                        socialTitle={t('languages')}
                         onMenuOpen={() => console.log('Menu opened')}
                         onMenuClose={() => console.log('Menu closed')}
                     />

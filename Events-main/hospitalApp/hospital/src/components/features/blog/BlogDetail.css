@@ -36,6 +36,35 @@
     opacity: 0.7;
 }
 
+/* 393px breakpoint */
+@media (max-width: 393px) {
+    .blog-detail-left {
+        margin-top: 64px !important;
+    }
+
+    .blog-detail-image {
+        margin-left: -1px !important;
+    }
+}
+
+/* 1280x832 Resolution */
+@media (min-width: 1280px) and (max-width: 1919px) {
+    .blogdetail-bg1 {
+        top: 7px !important;
+    }
+}
+
+/* 1920x1080 Resolution */
+@media (min-width: 1920px) {
+    .blogdetail-bg1 {
+        right: -4px !important;
+    }
+
+    .blogdetail-bg2 {
+        right: -4px !important;
+    }
+}
+
 /* Blog Detail Page Mobile */
 @media (max-width: 768px) {
     .blog-detail-page {

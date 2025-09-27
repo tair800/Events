@@ -34,6 +34,7 @@ namespace HospitalAPI.Controllers
                     eventItem.DetailImageLeft = ImagePathService.FormatContextualImagePath(eventItem.DetailImageLeft, "admin");
                     eventItem.DetailImageMain = ImagePathService.FormatContextualImagePath(eventItem.DetailImageMain, "admin");
                     eventItem.DetailImageRight = ImagePathService.FormatContextualImagePath(eventItem.DetailImageRight, "admin");
+                    eventItem.PdfUrl = ImagePathService.FormatUploadPath(eventItem.PdfUrl);
                 }
                 
                 return Ok(events);
@@ -70,6 +71,7 @@ namespace HospitalAPI.Controllers
                     eventItem.DetailImageLeft = ImagePathService.FormatContextualImagePath(eventItem.DetailImageLeft, "admin");
                     eventItem.DetailImageMain = ImagePathService.FormatContextualImagePath(eventItem.DetailImageMain, "admin");
                     eventItem.DetailImageRight = ImagePathService.FormatContextualImagePath(eventItem.DetailImageRight, "admin");
+                    eventItem.PdfUrl = ImagePathService.FormatUploadPath(eventItem.PdfUrl);
                 }
                 
                 return Ok(events);
@@ -179,6 +181,7 @@ namespace HospitalAPI.Controllers
                     eventItem.DetailImageLeft = ImagePathService.FormatContextualImagePath(eventItem.DetailImageLeft, "admin");
                     eventItem.DetailImageMain = ImagePathService.FormatContextualImagePath(eventItem.DetailImageMain, "admin");
                     eventItem.DetailImageRight = ImagePathService.FormatContextualImagePath(eventItem.DetailImageRight, "admin");
+                    eventItem.PdfUrl = ImagePathService.FormatUploadPath(eventItem.PdfUrl);
                 }
                 
                 return Ok(featuredEvents);
@@ -332,6 +335,7 @@ namespace HospitalAPI.Controllers
                 existingEvent.DetailImageLeft = eventItem.DetailImageLeft;
                 existingEvent.DetailImageMain = eventItem.DetailImageMain;
                 existingEvent.DetailImageRight = eventItem.DetailImageRight;
+                existingEvent.PdfUrl = eventItem.PdfUrl;
                 existingEvent.IsMain = eventItem.IsMain;
                 
                 // Update English language fields

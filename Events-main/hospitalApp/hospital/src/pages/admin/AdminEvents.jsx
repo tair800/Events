@@ -8,6 +8,23 @@ import Pagination from '../../components/ui/Pagination'
 import usePagination from '../../hooks/usePagination'
 import './AdminEvents.css'
 
+// Helper function to extract PDF filename from URL
+const getPdfFilename = (pdfUrl) => {
+    if (!pdfUrl) return '';
+
+    // Remove query parameters and get the filename
+    const urlWithoutParams = pdfUrl.split('?')[0];
+    const filename = urlWithoutParams.split('/').pop();
+
+    // If it's an event_pdf_ file, show a shorter name
+    if (filename.startsWith('event_pdf_')) {
+        return 'Event PDF';
+    }
+
+    // Otherwise show the filename (truncated if too long)
+    return filename.length > 15 ? filename.substring(0, 15) + '...' : filename;
+};
+
 function AdminEvents() {
     const [events, setEvents] = useState([]);
     const [eventData, setEventData] = useState({
@@ -26,6 +43,7 @@ function AdminEvents() {
         detailImageLeft: '',
         detailImageMain: '',
         detailImageRight: '',
+        pdfUrl: '',
         isMain: false,
         // English language fields
         titleEn: '',
@@ -703,6 +721,7 @@ function AdminEvents() {
             detailImageLeft: '',
             detailImageMain: '',
             detailImageRight: '',
+            pdfUrl: '',
             isMain: false,
             // English language fields
             titleEn: '',
@@ -739,7 +758,8 @@ function AdminEvents() {
     const handleImageBrowse = async (field) => {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
-        fileInput.accept = 'image/*';
+        // Accept images for image fields, PDFs for pdfUrl field
+        fileInput.accept = field === 'pdfUrl' ? '.pdf' : 'image/*';
         fileInput.style.display = 'none';
 
         fileInput.onchange = async (e) => {
@@ -749,7 +769,12 @@ function AdminEvents() {
                     const formData = new FormData();
                     formData.append('file', file);
 
-                    const response = await fetch('https://localhost:5000/api/ImageUpload/event', {
+                    // Use different endpoint for PDF uploads
+                    const uploadEndpoint = field === 'pdfUrl'
+                        ? 'https://localhost:5000/api/ImageUpload/event/pdf'
+                        : 'https://localhost:5000/api/ImageUpload/event';
+
+                    const response = await fetch(uploadEndpoint, {
                         method: 'POST',
                         body: formData
                     });
@@ -760,16 +785,17 @@ function AdminEvents() {
                             // Add timestamp to force image reload
                             const imagePathWithTimestamp = `${result.filePath}?t=${Date.now()}`;
                             setEventData(prev => ({ ...prev, [field]: imagePathWithTimestamp }));
-                            showAlert('success', 'Image Uploaded!', `Image "${file.name}" uploaded successfully!`);
+                            const fileType = field === 'pdfUrl' ? 'PDF' : 'Image';
+                            showAlert('success', `${fileType} Uploaded!`, `${fileType} "${file.name}" uploaded successfully!`);
                         } else {
-                            showAlert('error', 'Upload Failed!', result.message || 'Failed to upload image.');
+                            showAlert('error', 'Upload Failed!', result.message || 'Failed to upload file.');
                         }
                     } else {
-                        showAlert('error', 'Upload Failed!', 'Failed to upload image to server.');
+                        showAlert('error', 'Upload Failed!', 'Failed to upload file to server.');
                     }
                 } catch (error) {
                     console.error('Upload error:', error);
-                    showAlert('error', 'Upload Failed!', 'Failed to upload image. Please try again.');
+                    showAlert('error', 'Upload Failed!', 'Failed to upload file. Please try again.');
                 }
             }
         };
@@ -801,7 +827,8 @@ function AdminEvents() {
     const handleInlineImageBrowse = (eventId, field) => {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
-        fileInput.accept = 'image/*';
+        // Accept images for image fields, PDFs for pdfUrl field
+        fileInput.accept = field === 'pdfUrl' ? '.pdf' : 'image/*';
         fileInput.style.display = 'none';
 
         fileInput.onchange = async (e) => {
@@ -811,7 +838,12 @@ function AdminEvents() {
                     const formData = new FormData();
                     formData.append('file', file);
 
-                    const response = await fetch('https://localhost:5000/api/ImageUpload/event', {
+                    // Use different endpoint for PDF uploads
+                    const uploadEndpoint = field === 'pdfUrl'
+                        ? 'https://localhost:5000/api/ImageUpload/event/pdf'
+                        : 'https://localhost:5000/api/ImageUpload/event';
+
+                    const response = await fetch(uploadEndpoint, {
                         method: 'POST',
                         body: formData
                     });
@@ -822,16 +854,17 @@ function AdminEvents() {
                             // Add timestamp to force image reload
                             const imagePathWithTimestamp = `${result.filePath}?t=${Date.now()}`;
                             handleInlineInputChange(eventId, field, imagePathWithTimestamp);
-                            showAlert('success', 'Image Uploaded!', `Image "${file.name}" uploaded successfully!`);
+                            const fileType = field === 'pdfUrl' ? 'PDF' : 'Image';
+                            showAlert('success', `${fileType} Uploaded!`, `${fileType} "${file.name}" uploaded successfully!`);
                         } else {
-                            showAlert('error', 'Upload Failed!', result.message || 'Failed to upload image.');
+                            showAlert('error', 'Upload Failed!', result.message || 'Failed to upload file.');
                         }
                     } else {
-                        showAlert('error', 'Upload Failed!', 'Failed to upload image to server.');
+                        showAlert('error', 'Upload Failed!', 'Failed to upload file to server.');
                     }
                 } catch (error) {
                     console.error('Upload error:', error);
-                    showAlert('error', 'Upload Failed!', 'Failed to upload image. Please try again.');
+                    showAlert('error', 'Upload Failed!', 'Failed to upload file. Please try again.');
                 }
             }
         };
@@ -1495,6 +1528,60 @@ function AdminEvents() {
                                         </div>
                                     </div>
 
+                                    {/* PDF Section */}
+                                    <div className="form-group">
+                                        <label>PDF Fayl</label>
+                                        <div className="image-upload-container">
+                                            <div className="image-preview-container">
+                                                <div className="image-preview">
+                                                    {currentData.pdfUrl ? (
+                                                        <div className="image-preview-item">
+                                                            <div className="image-preview-content">
+                                                                <span className="pdf-preview" title={getPdfFilename(currentData.pdfUrl)}>
+                                                                    {getPdfFilename(currentData.pdfUrl)}
+                                                                </span>
+                                                            </div>
+                                                            <div className="image-actions">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleInlineImageDelete(event.id, 'pdfUrl')}
+                                                                    className="action-btn delete-btn small"
+                                                                    title="PDF faylı sil"
+                                                                >
+                                                                    <img src={adminDeleteIcon} alt="Delete" className="action-icon" />
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleInlineImageBrowse(event.id, 'pdfUrl')}
+                                                                    className="action-btn refresh-btn small"
+                                                                    title="PDF faylı seç"
+                                                                >
+                                                                    <img src={adminBrowseIcon} alt="Browse" className="action-icon" />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="image-preview-item">
+                                                            <div className="image-preview-content">
+                                                                <span className="no-pdf">PDF yoxdur</span>
+                                                            </div>
+                                                            <div className="image-actions">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleInlineImageBrowse(event.id, 'pdfUrl')}
+                                                                    className="action-btn refresh-btn small"
+                                                                    title="PDF faylı seç"
+                                                                >
+                                                                    <img src={adminBrowseIcon} alt="Browse" className="action-icon" />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div className="form-actions">
                                         <button
                                             className="admin-events-save-btn"
@@ -1914,6 +2001,60 @@ function AdminEvents() {
                                             <div className="admin-events-image-info">
                                                 *Detal şəkillər 347 x 224 ölçüsündə olmalıdır
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* PDF Upload Section */}
+                            <div className="admin-events-form-group">
+                                <label className="admin-events-form-label">PDF Fayl</label>
+                                <div className="admin-events-image-upload-container">
+                                    <div className="admin-events-image-preview-container">
+                                        <div className="admin-events-image-preview">
+                                            {eventData.pdfUrl ? (
+                                                <div className="admin-events-image-preview-item">
+                                                    <div className="admin-events-image-preview-content">
+                                                        <span className="admin-events-pdf-preview" title={getPdfFilename(eventData.pdfUrl)}>
+                                                            {getPdfFilename(eventData.pdfUrl)}
+                                                        </span>
+                                                    </div>
+                                                    <div className="admin-events-image-actions">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleImageDelete('pdfUrl')}
+                                                            className="admin-events-action-btn admin-events-delete-btn small"
+                                                            title="PDF faylı sil"
+                                                        >
+                                                            <img src={adminDeleteIcon} alt="Delete" className="admin-events-action-icon" />
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleImageBrowse('pdfUrl')}
+                                                            className="admin-events-action-btn admin-events-refresh-btn small"
+                                                            title="PDF faylı seç"
+                                                        >
+                                                            <img src={adminBrowseIcon} alt="Browse" className="admin-events-action-icon" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="admin-events-image-preview-item">
+                                                    <div className="admin-events-image-preview-content">
+                                                        <span className="admin-events-no-pdf">PDF yoxdur</span>
+                                                    </div>
+                                                    <div className="admin-events-image-actions">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleImageBrowse('pdfUrl')}
+                                                            className="admin-events-action-btn admin-events-refresh-btn small"
+                                                            title="PDF faylı seç"
+                                                        >
+                                                            <img src={adminBrowseIcon} alt="Browse" className="admin-events-action-icon" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
