@@ -5,3 +5,14 @@
 **/obj/
 **/node_modules/
 **/nodemodules/
+# === Common build/cache/deps ===
+.vs/
+**/.vs/
+**/bin/
+**/obj/
+**/node_modules/
+**/nodemodules/
+
+# temp build outputs
+hospitalApp/temp-build/
+**/temp-build/
