@@ -9,10 +9,14 @@ const RequestModal = ({ isOpen, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
         name: '',
         surname: '',
+        gender: '',
+        role: '',
+        specialty: '',
+        specialtyOther: '',
+        sector: '',
+        institution: '',
         email: '',
-        phone: '',
-        finCode: '',
-        vezife: ''
+        phone: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState({});
@@ -44,6 +48,30 @@ const RequestModal = ({ isOpen, onClose, onSuccess }) => {
             newErrors.surname = t('lastNameRequired');
         }
 
+        if (!formData.gender.trim()) {
+            newErrors.gender = t('genderRequired');
+        }
+
+        if (!formData.role.trim()) {
+            newErrors.role = t('roleRequired');
+        }
+
+        if (!formData.specialty.trim()) {
+            newErrors.specialty = t('specialtyRequired');
+        }
+
+        if (formData.specialty === 'digər' && !formData.specialtyOther.trim()) {
+            newErrors.specialtyOther = t('specialtyOtherRequired');
+        }
+
+        if (!formData.sector.trim()) {
+            newErrors.sector = t('sectorRequired');
+        }
+
+        if (!formData.institution.trim()) {
+            newErrors.institution = t('institutionRequired');
+        }
+
         if (!formData.email.trim()) {
             newErrors.email = t('emailRequired');
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -52,14 +80,6 @@ const RequestModal = ({ isOpen, onClose, onSuccess }) => {
 
         if (!formData.phone.trim()) {
             newErrors.phone = t('phoneRequired');
-        }
-
-        if (!formData.finCode.trim()) {
-            newErrors.finCode = t('finCodeRequired');
-        }
-
-        if (!formData.vezife.trim()) {
-            newErrors.vezife = t('positionRequired');
         }
 
         setErrors(newErrors);
@@ -76,16 +96,26 @@ const RequestModal = ({ isOpen, onClose, onSuccess }) => {
         setIsSubmitting(true);
 
         try {
-            await requestService.createRequest(formData);
+            // Prepare data to send - only include specialtyOther if specialty is 'digər'
+            const dataToSend = {
+                ...formData,
+                specialtyOther: formData.specialty === 'digər' ? formData.specialtyOther : ''
+            };
+
+            await requestService.createRequest(dataToSend);
 
             // Reset form
             setFormData({
                 name: '',
                 surname: '',
+                gender: '',
+                role: '',
+                specialty: '',
+                specialtyOther: '',
+                sector: '',
+                institution: '',
                 email: '',
-                phone: '',
-                finCode: '',
-                vezife: ''
+                phone: ''
             });
 
             // Close modal and notify parent
@@ -122,10 +152,14 @@ const RequestModal = ({ isOpen, onClose, onSuccess }) => {
             setFormData({
                 name: '',
                 surname: '',
+                gender: '',
+                role: '',
+                specialty: '',
+                specialtyOther: '',
+                sector: '',
+                institution: '',
                 email: '',
-                phone: '',
-                finCode: '',
-                vezife: ''
+                phone: ''
             });
             setErrors({});
             onClose();
@@ -202,6 +236,127 @@ const RequestModal = ({ isOpen, onClose, onSuccess }) => {
                         </div>
 
                         <div className="request-form-group">
+                            <label>{t('gender')} *</label>
+                            <div className="radio-group">
+                                <label className="radio-option">
+                                    <input
+                                        type="radio"
+                                        name="gender"
+                                        value="Kişi"
+                                        checked={formData.gender === 'Kişi'}
+                                        onChange={handleInputChange}
+                                        disabled={isSubmitting}
+                                    />
+                                    <span>{t('male')}</span>
+                                </label>
+                                <label className="radio-option">
+                                    <input
+                                        type="radio"
+                                        name="gender"
+                                        value="Qadın"
+                                        checked={formData.gender === 'Qadın'}
+                                        onChange={handleInputChange}
+                                        disabled={isSubmitting}
+                                    />
+                                    <span>{t('female')}</span>
+                                </label>
+                            </div>
+                            {errors.gender && <span className="error-message">{errors.gender}</span>}
+                        </div>
+
+                        <div className="request-form-group">
+                            <label htmlFor="role">{t('role')} *</label>
+                            <select
+                                id="role"
+                                name="role"
+                                className={`request-form-input ${errors.role ? 'error' : ''}`}
+                                value={formData.role}
+                                onChange={handleInputChange}
+                                required
+                                disabled={isSubmitting}
+                            >
+                                <option value="">{t('selectRole')}</option>
+                                <option value="həkim-mütəxəssis">{t('roleDoctorSpecialist')}</option>
+                                <option value="həkim">{t('roleDoctor')}</option>
+                                <option value="rezident">{t('roleResident')}</option>
+                                <option value="tələbə">{t('roleStudent')}</option>
+                                <option value="tibb bacısı">{t('roleNurse')}</option>
+                            </select>
+                            {errors.role && <span className="error-message">{errors.role}</span>}
+                        </div>
+
+                        <div className="request-form-group">
+                            <label htmlFor="specialty">{t('specialty')} *</label>
+                            <select
+                                id="specialty"
+                                name="specialty"
+                                className={`request-form-input ${errors.specialty ? 'error' : ''}`}
+                                value={formData.specialty}
+                                onChange={handleInputChange}
+                                required
+                                disabled={isSubmitting}
+                            >
+                                <option value="">{t('selectSpecialty')}</option>
+                                <option value="ümumi cərrah">{t('specialtyGeneralSurgeon')}</option>
+                                <option value="gastroenteroloq">{t('specialtyGastroenterologist')}</option>
+                                <option value="radioloq">{t('specialtyRadiologist')}</option>
+                                <option value="onkoloq">{t('specialtyOncologist')}</option>
+                                <option value="patoloq">{t('specialtyPathologist')}</option>
+                                <option value="digər">{t('specialtyOtherText')}</option>
+                            </select>
+                            {errors.specialty && <span className="error-message">{errors.specialty}</span>}
+                            {formData.specialty === 'digər' && (
+                                <>
+                                    <input
+                                        type="text"
+                                        name="specialtyOther"
+                                        className={`request-form-input ${errors.specialtyOther ? 'error' : ''}`}
+                                        value={formData.specialtyOther}
+                                        onChange={handleInputChange}
+                                        placeholder={t('enterSpecialtyOther')}
+                                        disabled={isSubmitting}
+                                        style={{ marginTop: '8px' }}
+                                    />
+                                    {errors.specialtyOther && <span className="error-message">{errors.specialtyOther}</span>}
+                                </>
+                            )}
+                        </div>
+
+                        <div className="request-form-group">
+                            <label htmlFor="sector">{t('sector')} *</label>
+                            <select
+                                id="sector"
+                                name="sector"
+                                className={`request-form-input ${errors.sector ? 'error' : ''}`}
+                                value={formData.sector}
+                                onChange={handleInputChange}
+                                required
+                                disabled={isSubmitting}
+                            >
+                                <option value="">{t('selectSector')}</option>
+                                <option value="dövlət">{t('sectorState')}</option>
+                                <option value="özəl">{t('sectorPrivate')}</option>
+                            </select>
+                            {errors.sector && <span className="error-message">{errors.sector}</span>}
+                        </div>
+
+                        <div className="request-form-group">
+                            <label htmlFor="institution">{t('institution')} *</label>
+                            <input
+                                type="text"
+                                id="institution"
+                                name="institution"
+                                className={`request-form-input ${errors.institution ? 'error' : ''}`}
+                                value={formData.institution}
+                                onChange={handleInputChange}
+                                required
+                                placeholder={t('enterInstitution')}
+                                disabled={isSubmitting}
+                            />
+                            {errors.institution && <span className="error-message">{errors.institution}</span>}
+                        </div>
+
+                        <div className="request-form-group">
                             <label htmlFor="phone">{t('phone')} *</label>
                             <input
                                 type="tel"
@@ -210,46 +365,11 @@ const RequestModal = ({ isOpen, onClose, onSuccess }) => {
                                 className={`request-form-input ${errors.phone ? 'error' : ''}`}
                                 value={formData.phone}
                                 onChange={handleInputChange}
-                                maxLength={20}
                                 required
                                 placeholder={t('enterPhone')}
                                 disabled={isSubmitting}
                             />
                             {errors.phone && <span className="error-message">{errors.phone}</span>}
-                        </div>
-
-                        <div className="request-form-group">
-                            <label htmlFor="finCode">{t('finCode')} *</label>
-                            <input
-                                type="text"
-                                id="finCode"
-                                name="finCode"
-                                className={`request-form-input ${errors.finCode ? 'error' : ''}`}
-                                value={formData.finCode}
-                                onChange={handleInputChange}
-                                maxLength={20}
-                                required
-                                placeholder={t('enterFinCode')}
-                                disabled={isSubmitting}
-                            />
-                            {errors.finCode && <span className="error-message">{errors.finCode}</span>}
-                        </div>
-
-                        <div className="request-form-group">
-                            <label htmlFor="vezife">{t('position')} *</label>
-                            <input
-                                type="text"
-                                id="vezife"
-                                name="vezife"
-                                className={`request-form-input ${errors.vezife ? 'error' : ''}`}
-                                value={formData.vezife}
-                                onChange={handleInputChange}
-                                maxLength={200}
-                                required
-                                placeholder={t('enterPosition')}
-                                disabled={isSubmitting}
-                            />
-                            {errors.vezife && <span className="error-message">{errors.vezife}</span>}
                         </div>
                     </div>
 

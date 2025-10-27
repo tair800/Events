@@ -87,6 +87,31 @@ namespace HospitalAPI.Controllers
                     return BadRequest("Surname is required");
                 }
 
+                if (string.IsNullOrWhiteSpace(request.Gender))
+                {
+                    return BadRequest("Gender is required");
+                }
+
+                if (string.IsNullOrWhiteSpace(request.Role))
+                {
+                    return BadRequest("Role is required");
+                }
+
+                if (string.IsNullOrWhiteSpace(request.Specialty))
+                {
+                    return BadRequest("Specialty is required");
+                }
+
+                if (string.IsNullOrWhiteSpace(request.Sector))
+                {
+                    return BadRequest("Sector is required");
+                }
+
+                if (string.IsNullOrWhiteSpace(request.Institution))
+                {
+                    return BadRequest("Institution is required");
+                }
+
                 if (string.IsNullOrWhiteSpace(request.Email))
                 {
                     return BadRequest("Email is required");
@@ -95,16 +120,6 @@ namespace HospitalAPI.Controllers
                 if (string.IsNullOrWhiteSpace(request.Phone))
                 {
                     return BadRequest("Phone is required");
-                }
-
-                if (string.IsNullOrWhiteSpace(request.FinCode))
-                {
-                    return BadRequest("Fin code is required");
-                }
-
-                if (string.IsNullOrWhiteSpace(request.Vezife))
-                {
-                    return BadRequest("Vezife is required");
                 }
 
                 // Validate email format
@@ -158,10 +173,14 @@ namespace HospitalAPI.Controllers
                 // Update all fields
                 existingRequest.Name = request.Name ?? existingRequest.Name;
                 existingRequest.Surname = request.Surname ?? existingRequest.Surname;
+                existingRequest.Gender = request.Gender ?? existingRequest.Gender;
+                existingRequest.Role = request.Role ?? existingRequest.Role;
+                existingRequest.Specialty = request.Specialty ?? existingRequest.Specialty;
+                existingRequest.SpecialtyOther = request.SpecialtyOther ?? existingRequest.SpecialtyOther;
+                existingRequest.Sector = request.Sector ?? existingRequest.Sector;
+                existingRequest.Institution = request.Institution ?? existingRequest.Institution;
                 existingRequest.Email = request.Email ?? existingRequest.Email;
                 existingRequest.Phone = request.Phone ?? existingRequest.Phone;
-                existingRequest.FinCode = request.FinCode ?? existingRequest.FinCode;
-                existingRequest.Vezife = request.Vezife ?? existingRequest.Vezife;
                 existingRequest.UpdatedAt = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();

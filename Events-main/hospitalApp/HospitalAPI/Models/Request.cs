@@ -10,33 +10,38 @@ namespace HospitalAPI.Models
         public int Id { get; set; }
         
         [Required]
-        [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
         
         [Required]
-        [MaxLength(100)]
         public string Surname { get; set; } = string.Empty;
         
         [Required]
-        [MaxLength(255)]
+        public string Gender { get; set; } = string.Empty; // Kişi, Qadın
+        
+        [Required]
+        public string Role { get; set; } = string.Empty; // həkim-mütəxəssis, həkim, rezident, tələbə, tibb bacısı
+        
+        [Required]
+        public string Specialty { get; set; } = string.Empty; // ümumi cərrah, gastroenteroloq, radioloq, onkoloq, patoloq, digər
+        
+        public string? SpecialtyOther { get; set; } // Only used when Specialty = "digər"
+        
+        [Required]
+        public string Sector { get; set; } = string.Empty; // dövlət, özəl
+        
+        [Required]
+        public string Institution { get; set; } = string.Empty; // Çalışdığınız qurum
+        
+        [Required]
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
         
         [Required]
-        [MaxLength(20)]
         public string Phone { get; set; } = string.Empty;
         
         [Required]
         [MaxLength(20)]
-        public string FinCode { get; set; } = string.Empty;
-        
-        [Required]
-        [MaxLength(200)]
-        public string Vezife { get; set; } = string.Empty;
-        
-        [Required]
-        [MaxLength(20)]
-        public string Status { get; set; } = "pending";
+        public string Status { get; set; } = "pending"; // pending, completed
         
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         

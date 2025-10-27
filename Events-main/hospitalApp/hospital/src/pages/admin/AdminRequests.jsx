@@ -304,6 +304,35 @@ function AdminRequests() {
                                             <span>{request.surname}</span>
                                         </div>
                                         <div className="request-info-item">
+                                            <label>Cinsiyyət:</label>
+                                            <span>{request.gender || 'N/A'}</span>
+                                        </div>
+                                        <div className="request-info-item">
+                                            <label>Status:</label>
+                                            <span>{request.role || 'N/A'}</span>
+                                        </div>
+                                        <div className="request-info-item">
+                                            <label>İxtisas:</label>
+                                            <span>{request.specialty || 'N/A'}</span>
+                                        </div>
+                                        {request.specialtyOther && (
+                                            <div className="request-info-item">
+                                                <label>Digər İxtisas:</label>
+                                                <span>{request.specialtyOther}</span>
+                                            </div>
+                                        )}
+                                        <div className="request-info-item">
+                                            <label>Sektor:</label>
+                                            <span>{request.sector || 'N/A'}</span>
+                                        </div>
+                                        <div className="request-info-item">
+                                            <label>Qurum:</label>
+                                            <span>{request.institution || 'N/A'}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="request-info-right">
+                                        <div className="request-info-item">
                                             <label>E-poçt:</label>
                                             <span>{request.email}</span>
                                         </div>
@@ -311,22 +340,10 @@ function AdminRequests() {
                                             <label>Telefon:</label>
                                             <span>{request.phone}</span>
                                         </div>
-                                    </div>
-
-                                    <div className="request-info-right">
-                                        <div className="request-info-item">
-                                            <label>Fin Kod:</label>
-                                            <span>{request.finCode}</span>
-                                        </div>
-                                        <div className="request-info-item">
-                                            <label>Vəzifə:</label>
-                                            <span>{request.vezife}</span>
-                                        </div>
                                         <div className="request-info-item">
                                             <label>Yaradılma Tarixi:</label>
                                             <span>{formatDate(request.createdAt)}</span>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>

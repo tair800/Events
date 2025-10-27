@@ -6,11 +6,23 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
     padding: 20px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .request-modal {
@@ -22,6 +34,19 @@
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .request-modal-header {
@@ -55,11 +80,6 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    transition: background-color 0.2s ease;
-}
-
-.request-modal-close:hover {
-    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .request-modal-close:focus,
@@ -92,6 +112,51 @@
 .request-form-group {
     display: flex;
     flex-direction: column;
+    animation: fadeInUp 0.4s ease-out backwards;
+}
+
+.request-form-group:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.request-form-group:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.request-form-group:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.request-form-group:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.request-form-group:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+.request-form-group:nth-child(6) {
+    animation-delay: 0.3s;
+}
+
+.request-form-group:nth-child(7) {
+    animation-delay: 0.35s;
+}
+
+.request-form-group:nth-child(8) {
+    animation-delay: 0.4s;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .request-form-group label {
@@ -106,9 +171,22 @@
     border: 2px solid #e5e7eb;
     border-radius: 8px;
     font-size: 16px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: all 0.2s ease;
     background-color: #f9fafb;
     color: #000000;
+}
+
+/* Fix autofill color issues */
+.request-form-input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: #000000 !important;
+    background-color: white !important;
+}
+
+.request-form-input:-webkit-autofill:hover,
+.request-form-input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: #000000 !important;
 }
 
 .request-form-input:focus {
@@ -117,12 +195,30 @@
     box-shadow: 0 0 0 3px rgba(27, 27, 63, 0.1);
     background-color: white;
     color: #000000;
+    transform: translateY(-1px);
 }
 
 .request-form-input.error {
     border-color: #ef4444;
     background-color: #fef2f2;
     color: #000000;
+    animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
 }
 
 .request-form-input:disabled {
@@ -132,11 +228,81 @@
     color: #000000;
 }
 
+/* Radio Button Styles */
+.radio-group {
+    display: flex;
+    gap: 24px;
+    margin-top: 8px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+
+.radio-option:hover {
+    background-color: #f3f4f6;
+}
+
+.radio-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    cursor: pointer;
+    accent-color: #1B1B3F;
+    transition: all 0.2s ease;
+}
+
+.radio-option:hover input[type="radio"] {
+    transform: scale(1.1);
+}
+
+.radio-option input[type="radio"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.radio-option span {
+    user-select: none;
+}
+
+/* Select Dropdown Styles */
+.request-form-input select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23374151' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+.request-form-input select option {
+    background-color: white;
+    color: #000000;
+}
+
 .error-message {
     color: #ef4444;
     font-size: 12px;
     margin-top: 4px;
     font-weight: 500;
+    animation: fadeInError 0.3s ease-out;
+}
+
+@keyframes fadeInError {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .request-modal-actions {
@@ -168,6 +334,12 @@
 .request-modal-cancel:hover:not(:disabled) {
     background-color: #e5e7eb;
     border-color: #d1d5db;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.request-modal-cancel:active:not(:disabled) {
+    transform: translateY(0);
 }
 
 .request-modal-submit {
@@ -178,8 +350,13 @@
 
 .request-modal-submit:hover:not(:disabled) {
     background: linear-gradient(135deg, #2D2D5F 0%, #1B1B3F 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(27, 27, 63, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(27, 27, 63, 0.4);
+}
+
+.request-modal-submit:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(27, 27, 63, 0.3);
 }
 
 .request-modal-submit:disabled {
