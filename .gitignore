@@ -1,0 +1,7 @@
+# === Common build/cache/deps ===
+.vs/
+**/.vs/
+**/bin/
+**/obj/
+**/node_modules/
+**/nodemodules/
