@@ -20,7 +20,8 @@ import {
   Error404,
   UserLogin,
   UserRegister,
-  AccountPage
+  AccountPage,
+  AccountDetails
 } from './pages'
 import { TestPage } from './pages'
 import Dashboard from './pages/admin/Dashboard'
@@ -71,12 +72,28 @@ function App() {
                   <Footer />
                 </>
               } />
-              <Route path="/login" element={<UserLogin />} />
-              <Route path="/register" element={<UserRegister />} />
+              <Route path="/login" element={
+                <>
+                  <Header showTopImage={false} />
+                  <UserLogin />
+                </>
+              } />
+              <Route path="/register" element={
+                <>
+                  <Header showTopImage={false} />
+                  <UserRegister />
+                </>
+              } />
               <Route path="/account" element={
                 <>
-                  <Header showTopImage={true} />
+                  <Header showTopImage={true} hidePageName={true} showAccountTabs={true} />
                   <AccountPage />
+                </>
+              } />
+              <Route path="/account/details" element={
+                <>
+                  <Header showTopImage={true} hidePageName={true} showAccountTabs={true} />
+                  <AccountDetails />
                 </>
               } />
               <Route path="/employee" element={

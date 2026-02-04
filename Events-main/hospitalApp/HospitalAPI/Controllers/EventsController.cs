@@ -275,6 +275,17 @@ namespace HospitalAPI.Controllers
                     return BadRequest("Price cannot be negative");
                 }
 
+                if (eventItem.DiscountedPrice.HasValue && eventItem.DiscountedPrice < 0)
+                {
+                    return BadRequest("Discounted price cannot be negative");
+                }
+
+                if (eventItem.DiscountedPrice.HasValue && eventItem.Price.HasValue &&
+                    eventItem.DiscountedPrice > eventItem.Price)
+                {
+                    return BadRequest("Discounted price cannot be greater than price");
+                }
+
                 // Log the creation for debugging
                 Console.WriteLine($"Creating Event: Price={eventItem.Price}, Currency={eventItem.Currency}, IsFree={eventItem.IsFree}");
 
@@ -319,6 +330,17 @@ namespace HospitalAPI.Controllers
                     return BadRequest("Price cannot be negative");
                 }
 
+                if (eventItem.DiscountedPrice.HasValue && eventItem.DiscountedPrice < 0)
+                {
+                    return BadRequest("Discounted price cannot be negative");
+                }
+
+                if (eventItem.DiscountedPrice.HasValue && eventItem.Price.HasValue &&
+                    eventItem.DiscountedPrice > eventItem.Price)
+                {
+                    return BadRequest("Discounted price cannot be greater than price");
+                }
+
                 // Update all properties
                 existingEvent.Title = eventItem.Title;
                 existingEvent.Subtitle = eventItem.Subtitle;
@@ -330,6 +352,7 @@ namespace HospitalAPI.Controllers
                 existingEvent.Trainer = eventItem.Trainer;
                 existingEvent.Region = eventItem.Region;
                 existingEvent.Price = eventItem.Price;
+                existingEvent.DiscountedPrice = eventItem.DiscountedPrice;
                 existingEvent.Currency = eventItem.Currency;
                 existingEvent.MainImage = eventItem.MainImage;
                 existingEvent.DetailImageLeft = eventItem.DetailImageLeft;

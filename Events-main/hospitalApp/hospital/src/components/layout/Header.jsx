@@ -10,7 +10,7 @@ import SpotlightNav from './SpotlightNav'
 import { useLanguage, useUserAuth } from '../../context'
 import { useTranslation } from '../../hooks/useTranslation'
 
-function Header({ showTopImage = false, customTopImage = null, hidePageName = false }) {
+function Header({ showTopImage = false, customTopImage = null, hidePageName = false, showAccountTabs = false }) {
     const [activePage, setActivePage] = useState('home');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
@@ -113,6 +113,21 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
+    const accountTabs = [
+        { id: 'dashboard', label: 'İdarəetmə paneli', icon: '/assets/account-dashboard.svg', path: '/account' },
+        { id: 'details', label: 'Hesab məlumatları', icon: '/assets/account-user.svg', path: '/account/details' },
+        { id: 'events', label: 'Tədbirlər', icon: '/assets/account-event.svg' },
+        { id: 'benefits', label: 'Membership Benefits', icon: '/assets/account-heart.svg' }
+    ];
+
+    const isAccountTabActive = (tab) => {
+        if (!tab.path) return false;
+        if (tab.path === '/account') {
+            return location.pathname === '/account';
+        }
+        return location.pathname.startsWith(tab.path);
+    };
+
     return (
         <header className={isHomePage ? 'home-page-header' : isEmployeeDetailPage ? 'employee-detail-page-header' : isBlogDetailPage ? 'blog-detail-page-header' : isGalleryPage ? 'gallery-page-header' : ''}>
             {showTopImage && (
@@ -206,6 +221,24 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
                     )}
                 </div>
             </div>
+
+            {showAccountTabs && (
+                <div className="account-top-tabs account-top-tabs--header">
+                    {accountTabs.map((tab) => (
+                        <button
+                            key={tab.id}
+                            className={`account-tab ${isAccountTabActive(tab) ? 'active' : ''}`}
+                            type="button"
+                            onClick={() => {
+                                if (tab.path) navigate(tab.path);
+                            }}
+                        >
+                            <span className="account-tab-icon" style={{ '--icon-url': `url(${tab.icon})` }} aria-hidden="true" />
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+            )}
 
             {!hidePageName && (
                 <div className="page-name-display">

@@ -51,7 +51,12 @@ namespace HospitalAPI.Services.Auth
                 Email = userForRegistration.Email,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
-                RoleId = role.Id
+                RoleId = role.Id,
+                FirstName = userForRegistration.FirstName?.Trim(),
+                LastName = userForRegistration.LastName?.Trim(),
+                Phone = userForRegistration.Phone?.Trim(),
+                Position = userForRegistration.Position?.Trim(),
+                FinCode = userForRegistration.FinCode?.Trim()
             };
 
             await _context.Users.AddAsync(user);

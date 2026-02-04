@@ -6,7 +6,7 @@ import { ROUTES } from '../../utils'
 import './Auth.css'
 
 const UserLogin = () => {
-    const [username, setUsername] = useState('')
+    const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
@@ -19,8 +19,8 @@ const UserLogin = () => {
         setLoading(true)
 
         try {
-            const response = await authService.login({ username, password })
-            login({ token: response.token, username, role: 'User' })
+            const response = await authService.login({ username: email, password })
+            login({ token: response.token, username: email, role: 'User' })
             navigate(ROUTES.HOME)
         } catch (err) {
             setError(err.message || 'Login failed')
@@ -30,37 +30,46 @@ const UserLogin = () => {
     }
 
     return (
-        <div className="auth-page">
-            <div className="auth-card">
-                <h1>User Login</h1>
+        <div className="auth-page auth-page--login">
+            <video className="auth-video" autoPlay muted loop playsInline>
+                <source src="/assets/home-video.mp4" type="video/mp4" />
+            </video>
+            <div className="auth-overlay" />
+            <div className="auth-card auth-card--login">
+                <h1>Daxil olun</h1>
                 {error && <div className="auth-message">{error}</div>}
                 <form onSubmit={handleSubmit}>
                     <div className="auth-field">
-                        <label htmlFor="login-username">Username</label>
+                        <label htmlFor="login-email">Email</label>
                         <input
-                            id="login-username"
-                            type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            id="login-email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="E-mailinizi daxil edin"
                             required
                         />
                     </div>
                     <div className="auth-field">
-                        <label htmlFor="login-password">Password</label>
+                        <label htmlFor="login-password">Şifrə</label>
                         <input
                             id="login-password"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Şifrənizi daxil edin"
                             required
                         />
                     </div>
-                    <div className="auth-actions">
-                        <button className="auth-primary" type="submit" disabled={loading}>
-                            {loading ? 'Signing in...' : 'Login'}
+                    <div className="auth-login-row">
+                        <span className="auth-login-forgot">Şifrənizi unutmusunuz?</span>
+                    </div>
+                    <div className="auth-actions auth-actions--login">
+                        <button className="auth-primary auth-primary--login" type="submit" disabled={loading}>
+                            {loading ? 'Daxil olunur...' : 'Daxil ol'}
                         </button>
-                        <Link className="auth-secondary" to={ROUTES.REGISTER}>
-                            Create an account
+                        <Link className="auth-secondary auth-secondary--login" to={ROUTES.REGISTER}>
+                            Hesabınız yoxdur? <span>Qeydiyyatdan keçin</span>
                         </Link>
                     </div>
                 </form>

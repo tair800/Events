@@ -50,6 +50,7 @@ namespace HospitalAPI.Data
                 entity.Property(e => e.DetailImageMain).HasMaxLength(500);
                 entity.Property(e => e.DetailImageRight).HasMaxLength(500);
                 entity.Property(e => e.Price).HasColumnType("REAL");
+                entity.Property(e => e.DiscountedPrice).HasColumnType("REAL");
                 // English language fields
                 entity.Property(e => e.TitleEn).HasMaxLength(200);
                 entity.Property(e => e.SubtitleEn).HasMaxLength(300);
@@ -374,6 +375,11 @@ namespace HospitalAPI.Data
                 entity.HasKey(u => u.Id);
                 entity.Property(u => u.Username).IsRequired().HasMaxLength(255);
                 entity.Property(u => u.Email).IsRequired().HasMaxLength(255);
+                entity.Property(u => u.FirstName).HasMaxLength(100);
+                entity.Property(u => u.LastName).HasMaxLength(100);
+                entity.Property(u => u.Phone).HasMaxLength(50);
+                entity.Property(u => u.Position).HasMaxLength(150);
+                entity.Property(u => u.FinCode).HasMaxLength(20);
                 entity.Property(u => u.PasswordHash).IsRequired();
                 entity.Property(u => u.PasswordSalt).IsRequired();
                 entity.Property(u => u.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");

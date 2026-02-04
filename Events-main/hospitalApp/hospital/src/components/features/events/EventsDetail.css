@@ -613,6 +613,67 @@
 }
 
 /* Countdown Timer */
+.event-detail-price-badge {
+    position: absolute;
+    left: 71px;
+    top: 13%;
+    transform: translateY(-50%);
+    width: 259px;
+    z-index: 2;
+}
+
+.event-detail-price-badge .price-badge-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.event-detail-price-badge .price-badge-logo {
+    position: absolute;
+    right: 7px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 66px;
+    height: auto;
+    object-fit: contain;
+}
+
+.event-detail-price-badge .price-badge-info {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    max-width: calc(100% - 90px);
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.event-detail-price-badge .price-row {
+    display: inline-flex;
+    align-items: baseline;
+    margin-left: 11px;
+    gap: 0.5rem;
+    font-family: 'Questrial:Regular', sans-serif;
+}
+
+.event-detail-price-badge .price-original {
+    text-decoration: line-through;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.8rem;
+    font-weight: 500;
+}
+
+.event-detail-price-badge .price-discount {
+    background: linear-gradient(78.03deg, #77C963 2.35%, #FFFFFF 97.65%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-size: 2.1rem;
+    font-weight: 700;
+}
+
+
 .countdown-timer {
     position: absolute;
     left: 71px;

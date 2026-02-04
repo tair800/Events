@@ -18,6 +18,7 @@ export const ROUTES = {
   LOGIN: '/login',
   REGISTER: '/register',
   ACCOUNT: '/account',
+  ACCOUNT_DETAILS: '/account/details',
 }
 
 // Pagination

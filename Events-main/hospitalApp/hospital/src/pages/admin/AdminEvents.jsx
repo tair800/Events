@@ -38,6 +38,7 @@ function AdminEvents() {
         trainer: '',
         region: '',
         price: 0,
+        discountedPrice: null,
         currency: 'AZN',
         mainImage: '',
         detailImageLeft: '',
@@ -639,6 +640,21 @@ function AdminEvents() {
 
             // Format the date safely
             let dataToSend = { ...editedData };
+            const priceValue = dataToSend.price ?? 0;
+            if (dataToSend.discountedPrice != null) {
+                if (dataToSend.discountedPrice < 0) {
+                    showAlert('error', 'Error!', 'Discounted price cannot be negative.');
+                    return;
+                }
+                if (priceValue < 0) {
+                    showAlert('error', 'Error!', 'Price cannot be negative.');
+                    return;
+                }
+                if (dataToSend.discountedPrice > priceValue) {
+                    showAlert('error', 'Error!', 'Discounted price cannot be greater than price.');
+                    return;
+                }
+            }
             if (editedData.eventDate) {
                 try {
                     const dateToFormat = editedData.eventDate.includes('T') ? editedData.eventDate : `${editedData.eventDate}T${editedData.time || '00:00'}`;
@@ -716,6 +732,7 @@ function AdminEvents() {
             trainer: '',
             region: '',
             price: 0,
+            discountedPrice: null,
             currency: 'AZN',
             mainImage: '',
             detailImageLeft: '',
@@ -902,6 +919,20 @@ function AdminEvents() {
         e.preventDefault();
         try {
             setLoading(true);
+            if (eventData.discountedPrice != null) {
+                if (eventData.discountedPrice < 0) {
+                    showAlert('error', 'Error!', 'Discounted price cannot be negative.');
+                    return;
+                }
+                if (eventData.price < 0) {
+                    showAlert('error', 'Error!', 'Price cannot be negative.');
+                    return;
+                }
+                if (eventData.discountedPrice > eventData.price) {
+                    showAlert('error', 'Error!', 'Discounted price cannot be greater than price.');
+                    return;
+                }
+            }
 
             // Format the date and time safely
             let eventDateToSend = '';
@@ -1347,6 +1378,25 @@ function AdminEvents() {
                                                         <option value="USD">USD</option>
                                                         <option value="EUR">EUR</option>
                                                     </select>
+                                                </div>
+                                                <label>Endirimli qiymət</label>
+                                                <div className="price-input-group">
+                                                    <input
+                                                        type="number"
+                                                        className="form-input price-input"
+                                                        value={currentData.discountedPrice ?? ''}
+                                                        onChange={(e) => {
+                                                            const value = e.target.value;
+                                                            handleInlineInputChange(
+                                                                event.id,
+                                                                'discountedPrice',
+                                                                value === '' ? null : parseFloat(value)
+                                                            );
+                                                        }}
+                                                        min="0"
+                                                        step="0.01"
+                                                        placeholder="Endirimli qiymət"
+                                                    />
                                                 </div>
                                             </div>
 
@@ -1798,6 +1848,26 @@ function AdminEvents() {
                                                 <option value="USD">USD</option>
                                                 <option value="EUR">EUR</option>
                                             </select>
+                                        </div>
+                                        <label htmlFor="discountedPrice">Discounted price</label>
+                                        <div className="price-input-group">
+                                            <input
+                                                type="number"
+                                                id="discountedPrice"
+                                                name="discountedPrice"
+                                                className="admin-events-form-input price-input"
+                                                value={eventData.discountedPrice ?? ''}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    setEventData(prev => ({
+                                                        ...prev,
+                                                        discountedPrice: value === '' ? null : parseFloat(value)
+                                                    }));
+                                                }}
+                                                min="0"
+                                                step="0.01"
+                                                placeholder="Discounted price"
+                                            />
                                         </div>
                                     </div>
 

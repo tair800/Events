@@ -214,7 +214,27 @@ const Home = () => {
     // Helper function to format price
     const formatPrice = (price, currency) => {
         if (price === 0 || price === '0' || price === null || price === undefined) return t('free');
-        return `${price} ${currency}`;
+        const symbols = {
+            USD: '$',
+            EUR: '€',
+            GBP: '£',
+            AZN: '₼'
+        };
+        const symbol = symbols[currency];
+        if (!symbol) {
+            return `${price} ${currency}`;
+        }
+        if (currency === 'USD' || currency === 'EUR' || currency === 'GBP') {
+            return `${symbol}${price}`;
+        }
+        return `${price} ${symbol}`;
+    };
+
+    const hasDiscount = (event) => {
+        if (!event) return false;
+        if (event.price === 0 || event.price === '0' || event.price === null || event.price === undefined) return false;
+        if (event.discountedPrice === null || event.discountedPrice === undefined) return false;
+        return event.discountedPrice < event.price;
     };
 
 
@@ -276,6 +296,9 @@ const Home = () => {
                             heroEvents.map((event, index) => {
                                 const { day, month } = formatEventDate(event.eventDate);
                                 const formattedPrice = formatPrice(event.price, event.currency);
+                                const formattedDiscountPrice = hasDiscount(event)
+                                    ? formatPrice(event.discountedPrice, event.currency)
+                                    : null;
                                 const eventDate = new Date(event.eventDate);
                                 // Language-aware time formatting
                                 const localeMap = {
@@ -316,7 +339,18 @@ const Home = () => {
                                                     </div>
                                                     {event.price !== 0 && event.price !== '0' && event.price !== null && event.price !== undefined && (
                                                         <div className="home-hero-event-price">
-                                                            {t('price')}: {formattedPrice}
+                                                            {t('price')}:{" "}
+                                                            {formattedDiscountPrice ? (
+                                                                <div className="price-stack">
+                                                                    <div className="price-row">
+                                                                        <span className="price-original">{formattedPrice}</span>
+                                                                        <span className="price-discount">{formattedDiscountPrice}</span>
+                                                                    </div>
+                                                                    <span className="price-note">Üzv ol, endirimli qiymətdən yararlan</span>
+                                                                </div>
+                                                            ) : (
+                                                                formattedPrice
+                                                            )}
                                                         </div>
                                                     )}
                                                     <div className="home-hero-event-buttons">
@@ -511,6 +545,9 @@ const Home = () => {
                         const { day, month } = formatEventDate(event.eventDate);
                         const truncatedDescription = truncateText(event.description, 120);
                         const formattedPrice = formatPrice(event.price, event.currency);
+                        const formattedDiscountPrice = hasDiscount(event)
+                            ? formatPrice(event.discountedPrice, event.currency)
+                            : null;
 
                         return (
                             <div key={event.id} className="home-long-card">
@@ -541,7 +578,19 @@ const Home = () => {
                                             {truncatedDescription}
                                         </p>
 
-                                        <div className="home-event-price">{formattedPrice}</div>
+                                        <div className="home-event-price">
+                                            {formattedDiscountPrice ? (
+                                                <div className="price-stack">
+                                                    <div className="price-row">
+                                                        <span className="price-original">{formattedPrice}</span>
+                                                        <span className="price-discount">{formattedDiscountPrice}</span>
+                                                    </div>
+                                                    <span className="price-note">Üzv ol, endirimli qiymətdən yararlan</span>
+                                                </div>
+                                            ) : (
+                                                formattedPrice
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="card-right-section">

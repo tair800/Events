@@ -25,6 +25,30 @@ const EventsDetail = () => {
     const [timelineLoading, setTimelineLoading] = useState(true);
     const [currentTimelineStart, setCurrentTimelineStart] = useState(0);
     const itemsPerPage = 3;
+    const formatPrice = (price, currency) => {
+        if (price === 0 || price === '0' || price === null || price === undefined) return t('free');
+        const symbols = {
+            USD: '$',
+            EUR: '€',
+            GBP: '£',
+            AZN: '₼'
+        };
+        const symbol = symbols[currency];
+        if (!symbol) {
+            return `${price} ${currency}`;
+        }
+        if (currency === 'USD' || currency === 'EUR' || currency === 'GBP') {
+            return `${symbol}${price}`;
+        }
+        return `${price} ${symbol}`;
+    };
+
+    const hasDiscount = (eventItem) => {
+        if (!eventItem) return false;
+        if (eventItem.price === 0 || eventItem.price === '0' || eventItem.price === null || eventItem.price === undefined) return false;
+        if (eventItem.discountedPrice === null || eventItem.discountedPrice === undefined) return false;
+        return eventItem.discountedPrice < eventItem.price;
+    };
 
     // Fetch timeline data from API
     useEffect(() => {
@@ -287,6 +311,30 @@ const EventsDetail = () => {
             </div>
 
             <div className="events-detail-main-image">
+                <div className="event-detail-price-badge">
+                    <img
+                        src="/assets/event-detailprice.svg"
+                        alt="Event Price Badge"
+                        className="price-badge-image"
+                    />
+                    <div className="price-badge-info">
+                        {hasDiscount(event) ? (
+                            <div className="price-row">
+                                <span className="price-original">{formatPrice(event.price, event.currency)}</span>
+                                <span className="price-discount">{formatPrice(event.discountedPrice, event.currency)}</span>
+                            </div>
+                        ) : (
+                            <div className="price-row">
+                                <span className="price-discount">{formatPrice(event.price, event.currency)}</span>
+                            </div>
+                        )}
+                    </div>
+                    <img
+                        src="/assets/footer.svg"
+                        alt="Hospital Logo"
+                        className="price-badge-logo"
+                    />
+                </div>
                 <div className="countdown-timer">
                     <div className="timer-display">
                         <div className="timer-unit">
