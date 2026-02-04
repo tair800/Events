@@ -7,7 +7,7 @@ import RequestModal from '../ui/RequestModal'
 import './Header.css'
 import StaggeredMenu from './StaggeredMenu'
 import SpotlightNav from './SpotlightNav'
-import { useLanguage } from '../../context'
+import { useLanguage, useUserAuth } from '../../context'
 import { useTranslation } from '../../hooks/useTranslation'
 
 function Header({ showTopImage = false, customTopImage = null, hidePageName = false }) {
@@ -17,6 +17,7 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
     const [isMobile, setIsMobile] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+    const { isAuthenticated, username, logout } = useUserAuth();
     const {
         selectedLanguage,
         isLanguageDropdownOpen,
@@ -66,6 +67,11 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
 
     const handleRequestModalClose = () => {
         setIsRequestModalOpen(false);
+    };
+
+    const handleLogout = () => {
+        logout();
+        navigate('/');
     };
 
 
@@ -186,6 +192,18 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
                         )}
                     </div>
                     <button className="uzv-btn" onClick={handleRequestModalOpen}>{t('joinMember')}</button>
+                    {isAuthenticated ? (
+                        <>
+                            <span className="user-greeting">Hi, {username || 'User'}</span>
+                            <button className="login-btn" onClick={() => navigate('/account')}>Account</button>
+                            <button className="login-btn" onClick={handleLogout}>Logout</button>
+                        </>
+                    ) : (
+                        <>
+                            <button className="login-btn" onClick={() => navigate('/login')}>Login</button>
+                            <button className="register-btn" onClick={() => navigate('/register')}>Register</button>
+                        </>
+                    )}
                 </div>
             </div>
 

@@ -1,8 +1,13 @@
 using HospitalAPI.Data;
 using HospitalAPI.Models;
+using HospitalAPI.Services.Auth;
+using HospitalAPI.Services.AdminAuth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,7 +39,11 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll",
         builder =>
         {
-            builder.WithOrigins("http://localhost:5173", "https://localhost:5173")
+            builder.WithOrigins(
+                      "http://localhost:5173",
+                      "https://localhost:5173",
+                      "http://localhost:5174",
+                      "https://localhost:5174")
                    .AllowAnyMethod()
                    .AllowAnyHeader()
                    .AllowCredentials();
@@ -45,6 +54,27 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddDbContext<HospitalDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAdminAuthService, AdminAuthService>();
+
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? string.Empty))
+        };
+    });
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -63,6 +93,10 @@ using (var scope = app.Services.CreateScope())
             context.Database.Migrate();
         }
         
+        // Seed roles and admin
+        await HospitalAPI.SeedRoles.SeedAsync(context);
+        await HospitalAPI.SeedAdminData.SeedAsync(context);
+
         // Seed event data
         await HospitalAPI.SeedEventData.SeedAsync(context);
         
@@ -104,6 +138,7 @@ app.UseStaticFiles(new StaticFileOptions
     DefaultContentType = "application/octet-stream"
 });
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapGet("/", () => Results.Redirect("/swagger/index.html", permanent: false));

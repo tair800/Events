@@ -15,6 +15,9 @@ export const ROUTES = {
   CONTACT: '/contact',
   ADMIN: '/admin',
   ADMIN_LOGIN: '/admin/login',
+  LOGIN: '/login',
+  REGISTER: '/register',
+  ACCOUNT: '/account',
 }
 
 // Pagination
@@ -32,6 +35,9 @@ export const UPLOAD = {
 // Local Storage Keys
 export const STORAGE_KEYS = {
   ADMIN_AUTH: 'adminAuthenticated',
+  USER_TOKEN: 'userToken',
+  USER_ROLE: 'userRole',
+  USER_NAME: 'userName',
   USER_PREFERENCES: 'userPreferences',
   THEME: 'theme',
 }

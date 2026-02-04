@@ -26,6 +26,9 @@ namespace HospitalAPI.Data
         public DbSet<EventEmployee> EventEmployees { get; set; }
         public DbSet<EventSpeaker> EventSpeakers { get; set; }
         public DbSet<EventTimeline> EventTimeline { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<Admin> Admins { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -355,6 +358,45 @@ namespace HospitalAPI.Data
                     .WithMany()
                     .HasForeignKey(et => et.EventId)
                     .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Configure Role table for SQLite
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.HasKey(r => r.Id);
+                entity.Property(r => r.Name).IsRequired().HasMaxLength(50);
+                entity.HasIndex(r => r.Name).IsUnique();
+            });
+
+            // Configure User table for SQLite
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(u => u.Id);
+                entity.Property(u => u.Username).IsRequired().HasMaxLength(255);
+                entity.Property(u => u.Email).IsRequired().HasMaxLength(255);
+                entity.Property(u => u.PasswordHash).IsRequired();
+                entity.Property(u => u.PasswordSalt).IsRequired();
+                entity.Property(u => u.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(u => u.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.HasIndex(u => u.Username).IsUnique();
+                entity.HasIndex(u => u.Email).IsUnique();
+
+                entity.HasOne(u => u.Role)
+                    .WithMany()
+                    .HasForeignKey(u => u.RoleId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Configure Admin table for SQLite
+            modelBuilder.Entity<Admin>(entity =>
+            {
+                entity.HasKey(a => a.Id);
+                entity.Property(a => a.Username).IsRequired().HasMaxLength(255);
+                entity.Property(a => a.PasswordHash).IsRequired();
+                entity.Property(a => a.PasswordSalt).IsRequired();
+                entity.Property(a => a.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(a => a.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.HasIndex(a => a.Username).IsUnique();
             });
         }
 

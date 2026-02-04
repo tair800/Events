@@ -171,6 +171,25 @@ header {
     background-color: #0056b3;
 }
 
+.register-btn {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.register-btn:hover {
+    background-color: #059669;
+}
+
+.user-greeting {
+    color: #ffffff;
+    font-size: 0.9rem;
+}
+
 .language-selector {
     display: flex;
     align-items: center;
