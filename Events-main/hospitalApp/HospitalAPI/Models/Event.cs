@@ -41,7 +41,7 @@ namespace HospitalAPI.Models
         
         [Column(TypeName = "decimal(10,2)")]
         public decimal? Price { get; set; }
-
+        
         [Column(TypeName = "decimal(10,2)")]
         public decimal? DiscountedPrice { get; set; }
         

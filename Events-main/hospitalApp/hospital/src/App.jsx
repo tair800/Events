@@ -21,7 +21,8 @@ import {
   UserLogin,
   UserRegister,
   AccountPage,
-  AccountDetails
+  AccountDetails,
+  Members
 } from './pages'
 import { TestPage } from './pages'
 import Dashboard from './pages/admin/Dashboard'
@@ -114,6 +115,13 @@ function App() {
                 <>
                   <Header showTopImage={true} />
                   <EventsPage />
+                  <Footer />
+                </>
+              } />
+              <Route path="/members" element={
+                <>
+                  <Header showTopImage={true} />
+                  <Members />
                   <Footer />
                 </>
               } />

@@ -222,7 +222,7 @@ const Home = () => {
         };
         const symbol = symbols[currency];
         if (!symbol) {
-            return `${price} ${currency}`;
+        return `${price} ${currency}`;
         }
         if (currency === 'USD' || currency === 'EUR' || currency === 'GBP') {
             return `${symbol}${price}`;

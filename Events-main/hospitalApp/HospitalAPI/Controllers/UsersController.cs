@@ -50,6 +50,28 @@ namespace HospitalAPI.Controllers
             });
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<UserProfileDto>>> GetUsers()
+        {
+            var users = await _context.Users
+                .OrderByDescending(u => u.CreatedAt)
+                .Select(u => new UserProfileDto
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    Email = u.Email,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Phone = u.Phone,
+                    Position = u.Position,
+                    FinCode = u.FinCode
+                })
+                .ToListAsync();
+
+            return Ok(users);
+        }
+
         [HttpPut("me")]
         public async Task<ActionResult<UserProfileDto>> UpdateProfile([FromBody] UpdateUserProfileDto update)
         {

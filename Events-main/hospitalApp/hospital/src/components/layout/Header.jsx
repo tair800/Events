@@ -46,6 +46,7 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
         { label: t('about'), href: '/about', id: 'about' },
         { label: t('events'), href: '/events', id: 'events' },
         { label: t('members'), href: '/employee', id: 'employee' },
+        { label: t('membersNav'), href: '/members', id: 'members' },
         { label: t('gallery'), href: '/gallery', id: 'gallery' },
         { label: t('blog'), href: '/blog', id: 'blog' },
         { label: t('contact'), href: '/contact', id: 'contact' },
@@ -84,6 +85,8 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
             setActivePage('contact');
         } else if (path === '/employee') {
             setActivePage('employee');
+        } else if (path === '/members') {
+            setActivePage('members');
         } else if (path.startsWith('/employee/')) {
             setActivePage('employee');
         } else if (path === '/events') {

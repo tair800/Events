@@ -91,6 +91,7 @@
     color: inherit;
     opacity: 0.4;
     transition: opacity 0.25s ease-out;
+    white-space: nowrap;
 }
 
 .spotlight-nav-root nav ul li a:is(:hover, :focus-visible) {

@@ -23,6 +23,10 @@ export const userService = {
         })
         return handleResponse(response)
     },
+    getUsers: async () => {
+        const response = await fetch(`${API_CONFIG.BASE_URL}/users`)
+        return handleResponse(response)
+    },
     updateProfile: async (payload) => {
         const response = await fetch(`${API_CONFIG.BASE_URL}/users/me`, {
             method: 'PUT',
