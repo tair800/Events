@@ -35,6 +35,7 @@ export const UserAuthProvider = ({ children }) => {
         localStorage.removeItem(STORAGE_KEYS.USER_TOKEN)
         localStorage.removeItem(STORAGE_KEYS.USER_NAME)
         localStorage.removeItem(STORAGE_KEYS.USER_ROLE)
+        localStorage.removeItem('userProfileCache')
         setToken('')
         setUsername('')
         setRole('User')

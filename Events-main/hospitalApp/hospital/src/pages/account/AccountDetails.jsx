@@ -44,6 +44,7 @@ const AccountDetails = () => {
             try {
                 const data = await userService.getProfile()
                 setProfile(data)
+                localStorage.setItem('userProfileCache', JSON.stringify(data))
                 setFormData({
                     firstName: data.firstName || '',
                     lastName: data.lastName || '',
@@ -135,6 +136,11 @@ const AccountDetails = () => {
                 finCode: formData.finCode?.trim()
             })
             setProfile(updated)
+            localStorage.setItem('userProfileCache', JSON.stringify({
+                ...profile,
+                ...updated
+            }))
+            window.dispatchEvent(new Event('profile-updated'))
 
             const hasPasswordUpdate = passwordData.currentPassword || passwordData.newPassword || passwordData.confirmPassword
             if (hasPasswordUpdate) {

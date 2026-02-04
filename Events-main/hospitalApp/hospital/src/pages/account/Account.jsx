@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import Swal from 'sweetalert2'
 import { useUserAuth } from '../../context'
 import { userService } from '../../services'
 import AccountProfileCard from './AccountProfileCard'
@@ -28,6 +29,7 @@ const Account = () => {
             try {
                 const data = await userService.getProfile()
                 setProfile(data)
+                localStorage.setItem('userProfileCache', JSON.stringify(data))
             } catch (error) {
                 console.error('Failed to load profile:', error)
             }
@@ -36,6 +38,43 @@ const Account = () => {
             loadProfile()
         }
     }, [token])
+
+    const handleToggleMembership = async () => {
+        if (!profile) return
+        const nextIsMember = !profile.isMember
+        try {
+            const updated = await userService.updateProfile({
+                isMember: nextIsMember
+            })
+            setProfile((prev) => ({
+                ...prev,
+                ...updated,
+                isMember: updated?.isMember ?? nextIsMember
+            }))
+            localStorage.setItem('userProfileCache', JSON.stringify({
+                ...profile,
+                ...updated,
+                isMember: updated?.isMember ?? nextIsMember
+            }))
+            window.dispatchEvent(new Event('profile-updated'))
+            Swal.fire({
+                title: 'Uğurlu',
+                text: nextIsMember ? 'Üzvlük aktiv edildi.' : 'Üzvlük deaktiv edildi.',
+                icon: 'success',
+                heightAuto: false,
+                returnFocus: false
+            })
+        } catch (error) {
+            console.error('Failed to update membership:', error)
+            Swal.fire({
+                title: 'Xəta',
+                text: error.message || 'Üzvlük yenilənmədi.',
+                icon: 'error',
+                heightAuto: false,
+                returnFocus: false
+            })
+        }
+    }
 
     return (
         <div className="account-page">
@@ -47,24 +86,49 @@ const Account = () => {
                             <span className="account-card-page">İdarəetmə paneli</span>
                             <h1>Xoş gəlmisiniz, {username || 'istifadəçi'}!</h1>
                         </div>
-                        <button className="account-cta-btn" type="button">Üzv ol</button>
+                        <button className="account-cta-btn" type="button" onClick={handleToggleMembership}>
+                            {profile?.isMember ? 'Üzvlükdən çıx' : 'Üzv ol'}
+                        </button>
                     </div>
-                    <div className="account-card-section-title">Account Details</div>
-                    <div className="account-row">
-                        <span className="account-label">Username</span>
-                        <span className="account-value">{username || '—'}</span>
-                    </div>
-                    <div className="account-row">
-                        <span className="account-label">Role</span>
-                        <span className="account-value">{role || 'User'}</span>
-                    </div>
-                    <div className="account-row">
-                        <span className="account-label">Email</span>
-                        <span className="account-value">{tokenPayload?.email || '—'}</span>
-                    </div>
-                    <div className="account-row">
-                        <span className="account-label">User ID</span>
-                        <span className="account-value">{tokenPayload?.nameid || '—'}</span>
+                    <div className="account-notifications">
+                        <div className="account-notifications-header">
+                            <h2>Notifications</h2>
+                            <button className="account-notifications-action" type="button" aria-label="Play">
+                                ▶
+                            </button>
+                        </div>
+                        <div className="account-notifications-list">
+                            <div className="account-notifications-row header">
+                                <span>Title</span>
+                                <span>Price</span>
+                                <span>Date</span>
+                                <span>Status</span>
+                            </div>
+                            <div className="account-notifications-row">
+                                <span className="notification-title">#Membership</span>
+                                <span className="notification-price">—</span>
+                                <span className="notification-date">Jan 25, 2026</span>
+                                <button className="notification-chip" type="button">Gözləmədə</button>
+                            </div>
+                            <div className="account-notifications-row">
+                                <span className="notification-title">HPB Carrahiyyə Hallarının Klinik Təhlili</span>
+                                <span className="notification-price">23 azn</span>
+                                <span className="notification-date">Jan 25, 2026</span>
+                                <button className="notification-chip" type="button">View more</button>
+                            </div>
+                            <div className="account-notifications-row">
+                                <span className="notification-title">HPB Carrahiyyə Hallarının Klinik Təhlili</span>
+                                <span className="notification-price">23 azn</span>
+                                <span className="notification-date">Jan 25, 2026</span>
+                                <button className="notification-chip" type="button">View more</button>
+                            </div>
+                            <div className="account-notifications-row">
+                                <span className="notification-title">HPB Carrahiyyə Hallarının Klinik Təhlili</span>
+                                <span className="notification-price">23 azn</span>
+                                <span className="notification-date">Jan 25, 2026</span>
+                                <button className="notification-chip" type="button">View more</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

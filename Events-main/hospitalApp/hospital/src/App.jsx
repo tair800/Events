@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import {
   Header,
@@ -22,6 +22,8 @@ import {
   UserRegister,
   AccountPage,
   AccountDetails,
+  AccountEvents,
+  AccountBenefits,
   Members
 } from './pages'
 import { TestPage } from './pages'
@@ -39,10 +41,60 @@ import AdminMail from './pages/admin/AdminMail'
 import AdminLayout from './pages/admin/AdminLayout'
 import AdminLogin from './pages/admin/AdminLogin'
 import { LanguageProvider, UserAuthProvider } from './context'
+import { API_CONFIG, STORAGE_KEYS } from './utils'
 
 import './App.css'
 
+const BlogAccessRoute = ({ children }) => {
+  const [status, setStatus] = useState('loading')
+
+  useEffect(() => {
+    const token = localStorage.getItem(STORAGE_KEYS.USER_TOKEN)
+    if (!token) {
+      setStatus('denied')
+      return
+    }
+
+    try {
+      const raw = localStorage.getItem('userProfileCache')
+      const cached = raw ? JSON.parse(raw) : null
+      if (cached?.isMember) {
+        setStatus('allowed')
+        return
+      }
+    } catch (error) {
+      // ignore cache errors and refetch
+    }
+
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch(`${API_CONFIG.BASE_URL}/users/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (!response.ok) {
+          setStatus('denied')
+          return
+        }
+        const profile = await response.json()
+        localStorage.setItem('userProfileCache', JSON.stringify(profile))
+        setStatus(profile?.isMember ? 'allowed' : 'denied')
+      } catch (error) {
+        setStatus('denied')
+      }
+    }
+
+    fetchProfile()
+  }, [])
+
+  if (status === 'loading') {
+    return null
+  }
+
+  return status === 'allowed' ? children : <Error404 />
+}
+
 function App() {
+
   return (
     <LanguageProvider>
       <UserAuthProvider>
@@ -95,6 +147,18 @@ function App() {
                 <>
                   <Header showTopImage={true} hidePageName={true} showAccountTabs={true} />
                   <AccountDetails />
+                </>
+              } />
+              <Route path="/account/events" element={
+                <>
+                  <Header showTopImage={true} hidePageName={true} showAccountTabs={true} />
+                  <AccountEvents />
+                </>
+              } />
+              <Route path="/account/benefits" element={
+                <>
+                  <Header showTopImage={true} hidePageName={true} showAccountTabs={true} />
+                  <AccountBenefits />
                 </>
               } />
               <Route path="/employee" element={
@@ -158,18 +222,22 @@ function App() {
                 <Route path="mail" element={<AdminMail />} />
               </Route>
               <Route path="/blog" element={
-                <>
-                  <Header showTopImage={true} />
-                  <BlogPage />
-                  <Footer />
-                </>
+                <BlogAccessRoute>
+                  <>
+                    <Header showTopImage={true} />
+                    <BlogPage />
+                    <Footer />
+                  </>
+                </BlogAccessRoute>
               } />
               <Route path="/blog/:id" element={
-                <>
-                  <Header showTopImage={true} />
-                  <BlogDetail />
-                  <Footer />
-                </>
+                <BlogAccessRoute>
+                  <>
+                    <Header showTopImage={true} />
+                    <BlogDetail />
+                    <Footer />
+                  </>
+                </BlogAccessRoute>
               } />
               <Route path="*" element={<Error404 />} />
             </Routes>

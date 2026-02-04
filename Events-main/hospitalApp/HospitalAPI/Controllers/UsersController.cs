@@ -46,7 +46,8 @@ namespace HospitalAPI.Controllers
                 LastName = user.LastName,
                 Phone = user.Phone,
                 Position = user.Position,
-                FinCode = user.FinCode
+                FinCode = user.FinCode,
+                IsMember = user.IsMember
             });
         }
 
@@ -65,7 +66,8 @@ namespace HospitalAPI.Controllers
                     LastName = u.LastName,
                     Phone = u.Phone,
                     Position = u.Position,
-                    FinCode = u.FinCode
+                    FinCode = u.FinCode,
+                    IsMember = u.IsMember
                 })
                 .ToListAsync();
 
@@ -87,11 +89,30 @@ namespace HospitalAPI.Controllers
                 return NotFound(new { message = "User not found" });
             }
 
-            user.FirstName = update.FirstName;
-            user.LastName = update.LastName;
-            user.Phone = update.Phone;
-            user.Position = update.Position;
-            user.FinCode = update.FinCode;
+            if (update.FirstName != null)
+            {
+                user.FirstName = update.FirstName;
+            }
+            if (update.LastName != null)
+            {
+                user.LastName = update.LastName;
+            }
+            if (update.Phone != null)
+            {
+                user.Phone = update.Phone;
+            }
+            if (update.Position != null)
+            {
+                user.Position = update.Position;
+            }
+            if (update.FinCode != null)
+            {
+                user.FinCode = update.FinCode;
+            }
+            if (update.IsMember.HasValue)
+            {
+                user.IsMember = update.IsMember.Value;
+            }
             user.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -105,7 +126,8 @@ namespace HospitalAPI.Controllers
                 LastName = user.LastName,
                 Phone = user.Phone,
                 Position = user.Position,
-                FinCode = user.FinCode
+                FinCode = user.FinCode,
+                IsMember = user.IsMember
             });
         }
 

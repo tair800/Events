@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import './Footer.css'
 import footerLeft from '../../assets/footer-left.png'
@@ -10,6 +10,27 @@ import { useTranslation } from '../../hooks/useTranslation'
 
 function Footer() {
     const { t } = useTranslation();
+    const [showBlog, setShowBlog] = useState(false);
+
+    useEffect(() => {
+        const resolveMemberStatus = () => {
+            try {
+                const raw = localStorage.getItem('userProfileCache');
+                const profile = raw ? JSON.parse(raw) : null;
+                setShowBlog(Boolean(profile?.isMember));
+            } catch (error) {
+                setShowBlog(false);
+            }
+        };
+
+        resolveMemberStatus();
+        window.addEventListener('profile-updated', resolveMemberStatus);
+        window.addEventListener('storage', resolveMemberStatus);
+        return () => {
+            window.removeEventListener('profile-updated', resolveMemberStatus);
+            window.removeEventListener('storage', resolveMemberStatus);
+        };
+    }, []);
 
     return (
         <footer>
@@ -27,7 +48,7 @@ function Footer() {
                         <Link to="/events" className="footer-link">{t('events')}</Link>
                         <Link to="/employee" className="footer-link">{t('employees')}</Link>
                         <Link to="/gallery" className="footer-link">{t('gallery')}</Link>
-                        <Link to="/blog" className="footer-link">{t('blog')}</Link>
+                        {showBlog && <Link to="/blog" className="footer-link">{t('blog')}</Link>}
                         <Link to="/contact" className="footer-link">{t('contact')}</Link>
                     </div>
                     <div className="social-media-icons">

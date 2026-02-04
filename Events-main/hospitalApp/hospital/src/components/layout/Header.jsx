@@ -9,6 +9,7 @@ import StaggeredMenu from './StaggeredMenu'
 import SpotlightNav from './SpotlightNav'
 import { useLanguage, useUserAuth } from '../../context'
 import { useTranslation } from '../../hooks/useTranslation'
+import { API_CONFIG, STORAGE_KEYS } from '../../utils'
 
 function Header({ showTopImage = false, customTopImage = null, hidePageName = false, showAccountTabs = false }) {
     const [activePage, setActivePage] = useState('home');
@@ -18,6 +19,7 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
     const navigate = useNavigate();
     const location = useLocation();
     const { isAuthenticated, username, logout } = useUserAuth();
+    const [isMember, setIsMember] = useState(false);
     const {
         selectedLanguage,
         isLanguageDropdownOpen,
@@ -48,7 +50,7 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
         { label: t('members'), href: '/employee', id: 'employee' },
         { label: t('membersNav'), href: '/members', id: 'members' },
         { label: t('gallery'), href: '/gallery', id: 'gallery' },
-        { label: t('blog'), href: '/blog', id: 'blog' },
+        ...(isMember ? [{ label: t('blog'), href: '/blog', id: 'blog' }] : []),
         { label: t('contact'), href: '/contact', id: 'contact' },
     ];
 
@@ -87,6 +89,10 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
             setActivePage('employee');
         } else if (path === '/members') {
             setActivePage('members');
+        } else if (path === '/account/events') {
+            setActivePage('events');
+        } else if (path === '/account/benefits') {
+            setActivePage('benefits');
         } else if (path.startsWith('/employee/')) {
             setActivePage('employee');
         } else if (path === '/events') {
@@ -104,6 +110,55 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
         }
     }, [location.pathname]);
 
+    useEffect(() => {
+        const resolveMemberStatus = () => {
+            try {
+                const raw = localStorage.getItem('userProfileCache');
+                const profile = raw ? JSON.parse(raw) : null;
+                if (profile) {
+                    setIsMember(Boolean(isAuthenticated && profile?.isMember));
+                    return;
+                }
+            } catch (error) {
+                setIsMember(false);
+                return;
+            }
+
+            if (!isAuthenticated) {
+                setIsMember(false);
+                return;
+            }
+
+            const token = localStorage.getItem(STORAGE_KEYS.USER_TOKEN);
+            if (!token) {
+                setIsMember(false);
+                return;
+            }
+
+            fetch(`${API_CONFIG.BASE_URL}/users/me`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+                .then((response) => (response.ok ? response.json() : null))
+                .then((profile) => {
+                    if (profile) {
+                        localStorage.setItem('userProfileCache', JSON.stringify(profile));
+                        setIsMember(Boolean(profile.isMember));
+                    } else {
+                        setIsMember(false);
+                    }
+                })
+                .catch(() => setIsMember(false));
+        };
+
+        resolveMemberStatus();
+        window.addEventListener('profile-updated', resolveMemberStatus);
+        window.addEventListener('storage', resolveMemberStatus);
+        return () => {
+            window.removeEventListener('profile-updated', resolveMemberStatus);
+            window.removeEventListener('storage', resolveMemberStatus);
+        };
+    }, [isAuthenticated]);
+
     // Mobile detection
     useEffect(() => {
         const checkMobile = () => {
@@ -119,8 +174,8 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
     const accountTabs = [
         { id: 'dashboard', label: 'İdarəetmə paneli', icon: '/assets/account-dashboard.svg', path: '/account' },
         { id: 'details', label: 'Hesab məlumatları', icon: '/assets/account-user.svg', path: '/account/details' },
-        { id: 'events', label: 'Tədbirlər', icon: '/assets/account-event.svg' },
-        { id: 'benefits', label: 'Membership Benefits', icon: '/assets/account-heart.svg' }
+        { id: 'events', label: 'Tədbirlər', icon: '/assets/account-event.svg', path: '/account/events' },
+        { id: 'benefits', label: 'Membership Benefits', icon: '/assets/account-heart.svg', path: '/account/benefits' }
     ];
 
     const isAccountTabActive = (tab) => {

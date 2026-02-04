@@ -32,6 +32,8 @@ namespace HospitalAPI.Models
         [MaxLength(20)]
         public string? FinCode { get; set; }
 
+        public bool IsMember { get; set; } = false;
+
         [Required]
         public byte[] PasswordHash { get; set; }
 

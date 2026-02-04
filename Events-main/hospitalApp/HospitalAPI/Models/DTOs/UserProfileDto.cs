@@ -10,6 +10,7 @@ namespace HospitalAPI.Models.DTOs
         public string? Phone { get; set; }
         public string? Position { get; set; }
         public string? FinCode { get; set; }
+        public bool IsMember { get; set; }
     }
 }
 

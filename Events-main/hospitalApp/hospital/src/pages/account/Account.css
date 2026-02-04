@@ -10,20 +10,21 @@
 
 .account-content {
     width: 100%;
-    max-width: 900px;
+    max-width: 1100px;
     display: flex;
     gap: 2rem;
-    align-items: stretch;
+    align-items: flex-start;
     margin-top: 0;
 }
 
 .account-profile-card {
-    flex: 0 0 40%;
+    flex: 0 0 35%;
     background: #ffffff;
     border-radius: 28px;
     border: 2px solid #1e50e2;
     padding: 1.7rem 1.25rem;
     min-height: 560px;
+    align-self: flex-start;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -171,12 +172,13 @@
 }
 
 .account-card {
-    flex: 0 0 60%;
+    flex: 0 0 74%;
     background: #ffffff;
     border-radius: 12px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
     padding: 1.25rem;
     min-height: 560px;
+    align-self: flex-start;
 }
 
 .account-card-header {
@@ -225,6 +227,32 @@
     padding: 0.6rem 1.6rem;
     font-size: 0.95rem;
     cursor: pointer;
+    outline: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.account-cta-btn:focus,
+.account-cta-btn:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+.account-cta-btn:active {
+    transform: scale(0.98);
+}
+
+.account-page button {
+    outline: none;
+}
+
+.account-page button:focus,
+.account-page button:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+.account-page button:active {
+    transform: scale(0.98);
 }
 
 .account-card-section-title {
@@ -351,4 +379,359 @@
     color: #111827;
     font-weight: 600;
     font-size: 0.85rem;
+}
+
+.account-notifications {
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.account-notifications-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.account-notifications-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #111827;
+}
+
+.account-notifications-action {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    border: none;
+    background: #e5e7eb;
+    color: #1f2937;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.account-notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.account-notifications-row {
+    display: grid;
+    grid-template-columns: 1.8fr 0.6fr 0.8fr 0.7fr;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.4rem;
+    border-top: 1px solid #e5e7eb;
+    color: #6b7280;
+    font-size: 0.95rem;
+    font-weight: 400;
+}
+
+.account-notifications-row:first-child {
+    border-top: none;
+}
+
+.account-notifications-row.header {
+    background: #f3f4f6;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.account-notifications-row:first-child .notification-price {
+    color: transparent;
+}
+
+.notification-title {
+    color: #6b7280;
+    font-weight: 400;
+}
+
+.notification-price {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.notification-date {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.notification-chip {
+    justify-self: end;
+    border: none;
+    background: #e5e7eb;
+    color: #6b7280;
+    border-radius: 999px;
+    padding: 0.4rem 1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.account-events-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: none;
+}
+
+.account-events-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+}
+
+.account-events-header h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    color: #111827;
+}
+
+.account-events-table {
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.account-events-head,
+.account-events-row {
+    display: grid;
+    grid-template-columns: 2.2fr 1.2fr 1.2fr 0.8fr 0.9fr;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.4rem;
+}
+
+.account-events-head {
+    background: #f3f4f6;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.account-events-status-btn {
+    justify-self: end;
+    border: none;
+    background: #e5e7eb;
+    color: #6b7280;
+    border-radius: 999px;
+    padding: 0.4rem 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    min-width: 120px;
+    text-align: center;
+}
+
+.account-events-row {
+    border-top: 1px solid #e5e7eb;
+    color: #6b7280;
+    font-weight: 400;
+}
+
+.events-name {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #6b7280;
+}
+
+.events-arrow-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+}
+
+.events-arrow {
+    color: #111827;
+    font-size: 0.75rem;
+    transition: transform 0.2s ease;
+}
+
+.events-date {
+    color: #6b7280;
+}
+
+.events-location,
+.events-price {
+    color: #6b7280;
+}
+
+.events-status {
+    justify-self: end;
+    border: none;
+    background: #e5e7eb;
+    color: #6b7280;
+    border-radius: 999px;
+    padding: 0.4rem 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    min-width: 120px;
+    text-align: center;
+}
+
+.account-events-row.expanded {
+    grid-template-columns: 1fr auto;
+    background: #f9fafb;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-top: none;
+    transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+    font-weight: 400;
+}
+
+.account-events-row.expanded.is-open {
+    max-height: 120px;
+    opacity: 1;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.events-doc {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.events-doc-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #eef2f7;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.events-doc-title {
+    font-weight: 600;
+    color: #111827;
+}
+
+.events-doc-date {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.events-doc-action {
+    font-size: 1.2rem;
+    color: #111827;
+}
+
+.account-benefits-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: none;
+}
+
+.account-benefits-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+}
+
+.account-benefits-header h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    color: #111827;
+}
+
+.account-benefits-table {
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.account-benefits-head,
+.account-benefits-row {
+    display: grid;
+    grid-template-columns: 2fr 2fr 0.8fr;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.4rem;
+}
+
+.account-benefits-head {
+    background: #f3f4f6;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.account-benefits-row {
+    border-top: 1px solid #e5e7eb;
+    color: #6b7280;
+    font-weight: 400;
+}
+
+.benefits-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+}
+
+.link-icon {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+}
+
+@media (max-width: 1100px) {
+
+    .account-benefits-head,
+    .account-benefits-row {
+        grid-template-columns: 1.5fr 1.2fr;
+    }
+
+    .account-benefits-head span:last-child,
+    .account-benefits-row span:last-child {
+        display: none;
+    }
+}
+
+@media (max-width: 1100px) {
+
+    .account-events-head,
+    .account-events-row {
+        grid-template-columns: 1.8fr 1fr 1fr;
+    }
+
+    .account-events-head span:nth-child(4),
+    .account-events-head span:nth-child(5),
+    .account-events-row .events-price,
+    .account-events-row .events-status,
+    .account-events-head .account-events-status-btn {
+        display: none;
+    }
+}
+
+@media (max-width: 920px) {
+    .account-notifications-row {
+        grid-template-columns: 1.4fr 0.7fr 0.8fr;
+    }
+
+    .account-notifications-row .notification-chip {
+        grid-column: 1 / -1;
+        justify-self: start;
+    }
 }

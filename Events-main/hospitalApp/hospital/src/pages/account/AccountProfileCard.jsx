@@ -1,13 +1,22 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '../../utils'
 import './Account.css'
 
 const AccountProfileCard = ({ profile }) => {
+    const cachedProfile = useMemo(() => {
+        try {
+            const raw = localStorage.getItem('userProfileCache')
+            return raw ? JSON.parse(raw) : null
+        } catch (error) {
+            return null
+        }
+    }, [])
+    const displayProfile = profile || cachedProfile
     const navigate = useNavigate()
-    const fullName = [profile?.firstName, profile?.lastName].filter(Boolean).join(' ')
-    const displayName = fullName || profile?.username || 'Raul Mirzayev'
-    const displayRole = profile?.position || 'Position'
+    const fullName = [displayProfile?.firstName, displayProfile?.lastName].filter(Boolean).join(' ')
+    const displayName = fullName || displayProfile?.username || 'Raul Mirzayev'
+    const displayRole = displayProfile?.position || 'Position'
 
     return (
         <div className="account-profile-card">
@@ -26,15 +35,15 @@ const AccountProfileCard = ({ profile }) => {
             <div className="profile-contacts">
                 <div className="profile-contact-item">
                     <img src="/assets/account-phone.svg" alt="" />
-                    <span>{profile?.phone || '+(994) 50 xxx xx xx'}</span>
+                    <span>{displayProfile?.phone || '+(994) 50 xxx xx xx'}</span>
                 </div>
                 <div className="profile-contact-item">
                     <img src="/assets/account-wp.svg" alt="" />
-                    <span>{profile?.phone || '+(994) 50 xxx xx xx'}</span>
+                    <span>{displayProfile?.phone || '+(994) 50 xxx xx xx'}</span>
                 </div>
                 <div className="profile-contact-item">
                     <img src="/assets/account-mail.svg" alt="" />
-                    <span>{profile?.email || 'examplegmail.com'}</span>
+                    <span>{displayProfile?.email || 'examplegmail.com'}</span>
                 </div>
                 <div className="profile-contact-item">
                     <img src="/assets/account-location.svg" alt="" />

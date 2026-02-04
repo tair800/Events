@@ -56,7 +56,8 @@ namespace HospitalAPI.Services.Auth
                 LastName = userForRegistration.LastName?.Trim(),
                 Phone = userForRegistration.Phone?.Trim(),
                 Position = userForRegistration.Position?.Trim(),
-                FinCode = userForRegistration.FinCode?.Trim()
+                FinCode = userForRegistration.FinCode?.Trim(),
+                IsMember = false
             };
 
             await _context.Users.AddAsync(user);
