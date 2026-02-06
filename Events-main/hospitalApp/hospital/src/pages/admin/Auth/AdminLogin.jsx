@@ -14,7 +14,8 @@ const AdminLogin = () => {
     e.preventDefault();
     try {
       const response = await api.post('/api/AdminAuth/login', { username, password });
-      login(response.data.token, 'admin');
+      localStorage.setItem('adminToken', response.data.token);
+      login();
       navigate('/admin'); 
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');

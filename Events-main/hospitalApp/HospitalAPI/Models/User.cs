@@ -32,6 +32,9 @@ namespace HospitalAPI.Models
         [MaxLength(20)]
         public string? FinCode { get; set; }
 
+        [MaxLength(500)]
+        public string? AvatarPath { get; set; }
+
         public bool IsMember { get; set; } = false;
 
         [Required]

@@ -34,6 +34,7 @@ import AdminContact from './pages/admin/AdminContact'
 import AdminBlog from './pages/admin/AdminBlog'
 import AdminEvents from './pages/admin/AdminEvents'
 import AdminUsers from './pages/admin/AdminUsers'
+import AdminScientificMaterials from './pages/admin/AdminScientificMaterials'
 import AdminSponsors from './pages/admin/AdminSponsors'
 import AdminGallery from './pages/admin/AdminGallery'
 import AdminEmployee from './pages/admin/AdminEmployee'
@@ -217,6 +218,7 @@ function App() {
               <Route path="blog" element={<AdminBlog />} />
               <Route path="events" element={<AdminEvents />} />
                 <Route path="users" element={<AdminUsers />} />
+              <Route path="scientificmaterials" element={<AdminScientificMaterials />} />
               <Route path="sponsors" element={<AdminSponsors />} />
               <Route path="gallery" element={<AdminGallery />} />
               <Route path="employee" element={<AdminEmployee />} />

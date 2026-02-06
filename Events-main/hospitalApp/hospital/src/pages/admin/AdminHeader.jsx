@@ -11,6 +11,7 @@ function AdminHeader({ title = "Dashboard" }) {
 
     const handleLogout = () => {
         localStorage.removeItem(STORAGE_KEYS.ADMIN_AUTH)
+        localStorage.removeItem('adminToken')
         navigate('/admin/login')
     }
     return (

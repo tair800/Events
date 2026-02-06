@@ -25,6 +25,7 @@ const translations = {
         blog: 'Bloq',
         contact: 'Əlaqə',
         joinMember: 'Üzv ol',
+        leaveMember: 'Üzvlükdən çıx',
         // Employee detail page
         whoAmI: 'Mən Kiməm?',
         pathToMedicine: 'Tibbə Aparan Yol',
@@ -43,6 +44,7 @@ const translations = {
         // Event detail page
         conferenceSpeakers: 'Konfrans spikerləri',
         conferencePlanning: 'Konfrans planlaması',
+        gallery: 'Qalereya',
         loadingData: 'Məlumatlar yüklənir...',
         noInformationAvailable: 'Məlumat mövcud deyil',
         noTimelineData: 'Timeline məlumatları mövcud deyil',
@@ -191,7 +193,11 @@ const translations = {
         messageError: 'Xəta!',
         messageNotSent: 'Mesaj göndərilmədi. Zəhmət olmasa yenidən cəhd edin.',
         findUsOnMap: 'Xəritədə Bizi Tapın',
-        languages: 'Dillər'
+        languages: 'Dillər',
+        // Account Benefits
+        membershipRequiredMessage: 'Elmi materiallara daxil olmaq üçün üzv olmalısınız.',
+        noScientificMaterials: 'Elmi materiallar mövcud deyil.',
+        loadingMaterials: 'Yüklənir...'
     },
     en: {
         // About page
@@ -217,6 +223,7 @@ const translations = {
         blog: 'Blog',
         contact: 'Contact',
         joinMember: 'Join Member',
+        leaveMember: 'Leave Member',
         // Employee detail page
         whoAmI: 'Who Am I?',
         pathToMedicine: 'Path to Medicine',
@@ -235,6 +242,7 @@ const translations = {
         // Event detail page
         conferenceSpeakers: 'Conference Speakers',
         conferencePlanning: 'Conference Planning',
+        gallery: 'Gallery',
         loadingData: 'Loading data...',
         noInformationAvailable: 'No information available',
         noTimelineData: 'No timeline data available',
@@ -383,7 +391,11 @@ const translations = {
         messageError: 'Error!',
         messageNotSent: 'Message was not sent. Please try again.',
         findUsOnMap: 'Find Us on Map',
-        languages: 'Languages'
+        languages: 'Languages',
+        // Account Benefits
+        membershipRequiredMessage: 'You need to be a member to access scientific materials.',
+        noScientificMaterials: 'No scientific materials available.',
+        loadingMaterials: 'Loading...'
     },
     ru: {
         // About page
@@ -409,6 +421,7 @@ const translations = {
         blog: 'Блог',
         contact: 'Контакты',
         joinMember: 'Стать участником',
+        leaveMember: 'Покинуть участника',
         // Employee detail page
         whoAmI: 'Кто Я?',
         pathToMedicine: 'Путь к Медицине',
@@ -427,6 +440,7 @@ const translations = {
         // Event detail page
         conferenceSpeakers: 'Спикеры конференции',
         conferencePlanning: 'Планирование конференции',
+        gallery: 'Галерея',
         loadingData: 'Загрузка данных...',
         noInformationAvailable: 'Информация недоступна',
         noTimelineData: 'Данные временной шкалы недоступны',
@@ -575,7 +589,11 @@ const translations = {
         messageError: 'Ошибка!',
         messageNotSent: 'Сообщение не было отправлено. Пожалуйста, попробуйте снова.',
         findUsOnMap: 'Найдите нас на карте',
-        languages: 'Языки'
+        languages: 'Языки',
+        // Account Benefits
+        membershipRequiredMessage: 'Вам необходимо быть участником, чтобы получить доступ к научным материалам.',
+        noScientificMaterials: 'Научные материалы недоступны.',
+        loadingMaterials: 'Загрузка...'
     }
 }
 

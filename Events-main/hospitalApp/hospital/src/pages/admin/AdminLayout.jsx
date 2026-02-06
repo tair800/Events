@@ -22,6 +22,8 @@ function AdminLayout() {
                 return 'Events';
             case '/admin/users':
                 return 'Users';
+            case '/admin/scientificmaterials':
+                return 'Elmi Materiallar';
             case '/admin/sponsors':
                 return 'Sponsors';
             case '/admin/contact':

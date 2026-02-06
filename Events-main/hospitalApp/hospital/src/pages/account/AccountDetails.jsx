@@ -186,7 +186,13 @@ const AccountDetails = () => {
     return (
         <div className="account-page">
             <div className="account-content">
-                <AccountProfileCard profile={profile} />
+                <AccountProfileCard 
+                    profile={profile} 
+                    onProfileUpdate={(updatedProfile) => {
+                        setProfile(updatedProfile)
+                        localStorage.setItem('userProfileCache', JSON.stringify(updatedProfile))
+                    }}
+                />
                 <div className="account-card account-details-card">
                     <div className="account-details-header">
                         <span className="account-card-page">Hesab məlumatları</span>

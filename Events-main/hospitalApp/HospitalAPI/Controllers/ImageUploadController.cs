@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using System.IO;
 
 namespace HospitalAPI.Controllers
@@ -400,6 +401,60 @@ namespace HospitalAPI.Controllers
             }
         }
 
+        [HttpPost("event/gallery")]
+        public async Task<IActionResult> UploadEventGalleryImage(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return BadRequest("No file uploaded.");
+                }
+
+                // Validate file type
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    return BadRequest("Invalid file type. Only JPG, JPEG, PNG, GIF, and WebP files are allowed.");
+                }
+
+                // Validate file size (max 10MB)
+                if (file.Length > 10 * 1024 * 1024)
+                {
+                    return BadRequest("File size too large. Maximum size is 10MB.");
+                }
+
+                // Generate unique filename
+                var fileName = $"{Guid.NewGuid()}{fileExtension}";
+                var filePath = Path.Combine(_uploadPath, fileName);
+
+                // Save file
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                // Return the file path for database storage
+                var relativePath = $"uploads/{fileName}";
+                return Ok(new { 
+                    success = true, 
+                    message = "File uploaded successfully.",
+                    filePath = relativePath,
+                    fileName = fileName
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { 
+                    success = false, 
+                    message = "An error occurred while uploading the file.",
+                    error = ex.Message 
+                });
+            }
+        }
+
         [HttpPost("logo")]
         public async Task<IActionResult> UploadLogoImage(IFormFile file)
         {
@@ -557,6 +612,61 @@ namespace HospitalAPI.Controllers
                 return StatusCode(500, new { 
                     success = false, 
                     message = "An error occurred while uploading the file.",
+                    error = ex.Message 
+                });
+            }
+        }
+
+        [HttpPost("user/avatar")]
+        [Authorize]
+        public async Task<IActionResult> UploadUserAvatar(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return BadRequest("No file uploaded.");
+                }
+
+                // Validate file type
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    return BadRequest("Invalid file type. Only JPG, JPEG, PNG, GIF, and WebP files are allowed.");
+                }
+
+                // Validate file size (max 5MB for avatars)
+                if (file.Length > 5 * 1024 * 1024)
+                {
+                    return BadRequest("File size too large. Maximum size is 5MB.");
+                }
+
+                // Generate unique filename
+                var fileName = $"user_avatar_{Guid.NewGuid()}{fileExtension}";
+                var filePath = Path.Combine(_uploadPath, fileName);
+
+                // Save file
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                // Return the file path for database storage
+                var relativePath = $"uploads/{fileName}";
+                return Ok(new { 
+                    success = true, 
+                    message = "Avatar uploaded successfully.",
+                    filePath = relativePath,
+                    fileName = fileName
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { 
+                    success = false, 
+                    message = "An error occurred while uploading the avatar.",
                     error = ex.Message 
                 });
             }

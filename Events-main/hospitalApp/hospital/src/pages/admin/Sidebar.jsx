@@ -68,6 +68,12 @@ function Sidebar() {
                         </Link>
                     </li>
                     <li className="admin-nav-item">
+                        <Link to="/admin/scientificmaterials" className={`admin-nav-link ${location.pathname === '/admin/scientificmaterials' ? 'active' : ''}`}>
+                            <img src={adminBlog} alt="Scientific Materials" className="admin-nav-icon" />
+                            Elmi Materiallar
+                        </Link>
+                    </li>
+                    <li className="admin-nav-item">
                         <Link to="/admin/sponsors" className={`admin-nav-link ${location.pathname === '/admin/sponsors' ? 'active' : ''}`}>
                             <img src={adminSponsor} alt="Sponsors" className="admin-nav-icon" />
                             Sponsors

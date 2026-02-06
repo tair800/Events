@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getContextualImagePath } from '../../../utils/imageUtils';
 import LogoCarousel from '../../ui/LogoCarousel';
-import { RequestModal, EmployeeSlider } from '../../ui';
+import { EmployeeSlider } from '../../ui';
 import { useLanguage } from '../../../context/LanguageContext';
 import { useTranslation } from '../../../hooks/useTranslation';
+import { useUserAuth } from '../../../context';
+import { ROUTES } from '../../../utils';
 // Removed timelineData import - now fetching from API
 import './EventsDetail.css';
 
@@ -14,17 +16,22 @@ const EventsDetail = () => {
     const eventId = parseInt(id);
     const { selectedLanguage } = useLanguage();
     const { t } = useTranslation();
+    const { isAuthenticated, token } = useUserAuth();
 
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0 });
-    const [showRequestModal, setShowRequestModal] = useState(false);
     const [timelineSlots, setTimelineSlots] = useState([]);
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(0);
     const [timelineLoading, setTimelineLoading] = useState(true);
     const [currentTimelineStart, setCurrentTimelineStart] = useState(0);
     const itemsPerPage = 3;
+    const [isPurchased, setIsPurchased] = useState(false);
+    const [gallerySlideIndex, setGallerySlideIndex] = useState(0);
+    const galleryItemsPerPage = 3;
+    const [galleryImages, setGalleryImages] = useState([]);
+    const [galleryLoading, setGalleryLoading] = useState(true);
     const formatPrice = (price, currency) => {
         if (price === 0 || price === '0' || price === null || price === undefined) return t('free');
         const symbols = {
@@ -115,6 +122,80 @@ const EventsDetail = () => {
         }
     }, [eventId, selectedLanguage]);
 
+    // Fetch gallery images
+    useEffect(() => {
+        const fetchGalleryImages = async () => {
+            if (!eventId) return;
+            try {
+                setGalleryLoading(true);
+                const response = await fetch(`https://localhost:5000/api/events/${eventId}/images`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch gallery images');
+                }
+                const data = await response.json();
+                setGalleryImages(data.map(img => img.imagePath));
+            } catch (err) {
+                console.error('Error fetching gallery images:', err);
+                setGalleryImages([]);
+            } finally {
+                setGalleryLoading(false);
+            }
+        };
+
+        if (eventId) {
+            fetchGalleryImages();
+        }
+    }, [eventId]);
+
+    useEffect(() => {
+        const fetchPurchaseStatus = async () => {
+            if (!token || !eventId) {
+                setIsPurchased(false);
+                return;
+            }
+            try {
+                const response = await fetch('https://localhost:5000/api/users/me/events', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+                    return;
+                }
+                const data = await response.json();
+                if (!Array.isArray(data)) return;
+                setIsPurchased(data.some((item) => item.eventId === eventId));
+            } catch (error) {
+                console.error('Failed to check purchase status:', error);
+            }
+        };
+
+        fetchPurchaseStatus();
+    }, [eventId, token]);
+
+    const handleBuyClick = async () => {
+        if (!isAuthenticated) {
+            navigate(ROUTES.LOGIN);
+            return;
+        }
+        if (!token || !eventId) {
+            navigate(ROUTES.LOGIN);
+            return;
+        }
+
+        try {
+            await fetch(`https://localhost:5000/api/events/${eventId}/attendees`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setIsPurchased(true);
+        } catch (error) {
+            console.error('Failed to register attendee:', error);
+        }
+    };
+
     // Countdown timer effect
     useEffect(() => {
         if (!event) return;
@@ -145,12 +226,6 @@ const EventsDetail = () => {
     }, [event]);
 
 
-    // Handle request modal success
-    const handleRequestSuccess = () => {
-        console.log('Request submitted successfully from event detail page');
-        setShowRequestModal(false);
-    };
-
     // Handle time slot selection
     const handleTimeSlotClick = (index) => {
         setSelectedTimeSlot(index);
@@ -167,6 +242,19 @@ const EventsDetail = () => {
         } catch (error) {
             console.error('Error refreshing timeline data:', error);
         }
+    };
+
+    // Handle gallery navigation
+    const handleGalleryNext = () => {
+        if (galleryImages.length === 0) return;
+        const maxIndex = Math.max(0, galleryImages.length - galleryItemsPerPage);
+        setGallerySlideIndex(prev => prev < maxIndex ? prev + 1 : 0);
+    };
+
+    const handleGalleryPrev = () => {
+        if (galleryImages.length === 0) return;
+        const maxIndex = Math.max(0, galleryImages.length - galleryItemsPerPage);
+        setGallerySlideIndex(prev => prev > 0 ? prev - 1 : maxIndex);
     };
 
     // Handle scroll button clicks for sliding window
@@ -319,13 +407,13 @@ const EventsDetail = () => {
                     />
                     <div className="price-badge-info">
                         {hasDiscount(event) ? (
-                            <div className="price-row">
-                                <span className="price-original">{formatPrice(event.price, event.currency)}</span>
-                                <span className="price-discount">{formatPrice(event.discountedPrice, event.currency)}</span>
+                            <div className="event-detail-price-row">
+                                <span className="event-detail-price-original">{formatPrice(event.price, event.currency)}</span>
+                                <span className="event-detail-price-discount">{formatPrice(event.discountedPrice, event.currency)}</span>
                             </div>
                         ) : (
-                            <div className="price-row">
-                                <span className="price-discount">{formatPrice(event.price, event.currency)}</span>
+                            <div className="event-detail-price-row">
+                                <span className="event-detail-price-discount">{formatPrice(event.price, event.currency)}</span>
                             </div>
                         )}
                     </div>
@@ -357,7 +445,13 @@ const EventsDetail = () => {
                 <img src={getContextualImagePath(event.detailImageLeft, 'admin')} alt="Event Detail Left" className="left-event-image" />
                 <img src={getContextualImagePath(event.detailImageMain, 'admin')} alt="Event Detail Main" className="main-event-image" />
                 <img src={getContextualImagePath(event.detailImageRight, 'admin')} alt="Event Detail Right" className="right-event-image" />
-                <button className="muraciet-btn" onClick={() => setShowRequestModal(true)}>{t('buyTicket')}</button>
+                <button
+                    className="muraciet-btn"
+                    onClick={handleBuyClick}
+                    disabled={isPurchased}
+                >
+                    {isPurchased ? t('basketBought') : t('buyTicket')}
+                </button>
                 {event.pdfUrl && (
                     <button
                         className="pdf-download-btn"
@@ -416,6 +510,57 @@ const EventsDetail = () => {
                     </button>
                 )}
             </div>
+
+            {!galleryLoading && galleryImages.length > 0 && (
+                <div className="event-gallery-section">
+                    <div className="event-detail-gallery-header">
+                        <div className="event-detail-gallery-header-left">
+                            <span className="event-detail-gallery-header-second">
+                                <span>{t('gallery')}</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div className="event-gallery-slider-container">
+                        <button 
+                            className="event-gallery-nav-btn event-gallery-nav-prev"
+                            onClick={handleGalleryPrev}
+                            disabled={galleryImages.length <= galleryItemsPerPage}
+                        >
+                            <img src="/assets/event-prev.svg" alt="Previous" />
+                        </button>
+                        <div className="event-gallery-slider">
+                            <div 
+                                className="event-gallery-slider-track"
+                                style={{ transform: `translateX(-${gallerySlideIndex * (100 / galleryItemsPerPage)}%)` }}
+                            >
+                                {galleryImages.map((image, index) => {
+                                    // Middle slide is the second visible slide (index + 1 from current slide)
+                                    const middleIndex = gallerySlideIndex + 1;
+                                    const isMiddle = index === middleIndex && middleIndex < galleryImages.length;
+                                    return (
+                                        <div key={index} className={`event-gallery-slide ${isMiddle ? 'event-gallery-slide-middle' : ''}`}>
+                                            <div className="event-gallery-item">
+                                                <img 
+                                                    src={image} 
+                                                    alt={`Gallery ${index + 1}`} 
+                                                    className="event-gallery-image"
+                                                />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                        <button 
+                            className="event-gallery-nav-btn event-gallery-nav-next"
+                            onClick={handleGalleryNext}
+                            disabled={galleryImages.length <= galleryItemsPerPage}
+                        >
+                            <img src="/assets/event-next.svg" alt="Next" />
+                        </button>
+                    </div>
+                </div>
+            )}
 
             <div className="employee-slider-section">
                 <div className="event-detail-employee-header">
@@ -542,11 +687,6 @@ const EventsDetail = () => {
             </div>
 
             {/* Request Modal */}
-            <RequestModal
-                isOpen={showRequestModal}
-                onClose={() => setShowRequestModal(false)}
-                onSuccess={handleRequestSuccess}
-            />
         </div>
     );
 };

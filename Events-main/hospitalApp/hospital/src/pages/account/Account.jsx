@@ -28,6 +28,7 @@ const Account = () => {
     const tokenPayload = useMemo(() => decodeTokenPayload(token), [token])
     const [profile, setProfile] = useState(null)
     const [basketItems, setBasketItems] = useState([])
+    const [userEvents, setUserEvents] = useState([])
 
     const basketStorageKey = useMemo(() => {
         if (!isAuthenticated) return null
@@ -64,6 +65,31 @@ const Account = () => {
             setBasketItems([])
         }
     }, [basketStorageKey])
+
+    useEffect(() => {
+        const fetchUserEvents = async () => {
+            if (!token) {
+                setUserEvents([])
+                return
+            }
+            try {
+                const response = await fetch('https://localhost:5000/api/users/me/events', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                if (!response.ok) {
+                    return
+                }
+                const data = await response.json()
+                setUserEvents(Array.isArray(data) ? data : [])
+            } catch (error) {
+                console.error('Failed to load user events:', error)
+            }
+        }
+
+        fetchUserEvents()
+    }, [token])
 
     useEffect(() => {
         const syncPaidPrices = async () => {
@@ -160,7 +186,13 @@ const Account = () => {
     return (
         <div className="account-page">
             <div className="account-content">
-                <AccountProfileCard profile={profile} />
+                <AccountProfileCard 
+                    profile={profile} 
+                    onProfileUpdate={(updatedProfile) => {
+                        setProfile(updatedProfile)
+                        localStorage.setItem('userProfileCache', JSON.stringify(updatedProfile))
+                    }}
+                />
                 <div className="account-card">
                     <div className="account-card-header">
                         <div className="account-card-title">
@@ -191,7 +223,7 @@ const Account = () => {
                                 <span className="notification-date">Jan 25, 2026</span>
                                 <button className="notification-chip" type="button">Gözləmədə</button>
                             </div>
-                            {basketItems.map((item) => (
+                            {userEvents.map((item) => (
                                 <div key={item.id} className="account-notifications-row">
                                     <span className="notification-title">{item.title}</span>
                                     <span className="notification-price">{formatBasketPrice(item)}</span>
@@ -199,7 +231,7 @@ const Account = () => {
                                     <button
                                         className="notification-chip"
                                         type="button"
-                                        onClick={() => navigate(`/event/${item.id}`)}
+                                        onClick={() => navigate(`/event/${item.eventId}`)}
                                     >
                                         {t('viewMore')}
                                     </button>

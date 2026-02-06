@@ -200,7 +200,13 @@ const AccountEvents = () => {
     return (
         <div className="account-page">
             <div className="account-content">
-                <AccountProfileCard profile={profile} />
+                <AccountProfileCard 
+                    profile={profile} 
+                    onProfileUpdate={(updatedProfile) => {
+                        setProfile(updatedProfile)
+                        localStorage.setItem('userProfileCache', JSON.stringify(updatedProfile))
+                    }}
+                />
                 <div className="account-card account-events-card">
                     <div className="account-events-header">
                         <span className="account-card-page">Tədbirlər</span>

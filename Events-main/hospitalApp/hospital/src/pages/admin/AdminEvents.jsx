@@ -84,6 +84,9 @@ function AdminEvents() {
     const [eventAttendees, setEventAttendees] = useState({});
     const [attendeesLoading, setAttendeesLoading] = useState(false);
     const [attendeesError, setAttendeesError] = useState(null);
+    const [eventImages, setEventImages] = useState({});
+    const [showImagesModal, setShowImagesModal] = useState(false);
+    const [imagesLoading, setImagesLoading] = useState(false);
     const [newSpeaker, setNewSpeaker] = useState({
         name: '',
         title: '',
@@ -230,24 +233,27 @@ function AdminEvents() {
         try {
             // Create promises for all related data
             const promises = events.map(async (event) => {
-                const [speakersResponse, timelineResponse, employeesResponse, attendeesResponse] = await Promise.all([
+                const [speakersResponse, timelineResponse, employeesResponse, attendeesResponse, imagesResponse] = await Promise.all([
                     fetch(`https://localhost:5000/api/eventspeakers/event/${event.id}`),
                     fetch(`https://localhost:5000/api/eventtimeline/event/${event.id}`),
                     fetch(`https://localhost:5000/api/eventemployees/event/${event.id}`),
-                    fetch(`https://localhost:5000/api/events/${event.id}/attendees`)
+                    fetch(`https://localhost:5000/api/events/${event.id}/attendees`),
+                    fetch(`https://localhost:5000/api/events/${event.id}/images`)
                 ]);
 
                 const speakersData = speakersResponse.ok ? await speakersResponse.json() : [];
                 const timelineData = timelineResponse.ok ? await timelineResponse.json() : [];
                 const employeesData = employeesResponse.ok ? await employeesResponse.json() : [];
                 const attendeesData = attendeesResponse.ok ? await attendeesResponse.json() : [];
+                const imagesData = imagesResponse.ok ? await imagesResponse.json() : [];
 
                 return {
                     eventId: event.id,
                     speakers: speakersData,
                     timeline: timelineData,
                     employees: employeesData,
-                    attendees: attendeesData
+                    attendees: attendeesData,
+                    images: imagesData
                 };
             });
 
@@ -259,18 +265,21 @@ function AdminEvents() {
             const timelineData = {};
             const employeesData = {};
             const attendeesData = {};
+            const imagesData = {};
 
-            results.forEach(({ eventId, speakers, timeline, employees, attendees }) => {
+            results.forEach(({ eventId, speakers, timeline, employees, attendees, images }) => {
                 speakersData[eventId] = speakers;
                 timelineData[eventId] = timeline;
                 employeesData[eventId] = employees;
                 attendeesData[eventId] = attendees;
+                imagesData[eventId] = images;
             });
 
             setEventSpeakers(speakersData);
             setEventTimeline(timelineData);
             setEventEmployees(employeesData);
             setEventAttendees(attendeesData);
+            setEventImages(imagesData);
         } catch (error) {
             console.error('Failed to load event related data:', error);
         }
@@ -344,6 +353,23 @@ function AdminEvents() {
             setAttendeesError('Failed to load attendees.');
         } finally {
             setAttendeesLoading(false);
+        }
+    };
+
+    const fetchEventImages = async (eventId) => {
+        try {
+            setImagesLoading(true);
+            const response = await fetch(`https://localhost:5000/api/events/${eventId}/images`);
+            if (response.ok) {
+                const data = await response.json();
+                setEventImages(prev => ({ ...prev, [eventId]: data }));
+            } else {
+                console.error('Failed to load images.');
+            }
+        } catch (error) {
+            console.error('Failed to fetch images:', error);
+        } finally {
+            setImagesLoading(false);
         }
     };
 
@@ -1126,11 +1152,18 @@ function AdminEvents() {
         setShowAttendeesModal(true);
     };
 
+    const openImagesModal = (eventId) => {
+        setSelectedEventId(eventId);
+        fetchEventImages(eventId);
+        setShowImagesModal(true);
+    };
+
     const closeModals = () => {
         setShowSpeakersModal(false);
         setShowTimelineModal(false);
         setShowEmployeesModal(false);
         setShowAttendeesModal(false);
+        setShowImagesModal(false);
         setShowEditTimelineModal(false);
         setShowEditSpeakerModal(false);
         setSelectedEventId(null);
@@ -1308,6 +1341,13 @@ function AdminEvents() {
                                                 title="İştirakçıları idarə et"
                                             >
                                                 İştirakçılar ({eventAttendees[event.id]?.length || 0})
+                                            </button>
+                                            <button
+                                                className="admin-events-management-btn images-btn"
+                                                onClick={() => openImagesModal(event.id)}
+                                                title="Şəkilləri idarə et"
+                                            >
+                                                Şəkillər ({eventImages[event.id]?.length || 0})
                                             </button>
                                             <button
                                                 className={`admin-events-status-btn ${currentData.isMain ? 'active' : ''}`}
@@ -2732,6 +2772,123 @@ function AdminEvents() {
                                                 {attendee.isMember ? 'Bəli' : 'Xeyr'}
                                             </span>
                                             <span>{attendee.certificateFileName ? 'Var' : 'Yoxdur'}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Images Management Modal */}
+            {showImagesModal && (
+                <div className="admin-events-modal-overlay" onClick={closeModals}>
+                    <div className="admin-events-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="admin-events-modal-header">
+                            <h2>Şəkillər</h2>
+                            <button className="admin-events-modal-close" onClick={closeModals}>×</button>
+                        </div>
+                        <div className="admin-events-modal-content">
+                            <div className="admin-images-actions">
+                                <label className="admin-events-submit-btn admin-events-upload-btn">
+                                    Şəkil Əlavə Et
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        style={{ display: 'none' }}
+                                        onChange={async (e) => {
+                                            const file = e.target.files[0];
+                                            if (!file || !selectedEventId) return;
+
+                                            try {
+                                                const formData = new FormData();
+                                                formData.append('file', file);
+
+                                                const uploadResponse = await fetch('https://localhost:5000/api/ImageUpload/event/gallery', {
+                                                    method: 'POST',
+                                                    body: formData
+                                                });
+
+                                                if (!uploadResponse.ok) {
+                                                    showAlert('error', 'Upload Failed!', 'Failed to upload image.');
+                                                    return;
+                                                }
+
+                                                const uploadResult = await uploadResponse.json();
+                                                if (!uploadResult.success) {
+                                                    showAlert('error', 'Upload Failed!', uploadResult.message || 'Failed to upload image.');
+                                                    return;
+                                                }
+
+                                                // Add image to event
+                                                const addResponse = await fetch('https://localhost:5000/api/events/images', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'Content-Type': 'application/json'
+                                                    },
+                                                    body: JSON.stringify({
+                                                        eventId: selectedEventId,
+                                                        imagePath: uploadResult.filePath,
+                                                        displayOrder: (eventImages[selectedEventId] || []).length
+                                                    })
+                                                });
+
+                                                if (addResponse.ok) {
+                                                    await fetchEventImages(selectedEventId);
+                                                    showAlert('success', 'Success!', 'Image added successfully.');
+                                                } else {
+                                                    showAlert('error', 'Failed!', 'Failed to add image.');
+                                                }
+                                            } catch (error) {
+                                                console.error('Error adding image:', error);
+                                                showAlert('error', 'Error!', 'An error occurred while adding image.');
+                                            }
+                                            e.target.value = '';
+                                        }}
+                                    />
+                                </label>
+                            </div>
+
+                            {imagesLoading ? (
+                                <div className="admin-attendees-loading">Yüklənir...</div>
+                            ) : (eventImages[selectedEventId] || []).length === 0 ? (
+                                <div className="admin-attendees-empty">Şəkil yoxdur.</div>
+                            ) : (
+                                <div className="admin-images-grid">
+                                    {(eventImages[selectedEventId] || []).map((image, index) => (
+                                        <div key={image.id} className="admin-image-item">
+                                            <img 
+                                                src={getContextualImagePath(image.imagePath, 'admin')} 
+                                                alt={`Gallery ${index + 1}`}
+                                                className="admin-image-preview"
+                                            />
+                                            <div className="admin-image-actions">
+                                                <button
+                                                    className="admin-image-delete-btn"
+                                                    onClick={async () => {
+                                                        if (window.confirm('Bu şəkili silmək istədiyinizə əminsiniz?')) {
+                                                            try {
+                                                                const response = await fetch(`https://localhost:5000/api/events/images/${image.id}`, {
+                                                                    method: 'DELETE'
+                                                                });
+
+                                                                if (response.ok) {
+                                                                    await fetchEventImages(selectedEventId);
+                                                                    showAlert('success', 'Success!', 'Image deleted successfully.');
+                                                                } else {
+                                                                    showAlert('error', 'Failed!', 'Failed to delete image.');
+                                                                }
+                                                            } catch (error) {
+                                                                console.error('Error deleting image:', error);
+                                                                showAlert('error', 'Error!', 'An error occurred while deleting image.');
+                                                            }
+                                                        }
+                                                    }}
+                                                >
+                                                    Sil
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>

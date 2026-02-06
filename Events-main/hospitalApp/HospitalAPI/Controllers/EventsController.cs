@@ -308,6 +308,100 @@ namespace HospitalAPI.Controllers
             return File(bytes, "application/pdf", $"certificate_preview_{eventId}.pdf");
         }
 
+        // GET: api/events/{eventId}/images - Get all images for an event
+        [HttpGet("{eventId}/images")]
+        public async Task<ActionResult<IEnumerable<EventImageDto>>> GetEventImages(int eventId)
+        {
+            try
+            {
+                var eventItem = await _context.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+                if (eventItem == null)
+                {
+                    return NotFound(new { message = "Event not found" });
+                }
+
+                var images = await _context.EventImages
+                    .Where(ei => ei.EventId == eventId)
+                    .OrderBy(ei => ei.DisplayOrder)
+                    .ThenBy(ei => ei.Id)
+                    .Select(ei => new EventImageDto
+                    {
+                        Id = ei.Id,
+                        EventId = ei.EventId,
+                        ImagePath = ImagePathService.FormatContextualImagePath(ei.ImagePath, "admin"),
+                        DisplayOrder = ei.DisplayOrder
+                    })
+                    .ToListAsync();
+
+                return Ok(images);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        // POST: api/events/images - Add image to event
+        [HttpPost("images")]
+        public async Task<IActionResult> AddEventImage([FromBody] EventImageDto imageDto)
+        {
+            try
+            {
+                var eventItem = await _context.Events.FirstOrDefaultAsync(e => e.Id == imageDto.EventId);
+                if (eventItem == null)
+                {
+                    return NotFound(new { message = "Event not found" });
+                }
+
+                var eventImage = new EventImage
+                {
+                    EventId = imageDto.EventId,
+                    ImagePath = imageDto.ImagePath,
+                    DisplayOrder = imageDto.DisplayOrder,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                _context.EventImages.Add(eventImage);
+                await _context.SaveChangesAsync();
+
+                return Ok(new EventImageDto
+                {
+                    Id = eventImage.Id,
+                    EventId = eventImage.EventId,
+                    ImagePath = ImagePathService.FormatContextualImagePath(eventImage.ImagePath, "admin"),
+                    DisplayOrder = eventImage.DisplayOrder
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        // DELETE: api/events/images/{id} - Delete event image
+        [HttpDelete("images/{id}")]
+        public async Task<IActionResult> DeleteEventImage(int id)
+        {
+            try
+            {
+                var eventImage = await _context.EventImages.FindAsync(id);
+                if (eventImage == null)
+                {
+                    return NotFound(new { message = "Image not found" });
+                }
+
+                _context.EventImages.Remove(eventImage);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         // GET: api/events/language/{lang} - Get all events in specific language
         [HttpGet("language/{lang}")]
         public async Task<ActionResult<IEnumerable<Event>>> GetEventsByLanguage(string lang)

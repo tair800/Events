@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         localStorage.removeItem(STORAGE_KEYS.ADMIN_AUTH)
+        localStorage.removeItem('adminToken')
         setIsAuthenticated(false)
     }
 

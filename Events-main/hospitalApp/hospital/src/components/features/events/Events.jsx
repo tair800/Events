@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { getContextualImagePath } from '../../../utils/imageUtils';
 import { useLanguage } from '../../../context/LanguageContext';
 import { useTranslation } from '../../../hooks/useTranslation';
+import { useUserAuth } from '../../../context';
+import { ROUTES } from '../../../utils';
 const searchIcon = '/assets/search.svg';
 const cardIcon = '/assets/event-arrow.svg';
 const eventImg = '/assets/event-img.png';
@@ -16,6 +18,8 @@ const Events = () => {
     const navigate = useNavigate();
     const { selectedLanguage } = useLanguage();
     const { t } = useTranslation();
+    const { isAuthenticated, token } = useUserAuth();
+    const [purchasedEventIds, setPurchasedEventIds] = useState(new Set());
 
     // API state
     const [events, setEvents] = useState([]);
@@ -62,6 +66,55 @@ const Events = () => {
     // Request modal state
     const [showRequestModal, setShowRequestModal] = useState(false);
 
+    useEffect(() => {
+        const fetchPurchasedEvents = async () => {
+            if (!token) {
+                setPurchasedEventIds(new Set());
+                return;
+            }
+            try {
+                const response = await fetch('https://localhost:5000/api/users/me/events', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+                    return;
+                }
+                const data = await response.json();
+                if (!Array.isArray(data)) return;
+                setPurchasedEventIds(new Set(data.map((item) => item.eventId)));
+            } catch (error) {
+                console.error('Failed to load purchased events:', error);
+            }
+        };
+
+        fetchPurchasedEvents();
+    }, [token]);
+
+    const handleBuyClick = async (eventId) => {
+        if (!isAuthenticated) {
+            navigate(ROUTES.LOGIN);
+            return;
+        }
+        if (!token) {
+            navigate(ROUTES.LOGIN);
+            return;
+        }
+
+        try {
+            await fetch(`https://localhost:5000/api/events/${eventId}/attendees`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setPurchasedEventIds((prev) => new Set(prev).add(eventId));
+        } catch (error) {
+            console.error('Failed to register attendee:', error);
+        }
+    };
+
     // Track large viewport (1920px+)
     const [isLargeViewport, setIsLargeViewport] = useState(() => {
         if (typeof window !== 'undefined' && window.matchMedia) {
@@ -93,6 +146,31 @@ const Events = () => {
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
     ];
+
+    const formatPrice = (price, currency) => {
+        if (price === 0 || price === '0' || price === null || price === undefined) return t('free');
+        const symbols = {
+            USD: '$',
+            EUR: '€',
+            GBP: '£',
+            AZN: '₼'
+        };
+        const symbol = symbols[currency];
+        if (!symbol) {
+            return `${price} ${currency}`;
+        }
+        if (currency === 'USD' || currency === 'EUR' || currency === 'GBP') {
+            return `${symbol}${price}`;
+        }
+        return `${price} ${symbol}`;
+    };
+
+    const hasDiscount = (event) => {
+        if (!event) return false;
+        if (event.price === 0 || event.price === '0' || event.price === null || event.price === undefined) return false;
+        if (event.discountedPrice === null || event.discountedPrice === undefined) return false;
+        return event.discountedPrice < event.price;
+    };
 
     // Get days in month for display month
     const daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
@@ -635,16 +713,42 @@ const Events = () => {
                                         const day = eventDate.getDate();
                                         const month = monthNames[eventDate.getMonth()];
 
+                                        const formattedPrice = formatPrice(event.price, event.currency);
+                                        const formattedDiscountPrice = hasDiscount(event)
+                                            ? formatPrice(event.discountedPrice, event.currency)
+                                            : null;
+
                                         return (
                                             <div
                                                 key={`${event.id}-${currentPage}-${searchTerm}`}
                                                 className={`events-card ${isPageChanging ? 'page-changing' : ''} ${isSearching ? 'search-animating' : ''}`}
                                             >
                                                 <span className="event-title">{event.title}</span>
+                                                <button
+                                                    className="event-buy-btn"
+                                                    type="button"
+                                                    onClick={() => handleBuyClick(event.id)}
+                                                    disabled={purchasedEventIds.has(event.id)}
+                                                >
+                                                    {purchasedEventIds.has(event.id) ? t('basketBought') : t('buyTicket')}
+                                                </button>
                                                 <div className="event-date">
                                                     <span className="event-day">{day}</span>
                                                     <span className="event-month">{month}</span>
                                                     <span className="event-venue">{event.venue}</span>
+                                                </div>
+                                                <div className="event-price">
+                                                    {formattedDiscountPrice ? (
+                                                        <div className="price-stack">
+                                                            <div className="price-row">
+                                                                <span className="price-original">{formattedPrice}</span>
+                                                                <span className="price-discount">{formattedDiscountPrice}</span>
+                                                            </div>
+                                                            <span className="price-note">Üzv ol, endirimli qiymətdən yararlan</span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="price-standard">{formattedPrice}</span>
+                                                    )}
                                                 </div>
                                                 <img src={getContextualImagePath(event.mainImage, 'admin')} alt="Event" className="event-image" />
                                                 <img

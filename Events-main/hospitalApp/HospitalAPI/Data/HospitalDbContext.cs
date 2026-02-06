@@ -28,6 +28,8 @@ namespace HospitalAPI.Data
         public DbSet<EventTimeline> EventTimeline { get; set; }
         public DbSet<EventAttendee> EventAttendees { get; set; }
         public DbSet<EventCertificate> EventCertificates { get; set; }
+        public DbSet<EventImage> EventImages { get; set; }
+        public DbSet<ScientificMaterial> ScientificMaterials { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Admin> Admins { get; set; }
@@ -88,6 +90,32 @@ namespace HospitalAPI.Data
                 entity.HasKey(c => c.Id);
                 entity.Property(c => c.FileName).IsRequired().HasMaxLength(255);
                 entity.Property(c => c.IssuedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
+
+            modelBuilder.Entity<EventImage>(entity =>
+            {
+                entity.HasKey(ei => ei.Id);
+                entity.Property(ei => ei.EventId).IsRequired();
+                entity.Property(ei => ei.ImagePath).IsRequired().HasMaxLength(500);
+                entity.Property(ei => ei.DisplayOrder).HasDefaultValue(0);
+                entity.Property(ei => ei.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(ei => ei.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                
+                // Configure relationship with Event
+                entity.HasOne<Event>()
+                    .WithMany()
+                    .HasForeignKey(ei => ei.EventId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<ScientificMaterial>(entity =>
+            {
+                entity.HasKey(sm => sm.Id);
+                entity.Property(sm => sm.Name).IsRequired().HasMaxLength(500);
+                entity.Property(sm => sm.Link).IsRequired().HasMaxLength(1000);
+                entity.Property(sm => sm.Date).IsRequired();
+                entity.Property(sm => sm.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(sm => sm.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // Configure Blogs table for SQLite

@@ -16,10 +16,12 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [isUzvDropdownOpen, setIsUzvDropdownOpen] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const { isAuthenticated, username, logout } = useUserAuth();
     const [isMember, setIsMember] = useState(false);
+    const [userProfile, setUserProfile] = useState(null);
     const {
         selectedLanguage,
         isLanguageDropdownOpen,
@@ -77,6 +79,49 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
         navigate('/');
     };
 
+    const handleToggleMembership = async () => {
+        try {
+            const token = localStorage.getItem(STORAGE_KEYS.USER_TOKEN);
+            if (!token) {
+                return;
+            }
+
+            const newMemberStatus = !isMember;
+            
+            const response = await fetch(`${API_CONFIG.BASE_URL}/users/me`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    isMember: newMemberStatus
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update membership status');
+            }
+
+            const updatedProfile = await response.json();
+            
+            // Update local storage
+            localStorage.setItem('userProfileCache', JSON.stringify(updatedProfile));
+            
+            // Update state
+            setUserProfile(updatedProfile);
+            setIsMember(newMemberStatus);
+            
+            // Dispatch event to notify other components
+            window.dispatchEvent(new Event('profile-updated'));
+            
+            // Close dropdown
+            setIsUzvDropdownOpen(false);
+        } catch (error) {
+            console.error('Error toggling membership:', error);
+        }
+    };
+
 
     // Set initial active page based on current path
     useEffect(() => {
@@ -116,10 +161,12 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
                 const raw = localStorage.getItem('userProfileCache');
                 const profile = raw ? JSON.parse(raw) : null;
                 if (profile) {
+                    setUserProfile(profile);
                     setIsMember(Boolean(isAuthenticated && profile?.isMember));
                     return;
                 }
             } catch (error) {
+                setUserProfile(null);
                 setIsMember(false);
                 return;
             }
@@ -142,12 +189,17 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
                 .then((profile) => {
                     if (profile) {
                         localStorage.setItem('userProfileCache', JSON.stringify(profile));
+                        setUserProfile(profile);
                         setIsMember(Boolean(profile.isMember));
                     } else {
+                        setUserProfile(null);
                         setIsMember(false);
                     }
                 })
-                .catch(() => setIsMember(false));
+                .catch(() => {
+                    setUserProfile(null);
+                    setIsMember(false);
+                });
         };
 
         resolveMemberStatus();
@@ -158,6 +210,26 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
             window.removeEventListener('storage', resolveMemberStatus);
         };
     }, [isAuthenticated]);
+
+    // Get user's display name (full name or username)
+    const getUserDisplayName = () => {
+        if (userProfile) {
+            const fullName = [userProfile.firstName, userProfile.lastName].filter(Boolean).join(' ');
+            if (fullName) return fullName;
+        }
+        // Try to get from cached profile
+        try {
+            const raw = localStorage.getItem('userProfileCache');
+            const cached = raw ? JSON.parse(raw) : null;
+            if (cached) {
+                const fullName = [cached.firstName, cached.lastName].filter(Boolean).join(' ');
+                if (fullName) return fullName;
+            }
+        } catch (error) {
+            // Ignore
+        }
+        return username || 'User';
+    };
 
     // Mobile detection
     useEffect(() => {
@@ -170,6 +242,20 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
 
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (isUzvDropdownOpen && !event.target.closest('.uzv-dropdown-container')) {
+                setIsUzvDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isUzvDropdownOpen]);
 
     const accountTabs = [
         { id: 'dashboard', label: 'İdarəetmə paneli', icon: '/assets/account-dashboard.svg', path: '/account' },
@@ -264,15 +350,47 @@ function Header({ showTopImage = false, customTopImage = null, hidePageName = fa
                             </div>
                         )}
                     </div>
-                    <button className="uzv-btn" onClick={handleRequestModalOpen}>{t('joinMember')}</button>
                     {isAuthenticated ? (
-                        <>
-                            <span className="user-greeting">Hi, {username || 'User'}</span>
-                            <button className="login-btn" onClick={() => navigate('/account')}>Account</button>
-                            <button className="login-btn" onClick={handleLogout}>Logout</button>
-                        </>
+                        <div className="uzv-dropdown-container">
+                            <button 
+                                className={`uzv-btn uzv-dropdown-btn ${isUzvDropdownOpen ? 'open' : ''}`}
+                                onClick={() => setIsUzvDropdownOpen(!isUzvDropdownOpen)}
+                            >
+                                {getUserDisplayName()}
+                                <span className="dropdown-arrow">▼</span>
+                            </button>
+                            {isUzvDropdownOpen && (
+                                <div className="uzv-dropdown">
+                                    <button 
+                                        className="uzv-dropdown-item account-item" 
+                                        onClick={() => {
+                                            navigate('/account')
+                                            setIsUzvDropdownOpen(false)
+                                        }}
+                                    >
+                                        Account
+                                    </button>
+                                    <button 
+                                        className="uzv-dropdown-item join-member-item" 
+                                        onClick={handleToggleMembership}
+                                    >
+                                        {isMember ? t('leaveMember') || 'Üzvlükdən çıx' : t('joinMember')}
+                                    </button>
+                                    <button 
+                                        className="uzv-dropdown-item logout-item" 
+                                        onClick={() => {
+                                            handleLogout()
+                                            setIsUzvDropdownOpen(false)
+                                        }}
+                                    >
+                                        Logout
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     ) : (
                         <>
+                            <button className="uzv-btn" onClick={handleRequestModalOpen}>{t('joinMember')}</button>
                             <button className="login-btn" onClick={() => navigate('/login')}>Login</button>
                             <button className="register-btn" onClick={() => navigate('/register')}>Register</button>
                         </>

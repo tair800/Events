@@ -636,6 +636,55 @@
         display: inline-block;
     }
 
+    .event-price {
+        position: absolute;
+        top: 10rem;
+        right: 2%;
+        transform: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        align-items: flex-end;
+        color: #ffffff;
+        font-size: 1rem;
+        font-weight: 400;
+        text-align: right;
+    }
+
+    .event-price .price-row {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        justify-content: flex-end;
+        align-self: flex-end;
+        width: 100%;
+        text-align: right;
+    }
+
+    .event-price .price-original {
+        text-decoration: line-through;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+    }
+
+    .event-price .price-discount {
+        background: linear-gradient(78.03deg, #77C963 2.35%, #FFFFFF 97.65%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-weight: 700;
+    }
+
+    .event-price .price-note {
+        display: block;
+        text-align: right;
+        align-self: flex-end;
+        width: 100%;
+        font-size: 0.5rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 400;
+    }
+
     .event-title {
         position: absolute;
         top: 1.6rem;
@@ -647,6 +696,46 @@
         line-height: 1.3;
         text-align: left;
         transition: all 0.3s ease;
+    }
+
+    .event-buy-btn {
+        position: absolute;
+        top: 6.2rem;
+        background: rgba(18, 67, 172, 1);
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.6rem 2rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        white-space: nowrap;
+        z-index: 2;
+        right: 13%;
+        outline: none;
+    }
+
+    .event-buy-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(18, 67, 172, 0.4);
+    }
+
+    .event-buy-btn:active {
+        transform: scale(0.98);
+    }
+
+    .event-buy-btn:focus,
+    .event-buy-btn:focus-visible {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .event-buy-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
     }
 
     .events-card:hover .event-title {

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.IO;
 
 namespace HospitalAPI.Controllers
 {
@@ -47,6 +48,7 @@ namespace HospitalAPI.Controllers
                 Phone = user.Phone,
                 Position = user.Position,
                 FinCode = user.FinCode,
+                AvatarPath = user.AvatarPath,
                 IsMember = user.IsMember
             });
         }
@@ -67,6 +69,7 @@ namespace HospitalAPI.Controllers
                     Phone = u.Phone,
                     Position = u.Position,
                     FinCode = u.FinCode,
+                    AvatarPath = u.AvatarPath,
                     IsMember = u.IsMember
                 })
                 .ToListAsync();
@@ -127,6 +130,61 @@ namespace HospitalAPI.Controllers
                 Phone = user.Phone,
                 Position = user.Position,
                 FinCode = user.FinCode,
+                AvatarPath = user.AvatarPath,
+                IsMember = user.IsMember
+            });
+        }
+
+        [HttpPut("me/avatar")]
+        public async Task<ActionResult<UserProfileDto>> UpdateAvatar([FromBody] UpdateAvatarDto update)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            if (update.AvatarPath != null)
+            {
+                // Delete old avatar if exists
+                if (!string.IsNullOrEmpty(user.AvatarPath))
+                {
+                    var oldAvatarPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", user.AvatarPath);
+                    if (System.IO.File.Exists(oldAvatarPath))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(oldAvatarPath);
+                        }
+                        catch
+                        {
+                            // Ignore deletion errors
+                        }
+                    }
+                }
+                user.AvatarPath = update.AvatarPath;
+            }
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new UserProfileDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Phone = user.Phone,
+                Position = user.Position,
+                FinCode = user.FinCode,
+                AvatarPath = user.AvatarPath,
                 IsMember = user.IsMember
             });
         }
