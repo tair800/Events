@@ -77,9 +77,13 @@ function AdminEvents() {
     const [showSpeakersModal, setShowSpeakersModal] = useState(false);
     const [showTimelineModal, setShowTimelineModal] = useState(false);
     const [showEmployeesModal, setShowEmployeesModal] = useState(false);
+    const [showAttendeesModal, setShowAttendeesModal] = useState(false);
     const [showEditTimelineModal, setShowEditTimelineModal] = useState(false);
     const [showEditSpeakerModal, setShowEditSpeakerModal] = useState(false);
     const [selectedEventId, setSelectedEventId] = useState(null);
+    const [eventAttendees, setEventAttendees] = useState({});
+    const [attendeesLoading, setAttendeesLoading] = useState(false);
+    const [attendeesError, setAttendeesError] = useState(null);
     const [newSpeaker, setNewSpeaker] = useState({
         name: '',
         title: '',
@@ -226,21 +230,24 @@ function AdminEvents() {
         try {
             // Create promises for all related data
             const promises = events.map(async (event) => {
-                const [speakersResponse, timelineResponse, employeesResponse] = await Promise.all([
+                const [speakersResponse, timelineResponse, employeesResponse, attendeesResponse] = await Promise.all([
                     fetch(`https://localhost:5000/api/eventspeakers/event/${event.id}`),
                     fetch(`https://localhost:5000/api/eventtimeline/event/${event.id}`),
-                    fetch(`https://localhost:5000/api/eventemployees/event/${event.id}`)
+                    fetch(`https://localhost:5000/api/eventemployees/event/${event.id}`),
+                    fetch(`https://localhost:5000/api/events/${event.id}/attendees`)
                 ]);
 
                 const speakersData = speakersResponse.ok ? await speakersResponse.json() : [];
                 const timelineData = timelineResponse.ok ? await timelineResponse.json() : [];
                 const employeesData = employeesResponse.ok ? await employeesResponse.json() : [];
+                const attendeesData = attendeesResponse.ok ? await attendeesResponse.json() : [];
 
                 return {
                     eventId: event.id,
                     speakers: speakersData,
                     timeline: timelineData,
-                    employees: employeesData
+                    employees: employeesData,
+                    attendees: attendeesData
                 };
             });
 
@@ -251,16 +258,19 @@ function AdminEvents() {
             const speakersData = {};
             const timelineData = {};
             const employeesData = {};
+            const attendeesData = {};
 
-            results.forEach(({ eventId, speakers, timeline, employees }) => {
+            results.forEach(({ eventId, speakers, timeline, employees, attendees }) => {
                 speakersData[eventId] = speakers;
                 timelineData[eventId] = timeline;
                 employeesData[eventId] = employees;
+                attendeesData[eventId] = attendees;
             });
 
             setEventSpeakers(speakersData);
             setEventTimeline(timelineData);
             setEventEmployees(employeesData);
+            setEventAttendees(attendeesData);
         } catch (error) {
             console.error('Failed to load event related data:', error);
         }
@@ -315,6 +325,25 @@ function AdminEvents() {
             }
         } catch (error) {
             console.error('Failed to fetch employees:', error);
+        }
+    };
+
+    const fetchEventAttendees = async (eventId) => {
+        try {
+            setAttendeesLoading(true);
+            setAttendeesError(null);
+            const response = await fetch(`https://localhost:5000/api/events/${eventId}/attendees`);
+            if (response.ok) {
+                const data = await response.json();
+                setEventAttendees(prev => ({ ...prev, [eventId]: data }));
+            } else {
+                setAttendeesError('Failed to load attendees.');
+            }
+        } catch (error) {
+            console.error('Failed to fetch attendees:', error);
+            setAttendeesError('Failed to load attendees.');
+        } finally {
+            setAttendeesLoading(false);
         }
     };
 
@@ -914,6 +943,32 @@ function AdminEvents() {
         Swal.fire({ icon, title, text, confirmButtonColor: '#1976d2', timer: 2000, showConfirmButton: false });
     };
 
+    const selectedEvent = selectedEventId
+        ? (editingEvents[selectedEventId] || events.find((event) => event.id === selectedEventId))
+        : null;
+
+    const isEventEnded = (eventItem) => {
+        if (!eventItem?.eventDate) return false;
+        const eventDate = new Date(eventItem.eventDate);
+        if (Number.isNaN(eventDate.getTime())) return false;
+
+        if (eventItem.time) {
+            const parts = eventItem.time.split(':');
+            const hours = Number(parts[0]);
+            const minutes = Number(parts[1] || 0);
+            if (!Number.isNaN(hours)) {
+                eventDate.setHours(hours, Number.isNaN(minutes) ? 0 : minutes, 0, 0);
+            }
+        } else {
+            // If only date is provided, treat the event as ended after the day finishes.
+            eventDate.setHours(23, 59, 59, 999);
+        }
+
+        return new Date() >= eventDate;
+    };
+
+    const isSelectedEventEnded = selectedEvent ? isEventEnded(selectedEvent) : false;
+
     // Handle form submission (create new event)
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -1028,6 +1083,24 @@ function AdminEvents() {
         }
     };
 
+    const handleGenerateCertificates = async (eventId) => {
+        try {
+            const response = await fetch(`https://localhost:5000/api/events/${eventId}/certificates/generate`, {
+                method: 'POST'
+            });
+            if (response.ok) {
+                const result = await response.json();
+                showAlert('success', 'Uğurlu', `${result.generated || 0} sertifikat yaradıldı.`);
+                await fetchEventAttendees(eventId);
+            } else {
+                const errorResult = await response.json().catch(() => null);
+                showAlert('error', 'Xəta!', errorResult?.message || 'Sertifikatlar yaradıla bilmədi.');
+            }
+        } catch (error) {
+            showAlert('error', 'Xəta!', 'Sertifikatlar yaradıla bilmədi.');
+        }
+    };
+
     // Open management modals
     const openSpeakersModal = (eventId) => {
         setSelectedEventId(eventId);
@@ -1047,10 +1120,17 @@ function AdminEvents() {
         setShowEmployeesModal(true);
     };
 
+    const openAttendeesModal = (eventId) => {
+        setSelectedEventId(eventId);
+        fetchEventAttendees(eventId);
+        setShowAttendeesModal(true);
+    };
+
     const closeModals = () => {
         setShowSpeakersModal(false);
         setShowTimelineModal(false);
         setShowEmployeesModal(false);
+        setShowAttendeesModal(false);
         setShowEditTimelineModal(false);
         setShowEditSpeakerModal(false);
         setSelectedEventId(null);
@@ -1058,6 +1138,12 @@ function AdminEvents() {
         setEditingTimelineSlot(null);
         setEditingSpeaker(null);
     };
+
+    useEffect(() => {
+        if (showAttendeesModal && selectedEventId) {
+            fetchEventAttendees(selectedEventId);
+        }
+    }, [showAttendeesModal, selectedEventId]);
 
     // Start editing timeline slot
     const startEditingTimelineSlot = (slot) => {
@@ -1215,6 +1301,13 @@ function AdminEvents() {
                                                 title="Üzvləri idarə et"
                                             >
                                                 Üzvlər ({eventEmployees[event.id]?.length || 0})
+                                            </button>
+                                            <button
+                                                className="admin-events-management-btn attendees-btn"
+                                                onClick={() => openAttendeesModal(event.id)}
+                                                title="İştirakçıları idarə et"
+                                            >
+                                                İştirakçılar ({eventAttendees[event.id]?.length || 0})
                                             </button>
                                             <button
                                                 className={`admin-events-status-btn ${currentData.isMain ? 'active' : ''}`}
@@ -2592,6 +2685,57 @@ function AdminEvents() {
                                     </div>
                                 )) || <p>Heç bir üzv təyin edilməyib</p>}
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showAttendeesModal && (
+                <div className="admin-events-modal-overlay" onClick={closeModals}>
+                    <div className="admin-events-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="admin-events-modal-header">
+                            <h2>İştirakçılar</h2>
+                            <button className="admin-events-modal-close" onClick={closeModals}>×</button>
+                        </div>
+                        <div className="admin-events-modal-content">
+                            <div className="admin-attendees-actions">
+                                <button
+                                    className="admin-events-submit-btn admin-events-preview-btn"
+                                    type="button"
+                                    onClick={() => window.open(`https://localhost:5000/api/events/${selectedEventId}/certificates/preview`, '_blank', 'noopener')}
+                                >
+                                    Preview PDF
+                                </button>
+                            </div>
+
+                            {attendeesLoading ? (
+                                <div className="admin-attendees-loading">Yüklənir...</div>
+                            ) : attendeesError ? (
+                                <div className="admin-attendees-error">{attendeesError}</div>
+                            ) : (eventAttendees[selectedEventId] || []).length === 0 ? (
+                                <div className="admin-attendees-empty">İştirakçı yoxdur.</div>
+                            ) : (
+                                <div className="admin-attendees-table">
+                                    <div className="admin-attendees-row header">
+                                        <span>Ad Soyad</span>
+                                        <span>Email</span>
+                                        <span>Telefon</span>
+                                        <span>Üzv</span>
+                                        <span>Sertifikat</span>
+                                    </div>
+                                    {(eventAttendees[selectedEventId] || []).map((attendee) => (
+                                        <div key={attendee.userId} className="admin-attendees-row">
+                                            <span>{`${attendee.firstName || ''} ${attendee.lastName || ''}`.trim() || attendee.username || attendee.email || '—'}</span>
+                                            <span>{attendee.email || attendee.username || '—'}</span>
+                                            <span>{attendee.phone || '—'}</span>
+                                            <span className={attendee.isMember ? 'member-yes' : 'member-no'}>
+                                                {attendee.isMember ? 'Bəli' : 'Xeyr'}
+                                            </span>
+                                            <span>{attendee.certificateFileName ? 'Var' : 'Yoxdur'}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

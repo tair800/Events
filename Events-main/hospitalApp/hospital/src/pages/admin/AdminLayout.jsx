@@ -20,6 +20,8 @@ function AdminLayout() {
                 return 'Üzvlər';
             case '/admin/events':
                 return 'Events';
+            case '/admin/users':
+                return 'Users';
             case '/admin/sponsors':
                 return 'Sponsors';
             case '/admin/contact':

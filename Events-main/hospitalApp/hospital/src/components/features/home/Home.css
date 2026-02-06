@@ -297,6 +297,13 @@
     transform: translateY(-1px);
 }
 
+.home-hero-btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
 .home-hero-btn-secondary {
     background: transparent;
     color: black;
@@ -703,6 +710,7 @@
     align-items: center;
     padding: 0;
     position: relative;
+    height: 220px;
 }
 
 /* Card Left Section */
@@ -831,6 +839,26 @@
     opacity: 0.9;
 }
 
+.home-event-buy-btn {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+}
+
+.home-basket {
+    width: 90%;
+    padding: 0.8rem 1rem;
+}
+
+.home-basket-head,
+.home-basket-row {
+    grid-template-columns: 2fr 1fr 1fr;
+}
+
+.home-basket-head span:last-child,
+.home-basket-row span:last-child {
+    display: none;
+}
+
 .home-event-trainer {
     font-size: 0.85rem;
     font-weight: 500;
@@ -860,8 +888,9 @@
 
 .home-event-price .price-row {
     display: inline-flex;
-    align-items: baseline;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
 }
 
 .home-event-price .price-original {
@@ -877,6 +906,103 @@
     color: transparent;
     font-weight: 700;
     font-size: 1.7rem;
+}
+
+.home-event-price .price-standard {
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+.home-event-buy-btn {
+    margin-left: auto;
+    background: rgba(18, 67, 172, 1);
+    border: none;
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0.7rem 3rem;
+    font-size: 0.85rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    white-space: nowrap;
+}
+
+.home-event-buy-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(18, 67, 172, 0.4);
+}
+
+.home-event-buy-btn:active {
+    transform: scale(0.98);
+}
+
+.home-event-buy-btn.is-disabled,
+.home-event-buy-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.home-basket {
+    width: 65%;
+    max-width: 1000px;
+    margin: 1.5rem auto 0;
+    background: #15183a;
+    border: 1px solid rgba(18, 67, 172, 0.6);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    color: #ffffff;
+}
+
+.home-basket-header h3 {
+    margin: 0 0 0.75rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.home-basket-empty {
+    padding: 0.75rem 0;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+}
+
+.home-basket-table {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.home-basket-head,
+.home-basket-row {
+    display: grid;
+    grid-template-columns: 2.2fr 1fr 1fr 0.8fr;
+    gap: 1rem;
+    align-items: center;
+}
+
+.home-basket-head {
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+}
+
+.home-basket-row {
+    font-size: 0.95rem;
+    font-weight: 400;
+    padding: 0.35rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.home-basket-row:first-of-type {
+    border-top: none;
+}
+
+.home-basket-status {
+    color: #63b3ff;
+    font-weight: 600;
 }
 
 .home-event-price .price-note {
@@ -3969,6 +4095,7 @@
         width: 65% !important;
         max-width: 1000px !important;
         flex-direction: row !important;
+        height: 220px !important;
     }
 
     .card-left-section {

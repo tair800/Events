@@ -1,8 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using HospitalAPI.Data;
 using HospitalAPI.Models;
+using HospitalAPI.Models.DTOs;
+using HospitalAPI.Services.Certificates;
 using HospitalAPI.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HospitalAPI.Controllers
 {
@@ -11,10 +15,123 @@ namespace HospitalAPI.Controllers
     public class EventsController : ControllerBase
     {
         private readonly HospitalDbContext _context;
+        private readonly IWebHostEnvironment _environment;
+        private readonly CertificatePdfService _certificatePdfService;
 
-        public EventsController(HospitalDbContext context)
+        public EventsController(
+            HospitalDbContext context,
+            IWebHostEnvironment environment,
+            CertificatePdfService certificatePdfService)
         {
             _context = context;
+            _environment = environment;
+            _certificatePdfService = certificatePdfService;
+        }
+
+        private string EnsureUploadsDirectory()
+        {
+            var uploadPath = Path.Combine(_environment.ContentRootPath, "wwwroot", "uploads");
+            if (!Directory.Exists(uploadPath))
+            {
+                Directory.CreateDirectory(uploadPath);
+            }
+            return uploadPath;
+        }
+
+        private bool IsEventEnded(Event eventItem)
+        {
+            if (eventItem.EventDate == default) return false;
+
+            var eventDate = eventItem.EventDate;
+            if (!string.IsNullOrWhiteSpace(eventItem.Time))
+            {
+                var parts = eventItem.Time.Split(':');
+                if (int.TryParse(parts[0], out var hours))
+                {
+                    var minutes = 0;
+                    if (parts.Length > 1)
+                    {
+                        int.TryParse(parts[1], out minutes);
+                    }
+                    eventDate = new DateTime(
+                        eventDate.Year,
+                        eventDate.Month,
+                        eventDate.Day,
+                        hours,
+                        minutes,
+                        0);
+                }
+            }
+            else
+            {
+                eventDate = new DateTime(
+                    eventDate.Year,
+                    eventDate.Month,
+                    eventDate.Day,
+                    23,
+                    59,
+                    59);
+            }
+
+            return DateTime.Now >= eventDate;
+        }
+
+        private async Task<int> GenerateCertificatesForEvent(Event eventItem, List<int>? onlyUserIds = null)
+        {
+            var attendeesQuery = _context.EventAttendees.Where(a => a.EventId == eventItem.Id);
+            if (onlyUserIds != null && onlyUserIds.Count > 0)
+            {
+                attendeesQuery = attendeesQuery.Where(a => onlyUserIds.Contains(a.UserId));
+            }
+
+            var attendees = await attendeesQuery.ToListAsync();
+            if (!attendees.Any())
+            {
+                return 0;
+            }
+
+            var userIds = attendees.Select(a => a.UserId).Distinct().ToList();
+            var users = await _context.Users
+                .Where(u => userIds.Contains(u.Id))
+                .ToListAsync();
+
+            var existingCertificates = await _context.EventCertificates
+                .Where(c => c.EventId == eventItem.Id && userIds.Contains(c.UserId))
+                .ToListAsync();
+
+            var generatedCount = 0;
+            var uploads = EnsureUploadsDirectory();
+
+            foreach (var attendee in attendees)
+            {
+                if (existingCertificates.Any(c => c.UserId == attendee.UserId))
+                {
+                    continue;
+                }
+
+                var user = users.FirstOrDefault(u => u.Id == attendee.UserId);
+                if (user == null)
+                {
+                    continue;
+                }
+
+                var fileName = _certificatePdfService.GenerateCertificatePdfFile(user, eventItem, uploads);
+                _context.EventCertificates.Add(new EventCertificate
+                {
+                    EventId = eventItem.Id,
+                    UserId = attendee.UserId,
+                    FileName = fileName,
+                    IssuedAt = DateTime.UtcNow
+                });
+                generatedCount++;
+            }
+
+            if (generatedCount > 0)
+            {
+                await _context.SaveChangesAsync();
+            }
+
+            return generatedCount;
         }
 
         // GET: api/events - Get all events
@@ -43,6 +160,152 @@ namespace HospitalAPI.Controllers
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
+        }
+
+        [Authorize]
+        [HttpPost("{eventId}/attendees")]
+        public async Task<IActionResult> RegisterAttendee(int eventId)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            var eventItem = await _context.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+            if (eventItem == null)
+            {
+                return NotFound(new { message = "Event not found" });
+            }
+
+            var existing = await _context.EventAttendees
+                .FirstOrDefaultAsync(a => a.EventId == eventId && a.UserId == userId);
+            if (existing != null)
+            {
+                return Ok(new { message = "Already registered" });
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            var basePrice = eventItem.Price ?? 0;
+            var discountPrice = eventItem.DiscountedPrice ?? basePrice;
+            var paidPrice = user.IsMember ? discountPrice : basePrice;
+
+            var attendee = new EventAttendee
+            {
+                EventId = eventId,
+                UserId = userId,
+                PaidPrice = paidPrice,
+                PaidCurrency = eventItem.Currency,
+                Status = "registered",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _context.EventAttendees.Add(attendee);
+            await _context.SaveChangesAsync();
+
+            if (IsEventEnded(eventItem))
+            {
+                await GenerateCertificatesForEvent(eventItem, new List<int> { userId });
+            }
+
+            return Ok(new { message = "Registered" });
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{eventId}/attendees")]
+        public async Task<ActionResult<IEnumerable<EventAttendeeDto>>> GetAttendees(int eventId)
+        {
+            var eventItem = await _context.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+            if (eventItem == null)
+            {
+                return NotFound(new { message = "Event not found" });
+            }
+
+            if (IsEventEnded(eventItem))
+            {
+                await GenerateCertificatesForEvent(eventItem);
+            }
+
+            var attendeeRows = await _context.EventAttendees
+                .Where(a => a.EventId == eventId)
+                .ToListAsync();
+
+            if (!attendeeRows.Any())
+            {
+                return Ok(new List<EventAttendeeDto>());
+            }
+
+            var userIds = attendeeRows.Select(a => a.UserId).ToList();
+            var users = await _context.Users
+                .Where(u => userIds.Contains(u.Id))
+                .ToListAsync();
+
+            var certificates = await _context.EventCertificates
+                .Where(c => c.EventId == eventId && userIds.Contains(c.UserId))
+                .ToListAsync();
+
+            var attendees = attendeeRows
+                .Select(attendee =>
+                {
+                    var user = users.FirstOrDefault(u => u.Id == attendee.UserId);
+                    var cert = certificates.FirstOrDefault(c => c.UserId == attendee.UserId);
+                    return new EventAttendeeDto
+                    {
+                        UserId = attendee.UserId,
+                        Username = user?.Username,
+                        Email = user?.Email,
+                        FirstName = user?.FirstName,
+                        LastName = user?.LastName,
+                        Phone = user?.Phone,
+                        IsMember = user?.IsMember ?? false,
+                        Status = attendee.Status,
+                        CertificateFileName = cert?.FileName
+                    };
+                })
+                .OrderBy(a => a.FirstName)
+                .ThenBy(a => a.LastName)
+                .ToList();
+
+            return Ok(attendees);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("{eventId}/certificates/generate")]
+        public async Task<IActionResult> GenerateCertificates(int eventId)
+        {
+            var eventItem = await _context.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+            if (eventItem == null)
+            {
+                return NotFound(new { message = "Event not found" });
+            }
+
+            if (eventItem.EventDate > DateTime.UtcNow)
+            {
+                return BadRequest(new { message = "Event has not ended yet." });
+            }
+
+            var generatedCount = await GenerateCertificatesForEvent(eventItem);
+            return Ok(new { generated = generatedCount });
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{eventId}/certificates/preview")]
+        public async Task<IActionResult> PreviewCertificate(int eventId)
+        {
+            var eventItem = await _context.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+            if (eventItem == null)
+            {
+                return NotFound(new { message = "Event not found" });
+            }
+
+            var bytes = _certificatePdfService.GeneratePreviewPdfBytes(eventItem);
+            return File(bytes, "application/pdf", $"certificate_preview_{eventId}.pdf");
         }
 
         // GET: api/events/language/{lang} - Get all events in specific language
@@ -402,6 +665,11 @@ namespace HospitalAPI.Controllers
                 
                 // Log after save
                 Console.WriteLine($"After save - Event Price: {existingEvent.Price}, IsFree: {existingEvent.IsFree}");
+
+                if (IsEventEnded(existingEvent))
+                {
+                    await GenerateCertificatesForEvent(existingEvent);
+                }
 
                 return NoContent();
             }

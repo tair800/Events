@@ -1,12 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useUserAuth } from '../../context'
 import { userService } from '../../services'
 import AccountProfileCard from './AccountProfileCard'
 import './Account.css'
 
 const AccountEvents = () => {
-    const { token } = useUserAuth()
+    const { token, username } = useUserAuth()
     const [profile, setProfile] = useState(null)
+    const [events, setEvents] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+    const [basketSynced, setBasketSynced] = useState(false)
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -23,10 +27,174 @@ const AccountEvents = () => {
         }
     }, [token])
 
-    const [expandedRows, setExpandedRows] = useState([true, true, true, true, true])
+    const fetchUserEvents = useCallback(async () => {
+        if (!token) {
+            setEvents([])
+            setLoading(false)
+            return
+        }
+
+        try {
+            setLoading(true)
+            const response = await fetch('https://localhost:5000/api/users/me/events', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            if (!response.ok) {
+                throw new Error('Failed to load events')
+            }
+            const data = await response.json()
+            setEvents(Array.isArray(data) ? data : [])
+        } catch (err) {
+            console.error('Failed to load user events:', err)
+            setError(err.message || 'Failed to load events')
+        } finally {
+            setLoading(false)
+        }
+    }, [token])
+
+    useEffect(() => {
+        fetchUserEvents()
+    }, [fetchUserEvents])
+
+    const getBasketKey = () => {
+        if (!token) return null
+        const identity = username || token
+        return identity ? `homeBasket:${identity}` : null
+    }
+
+    useEffect(() => {
+        const syncBasketToAttendees = async () => {
+            if (!token || basketSynced) return
+
+            const key = getBasketKey()
+            if (!key) {
+                setBasketSynced(true)
+                return
+            }
+
+            const stored = localStorage.getItem(key)
+            if (!stored) {
+                setBasketSynced(true)
+                return
+            }
+
+            let items = []
+            try {
+                const parsed = JSON.parse(stored)
+                items = Array.isArray(parsed) ? parsed : []
+            } catch (err) {
+                console.error('Failed to parse basket:', err)
+                setBasketSynced(true)
+                return
+            }
+
+            if (items.length === 0) {
+                setBasketSynced(true)
+                return
+            }
+
+            try {
+                await Promise.all(items.map((item) => (
+                    fetch(`https://localhost:5000/api/events/${item.id}/attendees`, {
+                        method: 'POST',
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    })
+                )))
+            } catch (err) {
+                console.error('Failed to sync basket attendees:', err)
+            } finally {
+                setBasketSynced(true)
+                await fetchUserEvents()
+            }
+        }
+
+        syncBasketToAttendees()
+    }, [basketSynced, fetchUserEvents, token, username])
+
+    const [expandedRows, setExpandedRows] = useState([])
+
+    useEffect(() => {
+        setExpandedRows(events.map(() => false))
+    }, [events])
 
     const toggleExpanded = (index) => {
         setExpandedRows((prev) => prev.map((isOpen, i) => (i === index ? !isOpen : isOpen)))
+    }
+
+    const formatDate = (dateString) => {
+        if (!dateString) return '—'
+        const date = new Date(dateString)
+        if (Number.isNaN(date.getTime())) return '—'
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: '2-digit',
+            year: 'numeric'
+        })
+    }
+
+    const formatTime = (dateString) => {
+        if (!dateString) return '—'
+        const date = new Date(dateString)
+        if (Number.isNaN(date.getTime())) return '—'
+        return date.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        })
+    }
+
+    const formatPrice = (event) => {
+        if (!event) return '—'
+        const priceValue = event.paidPrice ?? event.discountedPrice ?? event.price
+        if (priceValue === 0 || priceValue === '0' || priceValue === null || priceValue === undefined) return '—'
+        const symbols = { USD: '$', EUR: '€', GBP: '£', AZN: '₼' }
+        const currency = event.paidCurrency || event.currency
+        const symbol = symbols[currency]
+        if (!symbol) return `${priceValue} ${event.currency || ''}`.trim()
+        if (currency === 'USD' || currency === 'EUR' || currency === 'GBP') {
+            return `${symbol}${priceValue}`
+        }
+        return `${priceValue} ${symbol}`
+    }
+
+    const resolveCertificateUrl = (fileName) => {
+        if (!fileName) return null
+        const cleaned = String(fileName).split('?')[0]
+        if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
+            return cleaned
+        }
+        if (cleaned.startsWith('/uploads/')) {
+            return `https://localhost:5000${cleaned}`
+        }
+        const baseName = cleaned.split('/').pop()
+        return baseName ? `https://localhost:5000/api/ImageUpload/pdf/${baseName}` : null
+    }
+
+    const handleDownload = async (fileName) => {
+        const url = resolveCertificateUrl(fileName)
+        if (!url) return
+        try {
+            const response = await fetch(url)
+            if (!response.ok) {
+                throw new Error('Failed to download certificate')
+            }
+            const blob = await response.blob()
+            const downloadUrl = window.URL.createObjectURL(blob)
+            const link = document.createElement('a')
+            link.href = downloadUrl
+            link.download = String(fileName).split('/').pop() || 'certificate.pdf'
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            window.URL.revokeObjectURL(downloadUrl)
+        } catch (error) {
+            console.error('Certificate download failed:', error)
+            window.open(url, '_blank', 'noopener')
+        }
     }
 
     return (
@@ -49,171 +217,66 @@ const AccountEvents = () => {
                                 Status <span className="caret">▾</span>
                             </button>
                         </div>
-
-                        <div className="account-events-row">
-                            <span className="events-name">
-                                <button
-                                    className="events-arrow-btn"
-                                    type="button"
-                                    onClick={() => toggleExpanded(0)}
-                                    aria-expanded={expandedRows[0]}
-                                >
-                                    <span className="events-arrow">{expandedRows[0] ? '▼' : '▶'}</span>
-                                </button>
-                                HPB Carrahiyyə Hallarının Klinik Təhlili
-                            </span>
-                            <span className="events-date">Jan 25, 2026<br />17:00</span>
-                            <span className="events-location">Baku Cristal hall</span>
-                            <span className="events-price">20 ₼</span>
-                            <button className="events-status" type="button">Gözləmədə</button>
-                        </div>
-
-                        <div className={`account-events-row expanded ${expandedRows[0] ? 'is-open' : ''}`}>
-                            <div className="events-doc">
-                                <span className="events-doc-icon">
-                                    <img src="/assets/Download.svg" alt="" />
-                                </span>
-                                <div>
-                                    <div className="events-doc-title">HPB Carrahiyyə Hallarının Klinik Təhlili</div>
-                                    <div className="events-doc-date">12 Jan 2026</div>
-                                </div>
+                        {loading ? (
+                            <div className="account-events-row">
+                                <span>Loading...</span>
                             </div>
-                            <div className="events-doc-action">
-                                <img src="/assets/download.svg" alt="" />
+                        ) : error ? (
+                            <div className="account-events-row">
+                                <span>{error}</span>
                             </div>
-                        </div>
+                        ) : events.length === 0 ? (
+                            <div className="account-events-row">
+                                <span>No events found</span>
+                            </div>
+                        ) : (
+                            events.map((event, index) => {
+                                const isEnded = new Date(event.eventDate) < new Date()
+                                const canDownload = Boolean(event.certificateFileName)
+                                return (
+                                    <React.Fragment key={event.eventId}>
+                                        <div className="account-events-row">
+                                            <span className="events-name">
+                                                <button
+                                                    className="events-arrow-btn"
+                                                    type="button"
+                                                    onClick={() => toggleExpanded(index)}
+                                                    aria-expanded={expandedRows[index]}
+                                                >
+                                                    <span className="events-arrow">{expandedRows[index] ? '▼' : '▶'}</span>
+                                                </button>
+                                                {event.title}
+                                            </span>
+                                            <span className="events-date">{formatDate(event.eventDate)}<br />{formatTime(event.eventDate)}</span>
+                                            <span className="events-location">{event.venue || '—'}</span>
+                                            <span className="events-price">{formatPrice(event)}</span>
+                                            <button className="events-status" type="button">{isEnded ? 'Bitdi' : 'Gözləmədə'}</button>
+                                        </div>
 
-                        <div className="account-events-row">
-                            <span className="events-name">
-                                <button
-                                    className="events-arrow-btn"
-                                    type="button"
-                                    onClick={() => toggleExpanded(1)}
-                                    aria-expanded={expandedRows[1]}
-                                >
-                                    <span className="events-arrow">{expandedRows[1] ? '▼' : '▶'}</span>
-                                </button>
-                                HPB Carrahiyyə Hallarının Klinik Təhlili
-                            </span>
-                            <span className="events-date">Jan 25, 2026<br />17:00</span>
-                            <span className="events-location">Baku Cristal hall</span>
-                            <span className="events-price">20 ₼</span>
-                            <button className="events-status" type="button">Gözləmədə</button>
-                        </div>
-
-                        <div className={`account-events-row expanded ${expandedRows[1] ? 'is-open' : ''}`}>
-                            <div className="events-doc">
-                                <span className="events-doc-icon">
-                                    <img src="/assets/Download.svg" alt="" />
-                                </span>
-                                <div>
-                                    <div className="events-doc-title">HPB Carrahiyyə Hallarının Klinik Təhlili</div>
-                                    <div className="events-doc-date">12 Jan 2026</div>
-                                </div>
-                            </div>
-                            <div className="events-doc-action">
-                                <img src="/assets/download.svg" alt="" />
-                            </div>
-                        </div>
-
-                        <div className="account-events-row">
-                            <span className="events-name">
-                                <button
-                                    className="events-arrow-btn"
-                                    type="button"
-                                    onClick={() => toggleExpanded(2)}
-                                    aria-expanded={expandedRows[2]}
-                                >
-                                    <span className="events-arrow">{expandedRows[2] ? '▼' : '▶'}</span>
-                                </button>
-                                HPB Carrahiyyə Hallarının Klinik Təhlili
-                            </span>
-                            <span className="events-date">Jan 05, 2026<br />17:00</span>
-                            <span className="events-location">Baku Cristal hall</span>
-                            <span className="events-price">20 ₼</span>
-                            <button className="events-status">Bitdi</button>
-                        </div>
-
-                        <div className={`account-events-row expanded ${expandedRows[2] ? 'is-open' : ''}`}>
-                            <div className="events-doc">
-                                <span className="events-doc-icon">
-                                    <img src="/assets/Download.svg" alt="" />
-                                </span>
-                                <div>
-                                    <div className="events-doc-title">HPB Carrahiyyə Hallarının Klinik Təhlili</div>
-                                    <div className="events-doc-date">12 Jan 2026</div>
-                                </div>
-                            </div>
-                            <div className="events-doc-action">
-                                <img src="/assets/download.svg" alt="" />
-                            </div>
-                        </div>
-
-                        <div className="account-events-row">
-                            <span className="events-name">
-                                <button
-                                    className="events-arrow-btn"
-                                    type="button"
-                                    onClick={() => toggleExpanded(3)}
-                                    aria-expanded={expandedRows[3]}
-                                >
-                                    <span className="events-arrow">{expandedRows[3] ? '▼' : '▶'}</span>
-                                </button>
-                                HPB Carrahiyyə Hallarının Klinik Təhlili
-                            </span>
-                            <span className="events-date">Jan 25, 2026<br />17:00</span>
-                            <span className="events-location">Baku Cristal hall</span>
-                            <span className="events-price">20 ₼</span>
-                            <button className="events-status">Bitdi</button>
-                        </div>
-
-                        <div className={`account-events-row expanded ${expandedRows[3] ? 'is-open' : ''}`}>
-                            <div className="events-doc">
-                                <span className="events-doc-icon">
-                                    <img src="/assets/Download.svg" alt="" />
-                                </span>
-                                <div>
-                                    <div className="events-doc-title">HPB Carrahiyyə Hallarının Klinik Təhlili</div>
-                                    <div className="events-doc-date">12 Jan 2026</div>
-                                </div>
-                            </div>
-                            <div className="events-doc-action">
-                                <img src="/assets/download.svg" alt="" />
-                            </div>
-                        </div>
-
-                        <div className="account-events-row">
-                            <span className="events-name">
-                                <button
-                                    className="events-arrow-btn"
-                                    type="button"
-                                    onClick={() => toggleExpanded(4)}
-                                    aria-expanded={expandedRows[4]}
-                                >
-                                    <span className="events-arrow">{expandedRows[4] ? '▼' : '▶'}</span>
-                                </button>
-                                HPB Carrahiyyə Hallarının Klinik Təhlili
-                            </span>
-                            <span className="events-date">Jan 25, 2026<br />17:00</span>
-                            <span className="events-location">Baku Cristal hall</span>
-                            <span className="events-price">20 ₼</span>
-                            <button className="events-status">Bitdi</button>
-                        </div>
-
-                        <div className={`account-events-row expanded ${expandedRows[4] ? 'is-open' : ''}`}>
-                            <div className="events-doc">
-                                <span className="events-doc-icon">
-                                    <img src="/assets/Download.svg" alt="" />
-                                </span>
-                                <div>
-                                    <div className="events-doc-title">HPB Carrahiyyə Hallarının Klinik Təhlili</div>
-                                    <div className="events-doc-date">12 Jan 2026</div>
-                                </div>
-                            </div>
-                            <div className="events-doc-action">
-                                <img src="/assets/download.svg" alt="" />
-                            </div>
-                        </div>
+                                        <div className={`account-events-row expanded ${expandedRows[index] ? 'is-open' : ''}`}>
+                                            <div className="events-doc">
+                                                <span className="events-doc-icon">
+                                                    <img src="/assets/pdf.svg" alt="" />
+                                                </span>
+                                                <div>
+                                                    <div className="events-doc-title">{event.title}</div>
+                                                    <div className="events-doc-date">{formatDate(event.eventDate)}</div>
+                                                </div>
+                                            </div>
+                                            <button
+                                                className={`events-doc-action${canDownload ? '' : ' is-disabled'}`}
+                                                type="button"
+                                                onClick={() => handleDownload(event.certificateFileName)}
+                                                disabled={!canDownload}
+                                                aria-label="Download certificate"
+                                            >
+                                                <img src="/assets/download.svg" alt="" />
+                                            </button>
+                                        </div>
+                                    </React.Fragment>
+                                )
+                            })
+                        )}
                     </div>
                 </div>
             </div>

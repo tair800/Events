@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import { useUserAuth } from '../../context'
+import { useTranslation } from '../../hooks/useTranslation'
 import { userService } from '../../services'
 import AccountProfileCard from './AccountProfileCard'
 import './Account.css'
@@ -20,9 +22,18 @@ const decodeTokenPayload = (token) => {
 }
 
 const Account = () => {
-    const { username, role, token } = useUserAuth()
+    const navigate = useNavigate()
+    const { username, role, token, isAuthenticated } = useUserAuth()
+    const { t } = useTranslation()
     const tokenPayload = useMemo(() => decodeTokenPayload(token), [token])
     const [profile, setProfile] = useState(null)
+    const [basketItems, setBasketItems] = useState([])
+
+    const basketStorageKey = useMemo(() => {
+        if (!isAuthenticated) return null
+        const identity = username || token
+        return identity ? `homeBasket:${identity}` : null
+    }, [isAuthenticated, username, token])
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -38,6 +49,76 @@ const Account = () => {
             loadProfile()
         }
     }, [token])
+
+    useEffect(() => {
+        if (!basketStorageKey) {
+            setBasketItems([])
+            return
+        }
+        try {
+            const stored = localStorage.getItem(basketStorageKey)
+            const parsed = stored ? JSON.parse(stored) : []
+            setBasketItems(Array.isArray(parsed) ? parsed : [])
+        } catch (error) {
+            console.error('Failed to load basket:', error)
+            setBasketItems([])
+        }
+    }, [basketStorageKey])
+
+    useEffect(() => {
+        const syncPaidPrices = async () => {
+            if (!token) return
+            try {
+                const response = await fetch('https://localhost:5000/api/users/me/events', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                if (!response.ok) return
+                const data = await response.json()
+                if (!Array.isArray(data) || data.length === 0) return
+
+                setBasketItems((prev) => prev.map((item) => {
+                    const matched = data.find((event) => event.eventId === item.id)
+                    if (!matched) return item
+                    return {
+                        ...item,
+                        paidPrice: matched.paidPrice,
+                        paidCurrency: matched.paidCurrency
+                    }
+                }))
+            } catch (error) {
+                console.error('Failed to sync paid prices:', error)
+            }
+        }
+
+        syncPaidPrices()
+    }, [token])
+
+    const formatBasketPrice = (item) => {
+        if (!item) return '—'
+        const priceValue = item.paidPrice ?? item.discountedPrice ?? item.price
+        if (priceValue === 0 || priceValue === '0' || priceValue === null || priceValue === undefined) return '—'
+        const symbols = { USD: '$', EUR: '€', GBP: '£', AZN: '₼' }
+        const currency = item.paidCurrency || item.currency
+        const symbol = symbols[currency]
+        if (!symbol) return `${priceValue} ${item.currency || ''}`.trim()
+        if (currency === 'USD' || currency === 'EUR' || currency === 'GBP') {
+            return `${symbol}${priceValue}`
+        }
+        return `${priceValue} ${symbol}`
+    }
+
+    const formatBasketDate = (dateString) => {
+        if (!dateString) return '—'
+        const date = new Date(dateString)
+        if (Number.isNaN(date.getTime())) return '—'
+        return date.toLocaleDateString('en-US', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        })
+    }
 
     const handleToggleMembership = async () => {
         if (!profile) return
@@ -110,24 +191,20 @@ const Account = () => {
                                 <span className="notification-date">Jan 25, 2026</span>
                                 <button className="notification-chip" type="button">Gözləmədə</button>
                             </div>
-                            <div className="account-notifications-row">
-                                <span className="notification-title">HPB Carrahiyyə Hallarının Klinik Təhlili</span>
-                                <span className="notification-price">23 azn</span>
-                                <span className="notification-date">Jan 25, 2026</span>
-                                <button className="notification-chip" type="button">View more</button>
-                            </div>
-                            <div className="account-notifications-row">
-                                <span className="notification-title">HPB Carrahiyyə Hallarının Klinik Təhlili</span>
-                                <span className="notification-price">23 azn</span>
-                                <span className="notification-date">Jan 25, 2026</span>
-                                <button className="notification-chip" type="button">View more</button>
-                            </div>
-                            <div className="account-notifications-row">
-                                <span className="notification-title">HPB Carrahiyyə Hallarının Klinik Təhlili</span>
-                                <span className="notification-price">23 azn</span>
-                                <span className="notification-date">Jan 25, 2026</span>
-                                <button className="notification-chip" type="button">View more</button>
-                            </div>
+                            {basketItems.map((item) => (
+                                <div key={item.id} className="account-notifications-row">
+                                    <span className="notification-title">{item.title}</span>
+                                    <span className="notification-price">{formatBasketPrice(item)}</span>
+                                    <span className="notification-date">{formatBasketDate(item.eventDate)}</span>
+                                    <button
+                                        className="notification-chip"
+                                        type="button"
+                                        onClick={() => navigate(`/event/${item.id}`)}
+                                    >
+                                        {t('viewMore')}
+                                    </button>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>

@@ -26,6 +26,8 @@ namespace HospitalAPI.Data
         public DbSet<EventEmployee> EventEmployees { get; set; }
         public DbSet<EventSpeaker> EventSpeakers { get; set; }
         public DbSet<EventTimeline> EventTimeline { get; set; }
+        public DbSet<EventAttendee> EventAttendees { get; set; }
+        public DbSet<EventCertificate> EventCertificates { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Admin> Admins { get; set; }
@@ -69,6 +71,23 @@ namespace HospitalAPI.Data
                 entity.Property(e => e.RegionRu).HasMaxLength(100);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
+
+            modelBuilder.Entity<EventAttendee>(entity =>
+            {
+                entity.HasKey(a => a.Id);
+                entity.Property(a => a.PaidPrice).HasColumnType("REAL");
+                entity.Property(a => a.PaidCurrency).HasMaxLength(3);
+                entity.Property(a => a.Status).HasMaxLength(20);
+                entity.Property(a => a.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(a => a.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
+
+            modelBuilder.Entity<EventCertificate>(entity =>
+            {
+                entity.HasKey(c => c.Id);
+                entity.Property(c => c.FileName).IsRequired().HasMaxLength(255);
+                entity.Property(c => c.IssuedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // Configure Blogs table for SQLite

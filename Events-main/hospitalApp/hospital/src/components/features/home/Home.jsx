@@ -11,15 +11,17 @@ import eventPrev from '/assets/event-prev.svg';
 import InfoCard from '../../ui/InfoCard';
 import EmployeeSlider from '../employee/EmployeeSlider';
 import LogoCarousel from '../../ui/LogoCarousel';
-import { RequestModal } from '../../ui';
 import { getContextualImagePath } from '../../../utils/imageUtils';
 import { useLanguage } from '../../../context/LanguageContext';
 import { useTranslation } from '../../../hooks/useTranslation';
+import { useUserAuth } from '../../../context/UserAuthContext';
+import { ROUTES } from '../../../utils';
 
 const Home = () => {
     const navigate = useNavigate();
     const { selectedLanguage } = useLanguage();
     const { t } = useTranslation();
+    const { isAuthenticated, username, token } = useUserAuth();
     const [latestEvents, setLatestEvents] = useState([]);
     const [pastEvents, setPastEvents] = useState([]);
     const [employees, setEmployees] = useState([]);
@@ -37,8 +39,8 @@ const Home = () => {
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [showRequestModal, setShowRequestModal] = useState(false);
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0 });
+    const [basketItems, setBasketItems] = useState([]);
 
     // Fetch home sections data from API
     useEffect(() => {
@@ -211,6 +213,12 @@ const Home = () => {
         return { day, month };
     };
 
+    const formatBasketDate = (dateString) => {
+        const { day, month } = formatEventDate(dateString);
+        const year = new Date(dateString).getFullYear();
+        return `${day} ${month} ${year}`;
+    };
+
     // Helper function to format price
     const formatPrice = (price, currency) => {
         if (price === 0 || price === '0' || price === null || price === undefined) return t('free');
@@ -235,6 +243,98 @@ const Home = () => {
         if (event.price === 0 || event.price === '0' || event.price === null || event.price === undefined) return false;
         if (event.discountedPrice === null || event.discountedPrice === undefined) return false;
         return event.discountedPrice < event.price;
+    };
+
+    const resolveBasketPrice = (event) => {
+        if (hasDiscount(event)) {
+            return formatPrice(event.discountedPrice, event.currency);
+        }
+        return formatPrice(event.price, event.currency);
+    };
+
+    const getBasketKey = () => {
+        if (!isAuthenticated) return null;
+        const identity = username || token;
+        return identity ? `homeBasket:${identity}` : null;
+    };
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            setBasketItems([]);
+            return;
+        }
+
+        const key = getBasketKey();
+        if (!key) {
+            setBasketItems([]);
+            return;
+        }
+
+        try {
+            const stored = localStorage.getItem(key);
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed)) {
+                    setBasketItems(parsed);
+                    return;
+                }
+            }
+            setBasketItems([]);
+        } catch (err) {
+            console.error('Error loading basket:', err);
+            setBasketItems([]);
+        }
+    }, [isAuthenticated, username, token]);
+
+    const persistBasket = (items) => {
+        const key = getBasketKey();
+        if (!key) return;
+        localStorage.setItem(key, JSON.stringify(items));
+    };
+
+    const handleBuyClick = async (event) => {
+        if (!isAuthenticated) {
+            navigate(ROUTES.LOGIN);
+            return;
+        }
+        if (!token) {
+            navigate(ROUTES.LOGIN);
+            return;
+        }
+
+        try {
+            const response = await fetch(`https://localhost:5000/api/events/${event.id}/attendees`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to register attendee');
+            }
+
+            setBasketItems((prev) => {
+                if (prev.some((item) => item.id === event.id)) {
+                    return prev;
+                }
+                const next = [
+                    ...prev,
+                    {
+                        id: event.id,
+                        title: event.title,
+                        eventDate: event.eventDate,
+                        price: event.price,
+                        discountedPrice: event.discountedPrice,
+                        currency: event.currency
+                    }
+                ];
+                persistBasket(next);
+                return next;
+            });
+        } catch (error) {
+            console.error('Failed to register attendee:', error);
+        }
     };
 
 
@@ -299,6 +399,7 @@ const Home = () => {
                                 const formattedDiscountPrice = hasDiscount(event)
                                     ? formatPrice(event.discountedPrice, event.currency)
                                     : null;
+                                const isInBasket = basketItems.some((item) => item.id === event.id);
                                 const eventDate = new Date(event.eventDate);
                                 // Language-aware time formatting
                                 const localeMap = {
@@ -356,9 +457,10 @@ const Home = () => {
                                                     <div className="home-hero-event-buttons">
                                                         <button
                                                             className="home-hero-btn-primary"
-                                                            onClick={() => setShowRequestModal(true)}
+                                                            onClick={() => handleBuyClick(event)}
+                                                            disabled={isInBasket}
                                                         >
-                                                            {t('buyTicket')}
+                                                            {isInBasket ? t('basketBought') : t('buyTicket')}
                                                         </button>
                                                         <button
                                                             className="home-hero-btn-secondary"
@@ -549,6 +651,8 @@ const Home = () => {
                             ? formatPrice(event.discountedPrice, event.currency)
                             : null;
 
+                        const isInBasket = basketItems.some((item) => item.id === event.id);
+
                         return (
                             <div key={event.id} className="home-long-card">
                                 <div className="card-left-section">
@@ -584,11 +688,29 @@ const Home = () => {
                                                     <div className="price-row">
                                                         <span className="price-original">{formattedPrice}</span>
                                                         <span className="price-discount">{formattedDiscountPrice}</span>
+                                                        <button
+                                                            className={`home-event-buy-btn${isInBasket ? ' is-disabled' : ''}`}
+                                                            type="button"
+                                                            onClick={() => handleBuyClick(event)}
+                                                            disabled={isInBasket}
+                                                        >
+                                                            {isInBasket ? t('basketBought') : t('buyTicket')}
+                                                        </button>
                                                     </div>
                                                     <span className="price-note">Üzv ol, endirimli qiymətdən yararlan</span>
                                                 </div>
                                             ) : (
-                                                formattedPrice
+                                                <div className="price-row">
+                                                    <span className="price-standard">{formattedPrice}</span>
+                                                    <button
+                                                        className={`home-event-buy-btn${isInBasket ? ' is-disabled' : ''}`}
+                                                        type="button"
+                                                        onClick={() => handleBuyClick(event)}
+                                                        disabled={isInBasket}
+                                                    >
+                                                        {isInBasket ? t('basketBought') : t('buyTicket')}
+                                                    </button>
+                                                </div>
                                             )}
                                         </div>
                                     </div>
@@ -615,6 +737,32 @@ const Home = () => {
                             </div>
                         );
                     })
+                )}
+            </div>
+
+            <div className="home-basket">
+                <div className="home-basket-header">
+                    <h3>{t('basketTitle')}</h3>
+                </div>
+                {basketItems.length === 0 ? (
+                    <div className="home-basket-empty">{t('basketEmpty')}</div>
+                ) : (
+                    <div className="home-basket-table">
+                        <div className="home-basket-head">
+                            <span>{t('basketEvent')}</span>
+                            <span>{t('basketDate')}</span>
+                            <span>{t('basketPrice')}</span>
+                            <span>{t('basketStatus')}</span>
+                        </div>
+                        {basketItems.map((item) => (
+                            <div key={item.id} className="home-basket-row">
+                                <span>{item.title}</span>
+                                <span>{formatBasketDate(item.eventDate)}</span>
+                                <span>{resolveBasketPrice(item)}</span>
+                                <span className="home-basket-status">{t('basketBought')}</span>
+                            </div>
+                        ))}
+                    </div>
                 )}
             </div>
 
@@ -717,13 +865,6 @@ const Home = () => {
             {/* Logo Carousel */}
             <LogoCarousel />
 
-            {/* Request Modal */}
-            <RequestModal
-                isOpen={showRequestModal}
-                onClose={() => setShowRequestModal(false)}
-                onSuccess={() => {
-                }}
-            />
         </div>
     );
 };

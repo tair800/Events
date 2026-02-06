@@ -357,7 +357,7 @@ const EventsDetail = () => {
                 <img src={getContextualImagePath(event.detailImageLeft, 'admin')} alt="Event Detail Left" className="left-event-image" />
                 <img src={getContextualImagePath(event.detailImageMain, 'admin')} alt="Event Detail Main" className="main-event-image" />
                 <img src={getContextualImagePath(event.detailImageRight, 'admin')} alt="Event Detail Right" className="right-event-image" />
-                <button className="muraciet-btn" onClick={() => setShowRequestModal(true)}>Müraciət et</button>
+                <button className="muraciet-btn" onClick={() => setShowRequestModal(true)}>{t('buyTicket')}</button>
                 {event.pdfUrl && (
                     <button
                         className="pdf-download-btn"

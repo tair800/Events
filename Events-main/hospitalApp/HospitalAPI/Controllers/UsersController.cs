@@ -1,10 +1,10 @@
-using System.Security.Claims;
 using HospitalAPI.Data;
 using HospitalAPI.Models.DTOs;
 using HospitalAPI.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace HospitalAPI.Controllers
 {
@@ -159,6 +159,154 @@ namespace HospitalAPI.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpGet("me/events")]
+        public async Task<ActionResult<IEnumerable<UserEventDto>>> GetUserEvents()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            var attendeeRows = await _context.EventAttendees
+                .Where(a => a.UserId == userId)
+                .ToListAsync();
+
+            if (!attendeeRows.Any())
+            {
+                return Ok(new List<UserEventDto>());
+            }
+
+            var eventIds = attendeeRows.Select(a => a.EventId).Distinct().ToList();
+            var events = await _context.Events
+                .Where(e => eventIds.Contains(e.Id))
+                .ToListAsync();
+
+            var endedEventIds = events
+                .Where(e =>
+                {
+                    if (e.EventDate == default) return false;
+                    var eventDate = e.EventDate;
+                    if (!string.IsNullOrWhiteSpace(e.Time))
+                    {
+                        var parts = e.Time.Split(':');
+                        if (int.TryParse(parts[0], out var hours))
+                        {
+                            var minutes = 0;
+                            if (parts.Length > 1)
+                            {
+                                int.TryParse(parts[1], out minutes);
+                            }
+                            eventDate = new DateTime(
+                                eventDate.Year,
+                                eventDate.Month,
+                                eventDate.Day,
+                                hours,
+                                minutes,
+                                0);
+                        }
+                    }
+                    else
+                    {
+                        eventDate = new DateTime(
+                            eventDate.Year,
+                            eventDate.Month,
+                            eventDate.Day,
+                            23,
+                            59,
+                            59);
+                    }
+                    return DateTime.Now >= eventDate;
+                })
+                .Select(e => e.Id)
+                .ToList();
+
+            if (endedEventIds.Count > 0)
+            {
+                var existingCertificates = await _context.EventCertificates
+                    .Where(c => c.UserId == userId && endedEventIds.Contains(c.EventId))
+                    .ToListAsync();
+
+                var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                if (!Directory.Exists(uploads))
+                {
+                    Directory.CreateDirectory(uploads);
+                }
+
+                foreach (var eventItem in events.Where(e => endedEventIds.Contains(e.Id)))
+                {
+                    if (existingCertificates.Any(c => c.EventId == eventItem.Id))
+                    {
+                        continue;
+                    }
+
+                    var fileName = _context.EventCertificates
+                        .Where(c => c.EventId == eventItem.Id && c.UserId == userId)
+                        .Select(c => c.FileName)
+                        .FirstOrDefault();
+
+                    if (fileName != null)
+                    {
+                        continue;
+                    }
+
+                    var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                    if (user == null)
+                    {
+                        continue;
+                    }
+
+                    var pdfService = HttpContext.RequestServices.GetRequiredService<HospitalAPI.Services.Certificates.CertificatePdfService>();
+                    var generatedFile = pdfService.GenerateCertificatePdfFile(user, eventItem, uploads);
+                    _context.EventCertificates.Add(new HospitalAPI.Models.EventCertificate
+                    {
+                        EventId = eventItem.Id,
+                        UserId = userId,
+                        FileName = generatedFile,
+                        IssuedAt = DateTime.UtcNow
+                    });
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            var certificates = await _context.EventCertificates
+                .Where(c => c.UserId == userId && eventIds.Contains(c.EventId))
+                .ToListAsync();
+
+            var results = attendeeRows
+                .Select(attendee =>
+                {
+                    var eventItem = events.FirstOrDefault(e => e.Id == attendee.EventId);
+                    if (eventItem == null)
+                    {
+                        return null;
+                    }
+
+                    var cert = certificates.FirstOrDefault(c => c.EventId == attendee.EventId);
+                    return new UserEventDto
+                    {
+                        EventId = eventItem.Id,
+                        Title = eventItem.Title,
+                        EventDate = eventItem.EventDate,
+                        Venue = eventItem.Venue,
+                        Price = eventItem.Price,
+                        DiscountedPrice = eventItem.DiscountedPrice,
+                        Currency = eventItem.Currency,
+                        PaidPrice = attendee.PaidPrice,
+                        PaidCurrency = attendee.PaidCurrency,
+                        Status = attendee.Status,
+                        CertificateFileName = cert?.FileName
+                    };
+                })
+                .Where(result => result != null)
+                .OrderByDescending(result => result!.EventDate)
+                .Cast<UserEventDto>()
+                .ToList();
+
+            return Ok(results);
         }
     }
 }

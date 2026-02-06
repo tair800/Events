@@ -33,6 +33,7 @@ import AdminAbout from './pages/admin/AdminAbout'
 import AdminContact from './pages/admin/AdminContact'
 import AdminBlog from './pages/admin/AdminBlog'
 import AdminEvents from './pages/admin/AdminEvents'
+import AdminUsers from './pages/admin/AdminUsers'
 import AdminSponsors from './pages/admin/AdminSponsors'
 import AdminGallery from './pages/admin/AdminGallery'
 import AdminEmployee from './pages/admin/AdminEmployee'
@@ -98,33 +99,33 @@ function App() {
   return (
     <LanguageProvider>
       <UserAuthProvider>
-        <Router>
-          <ScrollToTop />
-          <div className="App">
-            <Routes>
+      <Router>
+        <ScrollToTop />
+        <div className="App">
+          <Routes>
 
-              <Route path="/" element={
-                <>
-                  <Header showTopImage={false} />
-                  <HomePage />
-                  <Footer />
-                </>
-              } />
-              <Route path="/test" element={<TestPage />} />
-              <Route path="/about" element={
-                <>
-                  <Header showTopImage={true} />
-                  <AboutPage />
-                  <Footer />
-                </>
-              } />
-              <Route path="/contact" element={
-                <>
-                  <Header showTopImage={true} />
-                  <ContactPage />
-                  <Footer />
-                </>
-              } />
+            <Route path="/" element={
+              <>
+                <Header showTopImage={false} />
+                <HomePage />
+                <Footer />
+              </>
+            } />
+            <Route path="/test" element={<TestPage />} />
+            <Route path="/about" element={
+              <>
+                <Header showTopImage={true} />
+                <AboutPage />
+                <Footer />
+              </>
+            } />
+            <Route path="/contact" element={
+              <>
+                <Header showTopImage={true} />
+                <ContactPage />
+                <Footer />
+              </>
+            } />
               <Route path="/login" element={
                 <>
                   <Header showTopImage={false} />
@@ -161,27 +162,27 @@ function App() {
                   <AccountBenefits />
                 </>
               } />
-              <Route path="/employee" element={
-                <>
-                  <Header showTopImage={true} />
-                  <EmployeePage />
-                  <Footer />
-                </>
-              } />
-              <Route path="/employee/:id" element={
-                <>
-                  <Header showTopImage={false} hidePageName={true} />
-                  <EmployeeDetail />
-                  <Footer />
-                </>
-              } />
-              <Route path="/events" element={
-                <>
-                  <Header showTopImage={true} />
-                  <EventsPage />
-                  <Footer />
-                </>
-              } />
+            <Route path="/employee" element={
+              <>
+                <Header showTopImage={true} />
+                <EmployeePage />
+                <Footer />
+              </>
+            } />
+            <Route path="/employee/:id" element={
+              <>
+                <Header showTopImage={false} hidePageName={true} />
+                <EmployeeDetail />
+                <Footer />
+              </>
+            } />
+            <Route path="/events" element={
+              <>
+                <Header showTopImage={true} />
+                <EventsPage />
+                <Footer />
+              </>
+            } />
               <Route path="/members" element={
                 <>
                   <Header showTopImage={true} />
@@ -189,60 +190,61 @@ function App() {
                   <Footer />
                 </>
               } />
-              <Route path="/event/:id" element={
-                <>
-                  <Header showTopImage={true} />
-                  <EventsDetail />
-                  <Footer />
-                </>
-              } />
-              <Route path="/gallery" element={
-                <>
-                  <Header showTopImage={true} />
-                  <GalleryPage />
-                  <Footer />
-                </>
-              } />
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin" element={
-                <ProtectedRoute>
-                  <AdminLayout />
-                </ProtectedRoute>
-              }>
-                <Route index element={<Dashboard />} />
-                <Route path="home" element={<AdminHome />} />
-                <Route path="about" element={<AdminAbout />} />
-                <Route path="contact" element={<AdminContact />} />
-                <Route path="blog" element={<AdminBlog />} />
-                <Route path="events" element={<AdminEvents />} />
-                <Route path="sponsors" element={<AdminSponsors />} />
-                <Route path="gallery" element={<AdminGallery />} />
-                <Route path="employee" element={<AdminEmployee />} />
-                <Route path="requests" element={<AdminRequests />} />
-                <Route path="mail" element={<AdminMail />} />
-              </Route>
-              <Route path="/blog" element={
+            <Route path="/event/:id" element={
+              <>
+                <Header showTopImage={true} />
+                <EventsDetail />
+                <Footer />
+              </>
+            } />
+            <Route path="/gallery" element={
+              <>
+                <Header showTopImage={true} />
+                <GalleryPage />
+                <Footer />
+              </>
+            } />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <AdminLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Dashboard />} />
+              <Route path="home" element={<AdminHome />} />
+              <Route path="about" element={<AdminAbout />} />
+              <Route path="contact" element={<AdminContact />} />
+              <Route path="blog" element={<AdminBlog />} />
+              <Route path="events" element={<AdminEvents />} />
+                <Route path="users" element={<AdminUsers />} />
+              <Route path="sponsors" element={<AdminSponsors />} />
+              <Route path="gallery" element={<AdminGallery />} />
+              <Route path="employee" element={<AdminEmployee />} />
+              <Route path="requests" element={<AdminRequests />} />
+              <Route path="mail" element={<AdminMail />} />
+            </Route>
+            <Route path="/blog" element={
                 <BlogAccessRoute>
-                  <>
-                    <Header showTopImage={true} />
-                    <BlogPage />
-                    <Footer />
-                  </>
+              <>
+                <Header showTopImage={true} />
+                <BlogPage />
+                <Footer />
+              </>
                 </BlogAccessRoute>
-              } />
-              <Route path="/blog/:id" element={
+            } />
+            <Route path="/blog/:id" element={
                 <BlogAccessRoute>
-                  <>
-                    <Header showTopImage={true} />
-                    <BlogDetail />
-                    <Footer />
-                  </>
+              <>
+                <Header showTopImage={true} />
+                <BlogDetail />
+                <Footer />
+              </>
                 </BlogAccessRoute>
-              } />
-              <Route path="*" element={<Error404 />} />
-            </Routes>
-          </div>
-        </Router>
+            } />
+            <Route path="*" element={<Error404 />} />
+          </Routes>
+        </div>
+      </Router>
       </UserAuthProvider>
     </LanguageProvider>
   )
