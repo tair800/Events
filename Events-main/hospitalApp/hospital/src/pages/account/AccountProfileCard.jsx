@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUserAuth } from '../../context'
-import { API_CONFIG } from '../../utils'
+import { API_CONFIG, ROUTES } from '../../utils'
 import { userService } from '../../services'
 import Swal from 'sweetalert2'
 import './Account.css'
@@ -262,7 +262,7 @@ const AccountProfileCard = ({ profile, onProfileUpdate }) => {
                 </div>
                 <div className="profile-contact-item">
                     <img src="/assets/account-location.svg" alt="" />
-                    <span>Bakı, Azərbaycan</span>
+                    <span>{displayProfile?.location || 'Bakı, Azərbaycan'}</span>
                 </div>
             </div>
         </div>

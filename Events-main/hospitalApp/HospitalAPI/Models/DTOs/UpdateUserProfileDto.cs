@@ -20,6 +20,12 @@ namespace HospitalAPI.Models.DTOs
         [StringLength(7, MinimumLength = 7, ErrorMessage = "FIN code must be 7 characters.")]
         public string? FinCode { get; set; }
 
+        [MaxLength(255)]
+        public string? Location { get; set; }
+
+        [MaxLength(255)]
+        public string? Clinic { get; set; }
+
         public bool? IsMember { get; set; }
     }
 }

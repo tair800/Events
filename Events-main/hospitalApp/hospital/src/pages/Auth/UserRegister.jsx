@@ -13,6 +13,8 @@ const UserRegister = () => {
     const [phone, setPhone] = useState('')
     const [position, setPosition] = useState('')
     const [finCode, setFinCode] = useState('')
+    const [location, setLocation] = useState('')
+    const [clinic, setClinic] = useState('')
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
     const [loading, setLoading] = useState(false)
@@ -43,6 +45,10 @@ const UserRegister = () => {
             setError('FIN must be 7 characters')
             return
         }
+        if (!location.trim()) {
+            setError('Location is required')
+            return
+        }
 
         setLoading(true)
         try {
@@ -56,7 +62,9 @@ const UserRegister = () => {
                 lastName,
                 phone,
                 position,
-                finCode
+                finCode,
+                location: location.trim(),
+                clinic: clinic.trim() || null
             })
             setSuccess('Account created! Redirecting to login...')
             setTimeout(() => navigate(ROUTES.LOGIN), 1200)
@@ -144,6 +152,27 @@ const UserRegister = () => {
                                 placeholder="Şəxsiyyət vəsiqənizin FIN kodunu daxil edin"
                                 maxLength={7}
                                 required
+                            />
+                        </div>
+                        <div className="auth-field">
+                            <label htmlFor="register-location">Ünvan</label>
+                            <input
+                                id="register-location"
+                                type="text"
+                                value={location}
+                                onChange={(e) => setLocation(e.target.value)}
+                                placeholder="Ünvanınızı daxil edin"
+                                required
+                            />
+                        </div>
+                        <div className="auth-field">
+                            <label htmlFor="register-clinic">Klinika</label>
+                            <input
+                                id="register-clinic"
+                                type="text"
+                                value={clinic}
+                                onChange={(e) => setClinic(e.target.value)}
+                                placeholder="Klinikanızı daxil edin (istəyə bağlı)"
                             />
                         </div>
                         <div className="auth-field">

@@ -435,6 +435,7 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    scroll-margin-top: 0;
 }
 
 .account-notifications-header {
@@ -449,15 +450,31 @@
     color: #111827;
 }
 
-.account-notifications-action {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
+.account-notifications-action.events-arrow-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
     border: none;
-    background: #e5e7eb;
-    color: #1f2937;
-    font-size: 1rem;
+    background: #e5e7eb !important;
+    border-radius: 6px;
+    padding: 0;
     cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.account-notifications-action.events-arrow-btn:hover {
+    background: #d1d5db !important;
+    transform: scale(1.05);
+}
+
+.account-notifications-action.events-arrow-btn:active {
+    transform: scale(0.95);
+}
+
+.account-notifications-action:hover {
+    background: #d1d5db;
 }
 
 .account-notifications-list {
@@ -469,6 +486,7 @@
     border-radius: 16px;
     overflow: hidden;
     background: #ffffff;
+    contain: layout;
 }
 
 .account-notifications-row {
@@ -481,6 +499,42 @@
     color: #6b7280;
     font-size: 0.95rem;
     font-weight: 400;
+    animation: fadeInUp 0.4s ease-out;
+    will-change: transform, opacity;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.account-notifications-row.notification-exit {
+    animation: fadeOutDown 0.3s ease-in forwards;
+}
+
+@keyframes fadeOutDown {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        max-height: 100px;
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-15px) scale(0.95);
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        margin: 0;
+        overflow: hidden;
+    }
 }
 
 .account-notifications-row:first-child {
@@ -606,7 +660,17 @@
 .events-arrow {
     color: #111827;
     font-size: 0.75rem;
-    transition: transform 0.2s ease;
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+.account-notifications-action .events-arrow {
+    transform: rotate(0deg);
+    transition: transform 0.3s ease;
+}
+
+.account-notifications-action[aria-expanded="true"] .events-arrow {
+    transform: rotate(90deg);
 }
 
 .events-date {

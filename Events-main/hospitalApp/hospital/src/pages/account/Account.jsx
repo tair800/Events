@@ -29,6 +29,7 @@ const Account = () => {
     const [profile, setProfile] = useState(null)
     const [basketItems, setBasketItems] = useState([])
     const [userEvents, setUserEvents] = useState([])
+    const [notificationsExpanded, setNotificationsExpanded] = useState(false)
 
     const basketStorageKey = useMemo(() => {
         if (!isAuthenticated) return null
@@ -206,8 +207,26 @@ const Account = () => {
                     <div className="account-notifications">
                         <div className="account-notifications-header">
                             <h2>Notifications</h2>
-                            <button className="account-notifications-action" type="button" aria-label="Play">
-                                ▶
+                            <button 
+                                className="account-notifications-action events-arrow-btn" 
+                                type="button" 
+                                aria-label="Toggle notifications"
+                                aria-expanded={notificationsExpanded}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    const scrollY = window.scrollY
+                                    setNotificationsExpanded(!notificationsExpanded)
+                                    // Prevent scroll jump - restore position after state update
+                                    setTimeout(() => {
+                                        window.scrollTo({
+                                            top: scrollY,
+                                            behavior: 'auto'
+                                        })
+                                    }, 0)
+                                }}
+                            >
+                                <span className="events-arrow">▶</span>
                             </button>
                         </div>
                         <div className="account-notifications-list">
@@ -217,14 +236,18 @@ const Account = () => {
                                 <span>Date</span>
                                 <span>Status</span>
                             </div>
-                            <div className="account-notifications-row">
+                            <div className="account-notifications-row" style={{ animationDelay: '0s' }}>
                                 <span className="notification-title">#Membership</span>
                                 <span className="notification-price">—</span>
                                 <span className="notification-date">Jan 25, 2026</span>
                                 <button className="notification-chip" type="button">Gözləmədə</button>
                             </div>
-                            {userEvents.map((item) => (
-                                <div key={item.id} className="account-notifications-row">
+                            {(notificationsExpanded ? userEvents : userEvents.slice(0, 3)).map((item, index) => (
+                                <div 
+                                    key={item.id} 
+                                    className="account-notifications-row"
+                                    style={{ animationDelay: `${index * 0.05}s` }}
+                                >
                                     <span className="notification-title">{item.title}</span>
                                     <span className="notification-price">{formatBasketPrice(item)}</span>
                                     <span className="notification-date">{formatBasketDate(item.eventDate)}</span>

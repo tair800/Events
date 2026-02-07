@@ -29,7 +29,9 @@ const AccountDetails = () => {
         email: '',
         phone: '',
         position: '',
-        finCode: ''
+        finCode: '',
+        location: '',
+        clinic: ''
     })
     const [passwordData, setPasswordData] = useState({
         currentPassword: '',
@@ -51,7 +53,9 @@ const AccountDetails = () => {
                     email: data.email || tokenPayload?.email || '',
                     phone: data.phone || '',
                     position: data.position || '',
-                    finCode: data.finCode || ''
+                    finCode: data.finCode || '',
+                    location: data.location || '',
+                    clinic: data.clinic || ''
                 })
             } catch (error) {
                 console.error('Failed to load profile:', error)
@@ -133,7 +137,9 @@ const AccountDetails = () => {
                 lastName: formData.lastName?.trim(),
                 phone: formData.phone?.trim(),
                 position: formData.position?.trim(),
-                finCode: formData.finCode?.trim()
+                finCode: formData.finCode?.trim(),
+                location: formData.location?.trim(),
+                clinic: formData.clinic?.trim()
             })
             setProfile(updated)
             localStorage.setItem('userProfileCache', JSON.stringify({
@@ -229,6 +235,14 @@ const AccountDetails = () => {
                             <label>FIN kodu</label>
                             <input type="text" placeholder="Şəxsiyyət vəsiqənizin FIN kodunu daxil edin" value={formData.finCode} onChange={handleChange('finCode')} maxLength={7} />
                             {errors.finCode && <span className="account-field-error">{errors.finCode}</span>}
+                        </div>
+                        <div className="account-field">
+                            <label>Ünvan</label>
+                            <input type="text" placeholder="Ünvanınızı daxil edin" value={formData.location} onChange={handleChange('location')} />
+                        </div>
+                        <div className="account-field">
+                            <label>Klinika</label>
+                            <input type="text" placeholder="Klinikanızı daxil edin" value={formData.clinic} onChange={handleChange('clinic')} />
                         </div>
                     </div>
 

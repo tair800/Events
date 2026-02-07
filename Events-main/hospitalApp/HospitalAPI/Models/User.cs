@@ -35,6 +35,12 @@ namespace HospitalAPI.Models
         [MaxLength(500)]
         public string? AvatarPath { get; set; }
 
+        [MaxLength(255)]
+        public string? Location { get; set; }
+
+        [MaxLength(255)]
+        public string? Clinic { get; set; }
+
         public bool IsMember { get; set; } = false;
 
         [Required]

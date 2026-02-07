@@ -48,6 +48,15 @@ namespace HospitalAPI.Models.DTOs
         [StringLength(7, MinimumLength = 7, ErrorMessage = "FIN code must be 7 characters.")]
         [JsonPropertyName("finCode")]
         public string? FinCode { get; set; }
+
+        [Required]
+        [MaxLength(255)]
+        [JsonPropertyName("location")]
+        public string? Location { get; set; }
+
+        [MaxLength(255)]
+        [JsonPropertyName("clinic")]
+        public string? Clinic { get; set; }
     }
 }
 

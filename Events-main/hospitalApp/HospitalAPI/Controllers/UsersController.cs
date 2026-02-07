@@ -49,6 +49,8 @@ namespace HospitalAPI.Controllers
                 Position = user.Position,
                 FinCode = user.FinCode,
                 AvatarPath = user.AvatarPath,
+                Location = user.Location,
+                Clinic = user.Clinic,
                 IsMember = user.IsMember
             });
         }
@@ -70,6 +72,8 @@ namespace HospitalAPI.Controllers
                     Position = u.Position,
                     FinCode = u.FinCode,
                     AvatarPath = u.AvatarPath,
+                    Location = u.Location,
+                    Clinic = u.Clinic,
                     IsMember = u.IsMember
                 })
                 .ToListAsync();
@@ -112,6 +116,14 @@ namespace HospitalAPI.Controllers
             {
                 user.FinCode = update.FinCode;
             }
+            if (update.Location != null)
+            {
+                user.Location = update.Location;
+            }
+            if (update.Clinic != null)
+            {
+                user.Clinic = update.Clinic;
+            }
             if (update.IsMember.HasValue)
             {
                 user.IsMember = update.IsMember.Value;
@@ -131,6 +143,8 @@ namespace HospitalAPI.Controllers
                 Position = user.Position,
                 FinCode = user.FinCode,
                 AvatarPath = user.AvatarPath,
+                Location = user.Location,
+                Clinic = user.Clinic,
                 IsMember = user.IsMember
             });
         }
@@ -185,6 +199,8 @@ namespace HospitalAPI.Controllers
                 Position = user.Position,
                 FinCode = user.FinCode,
                 AvatarPath = user.AvatarPath,
+                Location = user.Location,
+                Clinic = user.Clinic,
                 IsMember = user.IsMember
             });
         }

@@ -57,6 +57,8 @@ namespace HospitalAPI.Services.Auth
                 Phone = userForRegistration.Phone?.Trim(),
                 Position = userForRegistration.Position?.Trim(),
                 FinCode = userForRegistration.FinCode?.Trim(),
+                Location = userForRegistration.Location?.Trim(),
+                Clinic = userForRegistration.Clinic?.Trim(),
                 IsMember = false
             };
 

@@ -4,7 +4,6 @@ import { getContextualImagePath } from '../../../utils/imageUtils';
 import { useLanguage } from '../../../context/LanguageContext';
 import { useTranslation } from '../../../hooks/useTranslation';
 import './Employee.css';
-import employeeBg from '../../../assets/employee-bg.png';
 import Pagination from '../../ui/Pagination';
 import usePagination from '../../../hooks/usePagination';
 
@@ -137,23 +136,22 @@ const Employee = () => {
                         onClick={() => handleEmployeeClick(employee.id)}
                         style={{ cursor: 'pointer' }}
                     >
-                        <img
-                            src={employeeBg}
-                            alt="Employee Background"
-                            className="employee-bg-image"
-                        />
-                        <img
-                            src={employee.image ? getContextualImagePath(employee.image, 'admin') : "/assets/employee1.png"}
-                            alt="Employee"
-                            className="employee-photo"
-                        />
-                        <div className="employee-fullname">
-                            {employee.fullname}
+                        <div className="employee-image-container">
+                            <img
+                                src={employee.image ? getContextualImagePath(employee.image, 'admin') : "/assets/employee1.png"}
+                                alt="Employee"
+                                className="employee-photo"
+                            />
+                            <div className="employee-fullname">
+                                {employee.fullname}
+                            </div>
                         </div>
-                        <div className="employee-field-section">
-                            <div className="employee-field">
-                                <div className="employee-field-dot"></div>
-                                {employee.field}
+                        <div className="employee-info-section">
+                            <div className="employee-field-section">
+                                <div className="employee-field">
+                                    <div className="employee-field-dot"></div>
+                                    {employee.field}
+                                </div>
                             </div>
                         </div>
                     </div>

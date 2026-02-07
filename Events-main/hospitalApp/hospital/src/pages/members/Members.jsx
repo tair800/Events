@@ -47,7 +47,7 @@ const Members = () => {
                         <div className="members-row" key={member.id}>
                             <span>{fullName || member.username}</span>
                             <span>{member.position || '—'}</span>
-                            <span>{t('membersDefaultClinic')}</span>
+                            <span>{member.clinic || '—'}</span>
                         </div>
                     )
                 })}

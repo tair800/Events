@@ -39,7 +39,9 @@ function AdminUsers() {
                 user.email,
                 user.phone,
                 user.position,
-                user.finCode
+                user.finCode,
+                user.location,
+                user.clinic
             ]
                 .filter(Boolean)
                 .join(' ')
@@ -84,6 +86,8 @@ function AdminUsers() {
                             <span>Email</span>
                             <span>Phone</span>
                             <span>Position</span>
+                            <span>Location</span>
+                            <span>Clinic</span>
                             <span>FIN</span>
                             <span>Member</span>
                         </div>
@@ -93,6 +97,8 @@ function AdminUsers() {
                                 <span>{user.email || '—'}</span>
                                 <span>{user.phone || '—'}</span>
                                 <span>{user.position || '—'}</span>
+                                <span>{user.location || '—'}</span>
+                                <span>{user.clinic || '—'}</span>
                                 <span>{user.finCode || '—'}</span>
                                 <span className={user.isMember ? 'member-yes' : 'member-no'}>
                                     {user.isMember ? 'Yes' : 'No'}

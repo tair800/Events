@@ -11,6 +11,8 @@ namespace HospitalAPI.Models.DTOs
         public string? Position { get; set; }
         public string? FinCode { get; set; }
         public string? AvatarPath { get; set; }
+        public string? Location { get; set; }
+        public string? Clinic { get; set; }
         public bool IsMember { get; set; }
     }
 }
