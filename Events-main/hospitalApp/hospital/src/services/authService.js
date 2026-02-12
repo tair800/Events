@@ -22,5 +22,7 @@ const authRequest = async (endpoint, payload) => {
 export const authService = {
     login: (payload) => authRequest('/login', payload),
     register: (payload) => authRequest('/register', payload),
+    forgotPassword: (payload) => authRequest('/forgot-password', payload),
+    resetPassword: (payload) => authRequest('/reset-password', payload),
 }
 

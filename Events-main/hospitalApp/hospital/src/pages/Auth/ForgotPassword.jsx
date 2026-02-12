@@ -1,31 +1,28 @@
 import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { authService } from '../../services'
-import { useUserAuth } from '../../context'
 import { ROUTES } from '../../utils'
 import { useTranslation } from '../../hooks/useTranslation'
 import './Auth.css'
 
-const UserLogin = () => {
+const ForgotPassword = () => {
     const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
     const [error, setError] = useState('')
+    const [success, setSuccess] = useState('')
     const [loading, setLoading] = useState(false)
-    const navigate = useNavigate()
-    const { login } = useUserAuth()
     const { t } = useTranslation()
 
     const handleSubmit = async (event) => {
         event.preventDefault()
         setError('')
+        setSuccess('')
         setLoading(true)
 
         try {
-            const response = await authService.login({ username: email, password })
-            login({ token: response.token, username: email, role: 'User' })
-            navigate(ROUTES.HOME)
+            await authService.forgotPassword({ email })
+            setSuccess(t('resetLinkSent'))
         } catch (err) {
-            setError(err.message || t('loginFailed'))
+            setError(err.message || t('failedToSendLink'))
         } finally {
             setLoading(false)
         }
@@ -38,13 +35,14 @@ const UserLogin = () => {
             </video>
             <div className="auth-overlay" />
             <div className="auth-card auth-card--login">
-                <h1>{t('loginTitle')}</h1>
+                <h1>{t('forgotPasswordTitle')}</h1>
                 {error && <div className="auth-message">{error}</div>}
+                {success && <div className="auth-message success">{success}</div>}
                 <form onSubmit={handleSubmit}>
                     <div className="auth-field">
-                        <label htmlFor="login-email">{t('emailLabel')}</label>
+                        <label htmlFor="forgot-email">{t('emailLabel')}</label>
                         <input
-                            id="login-email"
+                            id="forgot-email"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -52,26 +50,12 @@ const UserLogin = () => {
                             required
                         />
                     </div>
-                    <div className="auth-field">
-                        <label htmlFor="login-password">{t('passwordLabel')}</label>
-                        <input
-                            id="login-password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder={t('passwordPlaceholder')}
-                            required
-                        />
-                    </div>
-                    <div className="auth-login-row">
-                        <Link to="/forgot-password" className="auth-login-forgot">{t('forgotPasswordLink')}</Link>
-                    </div>
                     <div className="auth-actions auth-actions--login">
                         <button className="auth-primary auth-primary--login" type="submit" disabled={loading}>
-                            {loading ? t('loggingIn') : t('loginButton')}
+                            {loading ? t('sending') : t('sendResetLink')}
                         </button>
-                        <Link className="auth-secondary auth-secondary--login" to={ROUTES.REGISTER}>
-                            {t('noAccount')} <span>{t('registerLink')}</span>
+                        <Link className="auth-secondary auth-secondary--login" to={ROUTES.LOGIN}>
+                            {t('backToLogin')} <span>{t('loginLink')}</span>
                         </Link>
                     </div>
                 </form>
@@ -80,5 +64,5 @@ const UserLogin = () => {
     )
 }
 
-export default UserLogin
+export default ForgotPassword
 

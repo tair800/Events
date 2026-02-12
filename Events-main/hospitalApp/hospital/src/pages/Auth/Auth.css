@@ -213,6 +213,12 @@
     text-decoration: underline;
     font-weight: 600;
     font-size: 0.9rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.auth-login-forgot:hover {
+    color: #ffffff;
 }
 
 @media (max-width: 900px) {

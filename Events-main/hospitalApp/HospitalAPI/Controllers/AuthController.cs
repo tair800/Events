@@ -50,6 +50,40 @@ namespace HospitalAPI.Controllers
                 return StatusCode(500, new { message = "Internal server error: " + ex.Message });
             }
         }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+        {
+            try
+            {
+                await _authService.ForgotPassword(forgotPasswordDto);
+                // Always return success to prevent email enumeration
+                return Ok(new { message = "If the email exists, a password reset link has been sent." });
+            }
+            catch (Exception ex)
+            {
+                // Still return success to prevent email enumeration
+                return Ok(new { message = "If the email exists, a password reset link has been sent." });
+            }
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+        {
+            try
+            {
+                await _authService.ResetPassword(resetPasswordDto);
+                return Ok(new { message = "Password has been reset successfully." });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error: " + ex.Message });
+            }
+        }
     }
 }
 

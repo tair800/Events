@@ -429,6 +429,7 @@ namespace HospitalAPI.Data
                 entity.Property(u => u.FinCode).HasMaxLength(20);
                 entity.Property(u => u.PasswordHash).IsRequired();
                 entity.Property(u => u.PasswordSalt).IsRequired();
+                entity.Property(u => u.PasswordResetToken).HasMaxLength(500);
                 entity.Property(u => u.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(u => u.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.HasIndex(u => u.Username).IsUnique();

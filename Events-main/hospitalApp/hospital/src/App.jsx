@@ -20,6 +20,8 @@ import {
   Error404,
   UserLogin,
   UserRegister,
+  ForgotPassword,
+  ResetPassword,
   AccountPage,
   AccountDetails,
   AccountEvents,
@@ -137,6 +139,18 @@ function App() {
                 <>
                   <Header showTopImage={false} />
                   <UserRegister />
+                </>
+              } />
+              <Route path="/forgot-password" element={
+                <>
+                  <Header showTopImage={false} />
+                  <ForgotPassword />
+                </>
+              } />
+              <Route path="/reset-password" element={
+                <>
+                  <Header showTopImage={false} />
+                  <ResetPassword />
                 </>
               } />
               <Route path="/account" element={

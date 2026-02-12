@@ -19,7 +19,6 @@
 
 /* Employee Unified Card */
 .employee-unified-card {
-    background: #1B1B3F;
     border-radius: 20px;
     transition: all 0.3s ease;
     width: 300px;
@@ -42,6 +41,9 @@
     justify-content: center;
     background: #1B1B3F;
     position: relative;
+    border-radius: 20px 20px 0 0;
+    margin: 0;
+    padding: 0;
 }
 
 .employee-photo {
@@ -56,6 +58,9 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    border-radius: 0 0 20px 20px;
+    margin: 0;
+    border: none;
 }
 
 .employee-fullname {
@@ -425,6 +430,11 @@
 
     .employee-image-container {
         height: 200px;
+        border-radius: 15px 15px 0 0;
+    }
+
+    .employee-info-section {
+        border-radius: 0 0 15px 15px;
     }
 
     .employee-fullname {
@@ -500,6 +510,11 @@
 
     .employee-image-container {
         height: 200px;
+        border-radius: 15px 15px 0 0;
+    }
+
+    .employee-info-section {
+        border-radius: 0 0 15px 15px;
     }
 
     .employee-fullname {
@@ -577,6 +592,11 @@
 
     .employee-image-container {
         height: 160px;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .employee-info-section {
+        border-radius: 0 0 12px 12px;
     }
 
     .employee-fullname {

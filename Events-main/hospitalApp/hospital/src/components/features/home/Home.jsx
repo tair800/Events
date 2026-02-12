@@ -213,12 +213,6 @@ const Home = () => {
         return { day, month };
     };
 
-    const formatBasketDate = (dateString) => {
-        const { day, month } = formatEventDate(dateString);
-        const year = new Date(dateString).getFullYear();
-        return `${day} ${month} ${year}`;
-    };
-
     // Helper function to format price
     const formatPrice = (price, currency) => {
         if (price === 0 || price === '0' || price === null || price === undefined) return t('free');
@@ -243,13 +237,6 @@ const Home = () => {
         if (event.price === 0 || event.price === '0' || event.price === null || event.price === undefined) return false;
         if (event.discountedPrice === null || event.discountedPrice === undefined) return false;
         return event.discountedPrice < event.price;
-    };
-
-    const resolveBasketPrice = (event) => {
-        if (hasDiscount(event)) {
-            return formatPrice(event.discountedPrice, event.currency);
-        }
-        return formatPrice(event.price, event.currency);
     };
 
     const getBasketKey = () => {
@@ -737,32 +724,6 @@ const Home = () => {
                             </div>
                         );
                     })
-                )}
-            </div>
-
-            <div className="home-basket">
-                <div className="home-basket-header">
-                    <h3>{t('basketTitle')}</h3>
-                </div>
-                {basketItems.length === 0 ? (
-                    <div className="home-basket-empty">{t('basketEmpty')}</div>
-                ) : (
-                    <div className="home-basket-table">
-                        <div className="home-basket-head">
-                            <span>{t('basketEvent')}</span>
-                            <span>{t('basketDate')}</span>
-                            <span>{t('basketPrice')}</span>
-                            <span>{t('basketStatus')}</span>
-                        </div>
-                        {basketItems.map((item) => (
-                            <div key={item.id} className="home-basket-row">
-                                <span>{item.title}</span>
-                                <span>{formatBasketDate(item.eventDate)}</span>
-                                <span>{resolveBasketPrice(item)}</span>
-                                <span className="home-basket-status">{t('basketBought')}</span>
-                            </div>
-                        ))}
-                    </div>
                 )}
             </div>
 

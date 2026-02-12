@@ -81,6 +81,7 @@ builder.Services.AddDbContext<HospitalDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAdminAuthService, AdminAuthService>();
 builder.Services.AddScoped<HospitalAPI.Services.Certificates.CertificatePdfService>();
+builder.Services.AddScoped<HospitalAPI.Services.Email.IEmailService, HospitalAPI.Services.Email.EmailService>();
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

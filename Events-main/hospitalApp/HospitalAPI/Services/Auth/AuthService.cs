@@ -7,6 +7,7 @@ using System.Text;
 using HospitalAPI.Data;
 using HospitalAPI.Models;
 using HospitalAPI.Models.DTOs;
+using HospitalAPI.Services.Email;
 
 namespace HospitalAPI.Services.Auth
 {
@@ -14,11 +15,13 @@ namespace HospitalAPI.Services.Auth
     {
         private readonly HospitalDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
 
-        public AuthService(HospitalDbContext context, IConfiguration configuration)
+        public AuthService(HospitalDbContext context, IConfiguration configuration, IEmailService emailService)
         {
             _context = context;
             _configuration = configuration;
+            _emailService = emailService;
         }
 
         public async Task<User> Register(UserForRegistrationDto userForRegistration)
@@ -142,6 +145,54 @@ namespace HospitalAPI.Services.Auth
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);
+        }
+
+        public async Task ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == forgotPasswordDto.Email);
+
+            // Don't reveal if email exists or not for security
+            if (user == null)
+            {
+                // Still return success to prevent email enumeration
+                return;
+            }
+
+            // Generate reset token
+            var resetToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+            user.PasswordResetToken = resetToken;
+            user.PasswordResetTokenExpires = DateTime.UtcNow.AddHours(1); // Token expires in 1 hour
+
+            await _context.SaveChangesAsync();
+
+            // Generate reset URL
+            var frontendUrl = _configuration["FrontendUrl"] ?? "http://localhost:5173";
+            var resetUrl = $"{frontendUrl}/reset-password?token={Uri.EscapeDataString(resetToken)}";
+
+            // Send email
+            await _emailService.SendPasswordResetEmailAsync(user.Email, resetToken, resetUrl);
+        }
+
+        public async Task ResetPassword(ResetPasswordDto resetPasswordDto)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => 
+                u.PasswordResetToken == resetPasswordDto.Token &&
+                u.PasswordResetTokenExpires > DateTime.UtcNow);
+
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException("Invalid or expired reset token");
+            }
+
+            // Update password
+            CreatePasswordHash(resetPasswordDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            user.PasswordResetToken = null;
+            user.PasswordResetTokenExpires = null;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
         }
     }
 }

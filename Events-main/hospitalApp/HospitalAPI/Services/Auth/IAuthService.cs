@@ -8,6 +8,8 @@ namespace HospitalAPI.Services.Auth
         Task<User> Register(UserForRegistrationDto userForRegistration);
         Task<string> Login(UserForLoginDto userForLogin);
         Task<bool> UserExists(string username);
+        Task ForgotPassword(ForgotPasswordDto forgotPasswordDto);
+        Task ResetPassword(ResetPasswordDto resetPasswordDto);
         void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt);
         bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt);
     }

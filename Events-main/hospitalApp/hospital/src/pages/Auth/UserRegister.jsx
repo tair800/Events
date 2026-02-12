@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { authService } from '../../services'
 import { ROUTES } from '../../utils'
+import { useTranslation } from '../../hooks/useTranslation'
 import './Auth.css'
 
 const UserRegister = () => {
@@ -19,6 +20,7 @@ const UserRegister = () => {
     const [success, setSuccess] = useState('')
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
+    const { t } = useTranslation()
 
     const handleSubmit = async (event) => {
         event.preventDefault()
@@ -30,23 +32,23 @@ const UserRegister = () => {
         const finCodeLength = 7
 
         if (password !== confirmPassword) {
-            setError('Passwords do not match')
+            setError(t('passwordsDoNotMatch'))
             return
         }
         if (!emailRegex.test(email)) {
-            setError('Invalid email format')
+            setError(t('invalidEmailFormat'))
             return
         }
         if (!phoneRegex.test(phone)) {
-            setError('Invalid phone format. Example: +994501234567')
+            setError(t('invalidPhoneFormat'))
             return
         }
         if (finCode.trim().length !== finCodeLength) {
-            setError('FIN must be 7 characters')
+            setError(t('finMustBe7Chars'))
             return
         }
         if (!location.trim()) {
-            setError('Location is required')
+            setError(t('locationRequired'))
             return
         }
 
@@ -66,10 +68,10 @@ const UserRegister = () => {
                 location: location.trim(),
                 clinic: clinic.trim() || null
             })
-            setSuccess('Account created! Redirecting to login...')
+            setSuccess(t('accountCreated'))
             setTimeout(() => navigate(ROUTES.LOGIN), 1200)
         } catch (err) {
-            setError(err.message || 'Registration failed')
+            setError(err.message || t('registrationFailed'))
         } finally {
             setLoading(false)
         }
@@ -82,119 +84,119 @@ const UserRegister = () => {
             </video>
             <div className="auth-overlay" />
             <div className="auth-card auth-card--register">
-                <h1>Qeydiyyatdan Keçin</h1>
+                <h1>{t('registerTitle')}</h1>
                 {error && <div className="auth-message">{error}</div>}
                 {success && <div className="auth-message success">{success}</div>}
                 <form onSubmit={handleSubmit}>
                     <div className="auth-grid">
                         <div className="auth-field">
-                            <label htmlFor="register-first-name">Ad</label>
+                            <label htmlFor="register-first-name">{t('firstNameLabel')}</label>
                             <input
                                 id="register-first-name"
                                 type="text"
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
-                                placeholder="Adınızı daxil edin"
+                                placeholder={t('firstNamePlaceholder')}
                                 required
                             />
                         </div>
                         <div className="auth-field">
-                            <label htmlFor="register-last-name">Soyad</label>
+                            <label htmlFor="register-last-name">{t('lastNameLabel')}</label>
                             <input
                                 id="register-last-name"
                                 type="text"
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
-                                placeholder="Soyadınızı daxil edin"
+                                placeholder={t('lastNamePlaceholder')}
                                 required
                             />
                         </div>
                         <div className="auth-field">
-                            <label htmlFor="register-email">Email</label>
+                            <label htmlFor="register-email">{t('emailLabel')}</label>
                             <input
                                 id="register-email"
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="E-mailinizi daxil edin"
+                                placeholder={t('emailPlaceholder')}
                                 required
                             />
                         </div>
                         <div className="auth-field">
-                            <label htmlFor="register-phone">Telefon</label>
+                            <label htmlFor="register-phone">{t('phoneLabel')}</label>
                             <input
                                 id="register-phone"
                                 type="text"
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
-                                placeholder="Telefon nömrənizi daxil edin"
+                                placeholder={t('phonePlaceholder')}
                                 required
                             />
                         </div>
                         <div className="auth-field">
-                            <label htmlFor="register-position">Vəzifəsi</label>
+                            <label htmlFor="register-position">{t('positionLabel')}</label>
                             <input
                                 id="register-position"
                                 type="text"
                                 value={position}
                                 onChange={(e) => setPosition(e.target.value)}
-                                placeholder="Vəzifənizi daxil edin"
+                                placeholder={t('positionPlaceholder')}
                                 required
                             />
                         </div>
                         <div className="auth-field">
-                            <label htmlFor="register-fin-code">FIN kodu</label>
+                            <label htmlFor="register-fin-code">{t('finCodeLabel')}</label>
                             <input
                                 id="register-fin-code"
                                 type="text"
                                 value={finCode}
                                 onChange={(e) => setFinCode(e.target.value)}
-                                placeholder="Şəxsiyyət vəsiqənizin FIN kodunu daxil edin"
+                                placeholder={t('finCodePlaceholder')}
                                 maxLength={7}
                                 required
                             />
                         </div>
                         <div className="auth-field">
-                            <label htmlFor="register-location">Ünvan</label>
+                            <label htmlFor="register-location">{t('locationLabel')}</label>
                             <input
                                 id="register-location"
                                 type="text"
                                 value={location}
                                 onChange={(e) => setLocation(e.target.value)}
-                                placeholder="Ünvanınızı daxil edin"
+                                placeholder={t('locationPlaceholder')}
                                 required
                             />
                         </div>
                         <div className="auth-field">
-                            <label htmlFor="register-clinic">Klinika</label>
+                            <label htmlFor="register-clinic">{t('clinicLabel')}</label>
                             <input
                                 id="register-clinic"
                                 type="text"
                                 value={clinic}
                                 onChange={(e) => setClinic(e.target.value)}
-                                placeholder="Klinikanızı daxil edin (istəyə bağlı)"
+                                placeholder={t('clinicPlaceholder')}
                             />
                         </div>
                         <div className="auth-field">
-                            <label htmlFor="register-password">Şifrə</label>
+                            <label htmlFor="register-password">{t('passwordLabel')}</label>
                             <input
                                 id="register-password"
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Şifrənizi daxil edin"
+                                placeholder={t('passwordPlaceholder')}
                                 required
                                 minLength={6}
                             />
                         </div>
                         <div className="auth-field">
-                            <label htmlFor="register-confirm">Şifrəni təsdiqləyin</label>
+                            <label htmlFor="register-confirm">{t('passwordConfirmLabel')}</label>
                             <input
                                 id="register-confirm"
                                 type="password"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                placeholder="Şifrənizi daxil edin"
+                                placeholder={t('passwordConfirmPlaceholder')}
                                 required
                                 minLength={6}
                             />
@@ -202,10 +204,10 @@ const UserRegister = () => {
                     </div>
                     <div className="auth-actions auth-actions--register">
                         <button className="auth-primary auth-primary--register" type="submit" disabled={loading}>
-                            {loading ? 'Qeydiyyat...' : 'Qeydiyyatdan Keçin'}
+                            {loading ? t('registering') : t('registerTitle')}
                         </button>
                         <Link className="auth-secondary auth-secondary--register" to={ROUTES.LOGIN}>
-                            Hesabınız var? <span>Daxil olun</span>
+                            {t('haveAccount')} <span>{t('loginLink')}</span>
                         </Link>
                     </div>
                 </form>
